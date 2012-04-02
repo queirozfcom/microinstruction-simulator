@@ -55,9 +55,14 @@
                         
                         if($vo->arg1IsIndirection()){
                             $this->setOne(15);
+                        }else{
+                            $this->setZero(15);
                         }
+                        
                         if($vo->arg2IsIndirection()){
                             $this->setOne(31);
+                        }else{
+                            $this->setZero(31);
                         }
                         
                         $this->setMnemonic($vo->getMnemonic());

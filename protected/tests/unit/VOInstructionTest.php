@@ -78,6 +78,12 @@ class VOInstructionTest extends PHPUnit_Framework_TestCase {
             $this->assertFalse($vo2->arg1IsConstant());
         }
         
+        public function test_arg1IsIndirectionAndArg2IsIndirection(){
+            $vo = new VOInstruction('MOV','r1',true,null,'r2',true,null);
+            
+            $this->assertTrue($vo->arg1IsIndirection());
+            $this->assertTrue($vo->arg2IsIndirection());
+        }
         
 
 }

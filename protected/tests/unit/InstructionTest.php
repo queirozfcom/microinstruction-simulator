@@ -189,6 +189,24 @@ class InstructionTest extends PHPUnit_Framework_TestCase{
         $this->assertEquals($inst[31],1);
         
     }
+    public function test_IndirectionBitIsGettingSetWhereItMust(){
+        $vo = new VOInstruction('MOV','r1',true,null,'r2',false,null);
+        
+        $inst = new Instruction($vo);
+        
+        $this->assertEquals(1,$inst[15]);
+        $this->assertEquals(0,$inst[31]);
+        
+    }
+    
+    
+    public function nttest_sizeIsCorrectForVOWithNoIndirection(){
+        $vo = new VOInstruction('MOV','r1',false,null,'r2',false,null);
+        
+        $inst = new Instruction($vo);
+        
+        $this->AssertEquals(37,count($inst));
+    }
     
     
 }
