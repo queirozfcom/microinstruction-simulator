@@ -1,0 +1,52 @@
+.ui-custom-icon-plus{
+    background-image: url('/images/plus.png') !important;
+}
+.ui-custom-icon-tick-32{
+    background-image: url('/images/tick-32.png') !important;
+    left: 16px !important;
+    top:16px !important;
+    width:32px !important;
+    height:32px !important;    
+}
+
+.ui-custom-icon-up{
+    background-image: url('/images/arrow-090-medium.png') !important;
+}
+.ui-custom-icon-down{
+    background-image: url('/images/arrow-270-medium.png') !important;
+}
+
+#main-div{
+    min-height:600px;
+    width:100%;
+    text-align: center;
+}
+
+.step-div{
+    margin: 10px;
+}
+
+.app-half-div{
+    text-align: left;
+    margin: 8px;
+}
+
+#left-div{
+    float:left;
+    width:35%;
+}
+
+#right-div{
+
+    width:61%;
+    min-height:60px;
+    float:right;
+}
+
+#add-new-instruction-button{
+    margin: 8px;
+}
+
+#controls-div{
+    margin: 8px;
+}
