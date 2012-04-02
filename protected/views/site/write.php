@@ -104,7 +104,7 @@ Yii::app()->getClientScript()->registerScriptFile('js/select/ui-selectmenu.js');
                         ),
                         array(
                             'name'=>'Content',
-                            'value'=>'$data',
+                            'value'=>'$data->humanReadableForm()',
                         )
                     )
     

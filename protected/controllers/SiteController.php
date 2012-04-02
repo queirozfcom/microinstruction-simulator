@@ -135,7 +135,7 @@ class SiteController extends Controller
                 
                 $indirection2 = $params['source_reg_indirection']==="0" ? false : true;
                 
-                $constant2    = $params['source_constant']==="" ? null : $params['target_constant'];
+                $constant2    = $params['source_constant']==="" ? null : $params['source_constant'];
                 
                 $vo = new VOInstruction($mnemonic,$arg1,$indirection1,$constant1,$arg2,$indirection2,$constant2);
                 

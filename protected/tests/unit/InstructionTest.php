@@ -200,13 +200,49 @@ class InstructionTest extends PHPUnit_Framework_TestCase{
     }
     
     
-    public function nttest_sizeIsCorrectForVOWithNoIndirection(){
+    public function sizeIsCorrectForVOWithNoIndirection(){
         $vo = new VOInstruction('MOV','r1',false,null,'r2',false,null);
         
         $inst = new Instruction($vo);
         
         $this->AssertEquals(37,count($inst));
     }
+    
+    public function testFieldsGetWrittenCorrectly(){
+        $vo = new VOInstruction("SUB",'r1',false,null,'constant',true,800);
+        
+        $inst = new Instruction($vo);
+        
+        $this->assertEquals("SUB",$inst->getMnemonic());
+        
+        $this->assertEquals("R1",$inst->getArg1());
+        $this->assertEquals("CONSTANT",$inst->getArg2());
+        $this->assertEquals(800,$inst->getConstant2());
+    }
+    public function testHumanReadableFormForSimpleInstruction(){
+        $vo = new VOInstruction("SUB",'r1',false,null,'constant',true,800);
+        
+        $inst = new Instruction($vo);
+        
+        $this->assertEquals("SUB(R1,[#800])",$inst->humanReadableForm());
+
+    }
+    public function testCorrectValuesGetSetForAnInstructionThatTakesOnlyOneParam(){
+        $vo = new VOInstruction("SHR",'r1',false,null,null,true,null);
+        
+        $inst = new Instruction($vo);
+        
+        $this->assertEquals("SHR",$inst->getMnemonic());
+        $this->assertEquals(null,$inst->getArg2());
+    }
+    public function testHUmanReadableFormFOrRelativelyCOmplexInstruction(){
+        $vo = new VOInstruction("SHL",'r1',false,null,null,false,null);
+        
+        $inst = new Instruction($vo);
+        
+        $this->assertEquals("SHL(R1)",$inst->humanReadableForm());
+    }
+    
     
     
 }
