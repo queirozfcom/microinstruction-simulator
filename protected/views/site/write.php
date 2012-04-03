@@ -86,6 +86,7 @@ Yii::app()->getClientScript()->registerScriptFile('js/select/ui-selectmenu.js');
                     ?>
                 </div>
                 
+     
              </div>  
             <?php $this->endWidget(); ?>
             
@@ -111,8 +112,24 @@ Yii::app()->getClientScript()->registerScriptFile('js/select/ui-selectmenu.js');
                 ));
                 //var_dump($dataProvider->getData());
             ?>
+        <?php 
+        $this->widget('zii.widgets.jui.CJuiButton', array(
+                    'name'=>'start_execution',
+                    'buttonType'=>'link',
+                    'themeUrl'=>'/ext/css',
+                    'theme'=>'lighty',
+                    'caption'=>'Proceed on to execution',
+                    'url'=>array('site/write'),   
+                    'htmlOptions'=>array(
+                        'style'=>'float:right;right:180px;margin-bottom:20px;'
+                    )
+
+        ));
+        ?>
         </div>
+
         <br />
     </div>
+
 </div>
 

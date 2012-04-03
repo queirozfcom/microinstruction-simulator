@@ -156,6 +156,9 @@ class SiteController extends Controller
 
             $dp=new CArrayDataProvider($prog->mainMemory->memoryArea,array(
                     'keyField'=>false,
+                    'pagination'=>array(
+                        'pageSize'=>30,
+                    ),
                 ));
             $this->render('write',array(
                 'dataProvider'=>$dp,
