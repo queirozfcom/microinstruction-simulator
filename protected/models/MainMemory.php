@@ -7,7 +7,7 @@ require_once 'helpers/MainMemoryException.php';
  	 * array 
  	 */
  	private $memoryArea;
- 	private $MAXIMUMBITSPERLINE=37;
+ 	private $MAXIMUMBITSPERLINE=32;
  	private $NUMBEROFLINES=10;
  	/**
  	 * Whatever was last read from the memory. 

@@ -108,6 +108,21 @@ class SiteController extends Controller
 		$this->redirect(Yii::app()->homeUrl);
 	}
         
+        public function actionExecute(){
+            
+            if(is_null(Yii::app()->user->getState('program'))){
+                $this->redirect(array('write'));
+            }
+            $dp=new CArrayDataProvider($this->getProgramInstance()->mainMemory->memoryArea,array(
+                    'keyField'=>false,
+                    'pagination'=>array(
+                        'pageSize'=>30,
+                    ),
+                ));
+            
+            $this->render('execute',array('dataProvider'=>$dp));
+        }
+        
         public function actionWrite()
         {
             

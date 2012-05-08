@@ -1,7 +1,4 @@
 <?php
-    require_once '../../models/Instruction.php';
-    require_once '../../models/helpers/VOInstruction.php';
-    require_once 'PHPUnit/Framework/TestCase.php';
 
 /*
  * To change this template, choose Tools | Templates
@@ -13,7 +10,7 @@
  *
  * @author felipe
  */
-class InstructionTest extends PHPUnit_Framework_TestCase{
+class InstructionTest extends CDbTestCase{
     
     
     private $validInstructions;
@@ -55,9 +52,9 @@ class InstructionTest extends PHPUnit_Framework_TestCase{
     }
     public function test_constructWithSImpleMovMnemonicWritesTheCorrectValueOntoTheInstruction(){
         $ins = new Instruction($this->voinst);
-        $this->assertEquals(1, $ins[32]);
+        $this->assertEquals(1, $ins[22]);
         
-        for ($i=33;$i<37;$i++){
+        for ($i=23;$i<26;$i++){
             $this->assertEquals(0,$ins[$i]);
         }
     }
@@ -67,11 +64,11 @@ class InstructionTest extends PHPUnit_Framework_TestCase{
         
         $inst = new Instruction($vo);
         
-        for($i=5;$i<15;$i++){
+        for($i=5;$i<9;$i++){
             $this->assertEquals($inst[$i], 1);
         }
         
-        for($j=21;$j<31;$j++){
+        for($j=16;$j<20;$j++){
             $this->assertEquals($inst[$j],1);
         }
     }
@@ -82,35 +79,30 @@ class InstructionTest extends PHPUnit_Framework_TestCase{
         $inst = new Instruction($vo);
         
     
-        for($j=21;$j<31;$j++){
+        for($j=16;$j<20;$j++){
             $this->assertEquals($inst[$j],1);
         }
     }
         
     public function testConstant1GetsSetCorrectly(){
-        $vo = new VOInstruction("NOR",'constant',false,4569,"R4",true,null);
+        $vo = new VOInstruction("NOR",'constant',false,949,"R4",true,null);
         
         $inst = new Instruction($vo);
         
-        //4569 in binary is 1000111011001
+        //4569 in binary is 1110110101
         $this->assertEquals($inst[0], 1);
         $this->assertEquals($inst[1], 0);
-        $this->assertEquals($inst[2], 0);
-        $this->assertEquals($inst[3], 1);
+        $this->assertEquals($inst[2], 1);
+        $this->assertEquals($inst[3], 0);
         $this->assertEquals($inst[4], 1);
-        $this->assertEquals($inst[5], 0);
-        $this->assertEquals($inst[6], 1);
+        $this->assertEquals($inst[5], 1);
+        $this->assertEquals($inst[6], 0);
         $this->assertEquals($inst[7], 1);
         $this->assertEquals($inst[8], 1);
-        $this->assertEquals($inst[9], 0);
-        $this->assertEquals($inst[10], 0);
-        $this->assertEquals($inst[11], 0);
-        $this->assertEquals($inst[12], 1);
-        $this->assertEquals($inst[13], 0);
-        $this->assertEquals($inst[14], 0);
+        $this->assertEquals($inst[9], 1);
         
         //for argument2, the constant field is all 1's
-        for($j=21;$j<31;$j++){
+        for($j=16;$j<20;$j++){
             $this->assertEquals($inst[$j],1);
         }
     }
@@ -129,48 +121,42 @@ class InstructionTest extends PHPUnit_Framework_TestCase{
         $this->assertEquals($inst[3], 0);        
         $this->assertEquals($inst[4], 0);
     
-        
+        //constant1
         $this->assertEquals($inst[5],  1);        
         $this->assertEquals($inst[6],  1);        
         $this->assertEquals($inst[7],  1);        
         $this->assertEquals($inst[8],  1);        
-        $this->assertEquals($inst[9],  1);        
-        $this->assertEquals($inst[10], 1);        
-        $this->assertEquals($inst[11], 1);        
-        $this->assertEquals($inst[12], 1);        
-        $this->assertEquals($inst[13], 1);        
-        $this->assertEquals($inst[14], 1);        
+        $this->assertEquals($inst[9],  1);
         
-//        $this->assertEquals($inst[15], 0);        
+        //indirection1
+        $this->assertEquals($inst[10], 1);
         
-        
+         
         //arg2
-        //800 in binary is 1100100000
-        
-        $this->assertEquals($inst[16], 0);            
+        //800 in binary is 1100100000       
+    
+        $this->assertEquals($inst[11], 0);        
+        $this->assertEquals($inst[12], 0);        
+        $this->assertEquals($inst[13], 0);        
+        $this->assertEquals($inst[14], 0);        
+        $this->assertEquals($inst[15], 0);        
+        $this->assertEquals($inst[16], 1);            
         $this->assertEquals($inst[17], 0);        
         $this->assertEquals($inst[18], 0);        
-        $this->assertEquals($inst[19], 0);        
-        $this->assertEquals($inst[20], 0);   
+        $this->assertEquals($inst[19], 1);        
+        $this->assertEquals($inst[20], 1);   
              
-        $this->assertEquals($inst[21], 1);        
-        $this->assertEquals($inst[22], 0);        
-        $this->assertEquals($inst[23], 0);        
-        $this->assertEquals($inst[24], 1);        
-        $this->assertEquals($inst[25], 1);        
+        
+        $this->assertEquals($inst[16], 1);        
+        $this->assertEquals($inst[17], 0);        
+        $this->assertEquals($inst[18], 0);        
+        $this->assertEquals($inst[19], 1);        
+        $this->assertEquals($inst[20], 1);        
         $this->assertEquals($inst[26], 0);        
-        $this->assertEquals($inst[27], 0);        
-        $this->assertEquals($inst[28], 0);        
-        $this->assertEquals($inst[29], 0);        
-        $this->assertEquals($inst[30], 0);        
         
 //        $this->assertEquals($inst[31], 0);        
         
-//        $this->assertEquals($inst[32], 0);        
-//        $this->assertEquals($inst[33], 1);        
-//        $this->assertEquals($inst[34], 1);        
-//        $this->assertEquals($inst[35], 0);        
-//        $this->assertEquals($inst[36], 0);        
+       
         
     }
     public function test_SettingOfIndirectionIsTrueWhenItShould(){
@@ -178,7 +164,7 @@ class InstructionTest extends PHPUnit_Framework_TestCase{
         
         $inst = new Instruction($vo);
         
-        $this->assertEquals($inst[15],1);
+        $this->assertEquals($inst[10],1);
         
     }
     public function test_settingOfIndirectionBitIsFalseWhenItShould(){
@@ -186,7 +172,7 @@ class InstructionTest extends PHPUnit_Framework_TestCase{
         
         $inst = new Instruction($vo);
         
-        $this->assertEquals($inst[31],1);
+        $this->assertEquals($inst[10],0);
         
     }
     public function test_IndirectionBitIsGettingSetWhereItMust(){
@@ -194,18 +180,18 @@ class InstructionTest extends PHPUnit_Framework_TestCase{
         
         $inst = new Instruction($vo);
         
-        $this->assertEquals(1,$inst[15]);
-        $this->assertEquals(0,$inst[31]);
+        $this->assertEquals(1,$inst[10]);
+        $this->assertEquals(0,$inst[21]);
         
     }
     
     
-    public function sizeIsCorrectForVOWithNoIndirection(){
+    public function testsizeIsCorrectForVOWithNoIndirection(){
         $vo = new VOInstruction('MOV','r1',false,null,'r2',false,null);
         
         $inst = new Instruction($vo);
         
-        $this->AssertEquals(37,count($inst));
+        $this->AssertEquals(32,count($inst));
     }
     
     public function testFieldsGetWrittenCorrectly(){

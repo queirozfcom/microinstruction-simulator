@@ -1,10 +1,10 @@
 <?php       
 Yii::app()->clientScript->registerCoreScript('jquery.ui');
 
-Yii::app()->getClientScript()->registerCssFile('css/app/style.css');
+Yii::app()->getClientScript()->registerCssFile('css/app/write.css');
 Yii::app()->getClientScript()->registerCssFile('css/select/ui-selectmenu.css');
 
-Yii::app()->getClientScript()->registerScriptFile('js/site/app/script.js');
+Yii::app()->getClientScript()->registerScriptFile('js/site/app/write.js');
 Yii::app()->getClientScript()->registerScriptFile('js/select/ui-selectmenu.js');
 
 ?>
@@ -119,7 +119,7 @@ Yii::app()->getClientScript()->registerScriptFile('js/select/ui-selectmenu.js');
                     'themeUrl'=>'/ext/css',
                     'theme'=>'lighty',
                     'caption'=>'Proceed on to execution',
-                    'url'=>array('site/write'),   
+                    'url'=>array('site/execute'),   
                     'htmlOptions'=>array(
                         'style'=>'float:right;right:180px;margin-bottom:20px;'
                     )

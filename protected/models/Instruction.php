@@ -1,9 +1,6 @@
-<?php
-	require_once "helpers/BinaryString.php";
-	require_once "helpers/InstructionException.php";
-	require_once "helpers/PrimitiveFunctions.php";
+<?php 
+
 	class Instruction extends BinaryString{
-		
 		/**
                  *@var array
                  *@static 
@@ -30,18 +27,18 @@
                                                 'BRC');
                 
                 
-                protected $length = 37;		
+                protected $length = 32;		
 		protected $string;
                 
                 //switch to private upon end of testing
                 
                 private $arg1;
-                private  $constant1 = null;
-                private $indirection1;
+                private $constant1 = null;
+                private $indirection1 = 0;
                 
                 private $arg2;
                 private $constant2 = null;
-                private $indirection2;
+                private $indirection2 = 0;
                 
                 private $mnemonic;
 
@@ -68,20 +65,21 @@
                         
                         if($vo->arg1IsIndirection()){
                             $this->indirection1 = true;
-                            $this->setOne(15);
+                            $this->setOne(10);
                         }else{
                             $this->indirection1 = false;
-                            $this->setZero(15);
+                            $this->setZero(10);
                         }
                         
                         if($vo->arg2IsIndirection()){
                             $this->indirection2 = true;
-                            $this->setOne(31);
+                            $this->setOne(21);
                         }else{
                             $this->indirection2 = false;
-                            $this->setZero(31);
+                            $this->setZero(21);
                         }
-                        
+                        //these 5 bits aren't used up to now
+                        $this->setOne(27,28,29,30,31);
                         $this->setMnemonic($vo->getMnemonic());
       
                 }
@@ -134,30 +132,30 @@
 					break;
 				case "R1":
 					$this->setIntValueStartingAt(2, 5, 0);
-                                        $this->setOne(5,6,7,8,9,10,11,12,13,14);
+                                        $this->setOne(5,6,7,8,9);
 					break;
 				case "R2":
 					$this->setIntValueStartingAt(3, 5, 0);
-                                        $this->setOne(5,6,7,8,9,10,11,12,13,14);
+                                        $this->setOne(5,6,7,8,9);
 					break;
 				case "R3":
 					$this->setIntValueStartingAt(4, 5, 0);
-                                        $this->setOne(5,6,7,8,9,10,11,12,13,14);
+                                        $this->setOne(5,6,7,8,9);
 					break;
 				case "R4":
 					$this->setIntValueStartingAt(5, 5, 0);
-                                        $this->setOne(5,6,7,8,9,10,11,12,13,14);
+                                        $this->setOne(5,6,7,8,9);
 					break;
 				case "AR1":
 					$this->setIntValueStartingAt(6, 5, 0);
-                                        $this->setOne(5,6,7,8,9,10,11,12,13,14);
+                                        $this->setOne(5,6,7,8,9);
 					break;
 				case "AR2":
 					$this->setIntValueStartingAt(7, 5, 0);
-                                        $this->setOne(5,6,7,8,9,10,11,12,13,14);
+                                        $this->setOne(5,6,7,8,9);
 					break;
                                 case "CONSTANT":
-                                        $this->setZero(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14);
+                                        $this->setZero(0,1,2,3,4,5,6,7,8,9);
                                         break;
 				default:
 					throw new InstructionException('Invalid Argument1');
@@ -170,40 +168,40 @@
                     $this->arg2 = strtoupper($arg2);
 			switch(strtoupper($arg2)){
 				case "R0":
-					$this->setIntValueStartingAt(1, 5, 16);
-                                        $this->setOne(21,22,23,24,25,26,27,28,29,30);
+					$this->setIntValueStartingAt(1, 5, 11);
+                                        $this->setOne(16,17,18,19,20);
 					break;
 				case "R1":
-					$this->setIntValueStartingAt(2, 5, 16);
-                                        $this->setOne(21,22,23,24,25,26,27,28,29,30);    
+					$this->setIntValueStartingAt(2, 5, 11);
+                                        $this->setOne(16,17,18,19,20);    
                                         break;
 				case "R2":
-					$this->setIntValueStartingAt(3, 5, 16);
-                                        $this->setOne(21,22,23,24,25,26,27,28,29,30);
+					$this->setIntValueStartingAt(3, 5, 11);
+                                        $this->setOne(16,17,18,19,20);
 					break;
 				case "R3":
-                                        $this->setIntValueStartingAt(4, 5, 16);
-                                        $this->setOne(21,22,23,24,25,26,27,28,29,30);
+                                        $this->setIntValueStartingAt(4, 5, 11);
+                                        $this->setOne(16,17,18,19,20);
 					break;
 				case "R4":
-                                        $this->setIntValueStartingAt(5, 5, 16);
-                                        $this->setOne(21,22,23,24,25,26,27,28,29,30);
+                                        $this->setIntValueStartingAt(5, 5, 11);
+                                        $this->setOne(16,17,18,19,20);
 					break;
 				case "AR1":
-                                        $this->setIntValueStartingAt(6, 5, 16);
-                                        $this->setOne(21,22,23,24,25,26,27,28,29,30);
+                                        $this->setIntValueStartingAt(6, 5, 11);
+                                        $this->setOne(16,17,18,19,20);
 					break;
 				case "AR2":
-                                        $this->setIntValueStartingAt(7, 5, 16);
-                                        $this->setOne(21,22,23,24,25,26,27,28,29,30);
+                                        $this->setIntValueStartingAt(7, 5, 11);
+                                        $this->setOne(16,17,18,19,20);
 					break;
                                 case "CONSTANT":
-                                        $this->setZero(16,17,18,19,20,21,22,23,24,25,26,27,28,29,30);
+                                        $this->setZero(11,12,13,14,15,16,17,18,19,20);
                                         break;
                                 case null:
                                         $this->arg2 = null;
+                                        $this->setOne(11,12,13,14,15);
                                         $this->setOne(16,17,18,19,20);
-                                        $this->setOne(21,22,23,24,25,26,27,28,29,30);
                                         break;
 				default:
 					throw new InstructionException('Invalid Argument2');
@@ -217,61 +215,61 @@
 		 */
 			switch(strtoupper($mnemonic)){
 				case "MOV":
-					$this->setIntValueStartingAt(1,5,32);
+					$this->setIntValueStartingAt(1,5,22);
 					break;
 				case "ADD":
-					$this->setIntValueStartingAt(2,5,32);
+					$this->setIntValueStartingAt(2,5,22);
 					break;
 				case "SUB":
-					$this->setIntValueStartingAt(3,5,32);
+					$this->setIntValueStartingAt(3,5,22);
 					break;
 				case "AND":
-					$this->setIntValueStartingAt(4,5,32);
+					$this->setIntValueStartingAt(4,5,22);
 					break;
 				case "OR":
-					$this->setIntValueStartingAt(5,5,32);
+					$this->setIntValueStartingAt(5,5,22);
 					break;
 				case "NAND":
-					$this->setIntValueStartingAt(6,5,32);
+					$this->setIntValueStartingAt(6,5,22);
 					break;
 				case "NOR":
-					$this->setIntValueStartingAt(7,5,32);
+					$this->setIntValueStartingAt(7,5,22);
 					break;
 				case "XOR":
-					$this->setIntValueStartingAt(8,5,32);
+					$this->setIntValueStartingAt(8,5,22);
 					break;
 				case "CMP":
-					$this->setIntValueStartingAt(9,5,32);
+					$this->setIntValueStartingAt(9,5,22);
 					break;
 				case "CLR":
-					$this->setIntValueStartingAt(10,5,32);
+					$this->setIntValueStartingAt(10,5,22);
 					break;
 				case "NEG":
-					$this->setIntValueStartingAt(11,5,32);
+					$this->setIntValueStartingAt(11,5,22);
 					break;
 				case "SHL":
-					$this->setIntValueStartingAt(12,5,32);
+					$this->setIntValueStartingAt(12,5,22);
 					break;
 				case "SHR":
-					$this->setIntValueStartingAt(13,5,32);
+					$this->setIntValueStartingAt(13,5,22);
 					break;
 				case "BRZ":
-					$this->setIntValueStartingAt(14,5,32);
+					$this->setIntValueStartingAt(14,5,22);
 					break;
 				case "BRN":
-					$this->setIntValueStartingAt(15,5,32);
+					$this->setIntValueStartingAt(15,5,22);
 					break;
 				case "BRE":
-					$this->setIntValueStartingAt(16,5,32);
+					$this->setIntValueStartingAt(16,5,22);
 					break;
 				case "BRL":
-					$this->setIntValueStartingAt(17,5,32);
+					$this->setIntValueStartingAt(17,5,22);
 					break;
 				case "BRG":
-					$this->setIntValueStartingAt(18,5,32);
+					$this->setIntValueStartingAt(18,5,22);
 					break;
 				case "BRC":
-					$this->setIntValueStartingAt(19,5,32);
+					$this->setIntValueStartingAt(19,5,22);
 					break;
 				default:
 					throw new InstructionException("Invalid Mnemonic for this machine.");
@@ -280,11 +278,11 @@
 		
                 public function setConstant1($intValue){
                     $this->constant1 = $intValue;
-                    $this->setIntValueStartingAt($intValue, 15, 0);
+                    $this->setIntValueStartingAt($intValue, 10, 0);
                 }
                 public function setConstant2($intValue){
                     $this->constant2 = $intValue;
-                    $this->setIntValueStartingAt($intValue, 15, 16);
+                    $this->setIntValueStartingAt($intValue, 10, 11);
                 }
                 public function humanReadableForm(){
                     $output = "";
