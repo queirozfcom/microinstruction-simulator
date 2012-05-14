@@ -123,16 +123,39 @@ class SiteController extends Controller
             $this->render('execute',array('dataProvider'=>$dp));
         }
         
-        public function actionRegisters(){
-            $prog = $this->getProgramInstance();
-            $array = $prog->dumpRegisters();
-            
+        public function actionBootstrap(){
+            if(Yii::app()->request->isPostRequest)
+            {
+                $prog = $this->getProgramInstance();
+                $prog->bootstrap();
+                $this->setProgramInstance($prog);
+                
+                $this->dumpInfoAsJson($prog);
+            }
+            else
+                throw new CHttpException(400,'Invalid request. Please do not repeat this request again.');
+
+        }
+        public function actionfetchfirst(){
+            if(Yii::app()->request->isPostRequest)
+            {
+                $prog = $this->getProgramInstance();
+                $prog->fetchFirst();
+                $this->setProgramInstance($prog);
+                
+                $this->dumpInfoAsJson($prog);
+            }
+            else
+                throw new CHttpException(400,'Invalid request. Please do not repeat this request again.');
+
+        }
+        private function dumpInfoAsJson(Program $prog){
+            $array = $prog->dumpInfo();
+
             $json = json_encode($array);
             echo $json;
             Yii::app()->end();
-            
         }
-        
         public function actionWrite()
         {
             

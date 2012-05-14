@@ -39,7 +39,8 @@
 	private $nextInstruction;
 	public  $executionPhase = false;
 	private $microInstructionLog;
-	
+	private $fetchFirst = false;
+        
         public function appendToMemory(BinaryString $bs){
             $this->mainMemory->append($bs);
         }
@@ -77,21 +78,25 @@
 	 * For testing purposes mainly.
 	 * @return array The registers and their values
 	 */
-	public function dumpRegisters(){
+	public function dumpInfo(){
                         
-		$registers         = array();
-		$registers["R0"]   =(String) $this->R0;
-		$registers["R1"]   =(String) $this->R1;
-		$registers["R2"]   =(String) $this->R2;
-		$registers["R3"]   =(String) $this->R3;
-		$registers["R4"]   =(String) $this->R4;
-		$registers["AR1"]  =(String) $this->AR1;
-		$registers["AR2"]  =(String) $this->AR2;
-		$registers["MDR"]  =(String) $this->MDR;
-		$registers["MAR"]  =(String) $this->MAR;
-		$registers["IR"]   =(String) $this->IR;
-		
-		return $registers;		
+		$output         = array();
+		$output["R0"]   =(String) $this->R0;
+		$output["R1"]   =(String) $this->R1;
+		$output["R2"]   =(String) $this->R2;
+		$output["R3"]   =(String) $this->R3;
+		$output["R4"]   =(String) $this->R4;
+		$output["AR1"]  =(String) $this->AR1;
+		$output["AR2"]  =(String) $this->AR2;
+		$output["MDR"]  =(String) $this->MDR;
+		$output["MAR"]  =(String) $this->MAR;
+		$output["IR"]   =(String) $this->IR;
+		$output['current_micro'] = $this->currentMicroinstruction;
+                $output['current_macro'] = $this->currentInstruction;
+                $output['execution_phase'] = $this->executionPhase;
+                $output['fetch_first'] = $this->fetchFirst;
+                
+		return $output;		
 	}
         
        
@@ -107,10 +112,16 @@
 	 */
 	public function bootstrap(){
 		$this->setCurrentInstruction("bootstrap");
-		$this->executionPhase     = true;
+		$this->executionPhase    = true;
 		
 		$this->PC->setContent(new BinaryString(0));
 	}
+        public function fetchFirst(){
+            $this->fetch();
+            $this->fetchFirst = true;
+            
+        }
+        
 	public function fetch(){
 		$this->setCurrentInstruction("fetch");
 		
@@ -173,7 +184,7 @@
 	 * @param String|Instruction $param
 	 */
 	private function setCurrentInstruction($param){
-			$this->currentInstruction=$param;
+		$this->currentInstruction=$param;
 	}
 	/**
 	 * For a microinstruction that involves moving data, the ALU will be used, and therefore we must

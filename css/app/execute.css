@@ -48,10 +48,6 @@
     float:right;
 }
 
-#add-new-instruction-button{
-    
-}
-
 #instruction-grid{
     min-height:210px;
     max-height:210px;
@@ -67,9 +63,9 @@
     min-height: 200px;
 }
 
-#bootstrap-button{
+#bootstrap-button,#fetch-first-instruction-button{
     
-    margin-bottom: 5px;
+    top:10px;
 }
 
 #mux-b-regs-div, #mux-a-regs-div, #memory-related-regs-div,#ir-regs-div{
@@ -94,3 +90,11 @@
     font-family: monospace;
 }
 
+#current-instruction-span{
+    color:blue;
+    font-family: monospace;
+}
+#current-microinstruction-span{
+    color:black;
+    font-family: monospace;
+}

@@ -43,14 +43,28 @@ Yii::app()->getClientScript()->registerCssFile('css/common/common.css');?>
                     'theme'=>'lighty',        
                     'caption'=>'bootstrap',
                     'htmlOptions'=>array(
-                        'targeturl'=>  $this->createUrl('site/registers')
+                        'targeturl'=>  $this->createUrl('site/bootstrap')
+                    )
+                ));
+            ?>
+            <?php
+                $this->widget('zii.widgets.jui.CJuiButton', array(
+                    'name'=>'fetch-first-instruction-button',
+                    'themeUrl'=>'/ext/css',
+                    'theme'=>'lighty',        
+                    'caption'=>'fetch first instruction',
+                    'htmlOptions'=>array(
+                        'style'=>'display:none;',
+                        'targeturl'=>  $this->createUrl('site/fetchfirst')
                     )
                 ));
             ?>
             
         </div>
         <div class="ui-widget-content app-half-div ui-corner-all" id="right-div">
-            <div class="subtitle">Current Microprogram</div>
+            <div class="subtitle">Current Instruction: <br /><span id="current-instruction-span">&nbsp;</span></div>
+            <div class="subtitle">Associated Microprogram: <span id="current-microinstruction-span"><br /><br /><br /><br /></span></div>
+            
         </div>
         
         <div class="ui-widget-content app-half-div ui-corner-all" id="bottom-div">
@@ -78,7 +92,7 @@ Yii::app()->getClientScript()->registerCssFile('css/common/common.css');?>
                 <div class="display-div" id="ar2-contents">
                     AR2:
                     <div class="reg-contents-input">
-                        00000000000000000000000000000000
+                        11111111111111111111111111111111
                     </div>
                 </div>
             </div>
@@ -86,7 +100,7 @@ Yii::app()->getClientScript()->registerCssFile('css/common/common.css');?>
                 <div class="display-div" id="r0-contents">
                     R0:<br />
                     <div class="reg-contents-input">
-                        00000000000000000000000000000000
+                        11111111111111111111111111111111
                     </div>
                 </div>
                 <div class="display-div" id="r1-contents" >
