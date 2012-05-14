@@ -78,21 +78,23 @@
 	 * @return array The registers and their values
 	 */
 	public function dumpRegisters(){
+                        
 		$registers         = array();
-		$registers["R0"]   = $this->R0;
-		$registers["R1"]   = $this->R1;
-		$registers["R2"]   = $this->R2;
-		$registers["R3"]   = $this->R3;
-		$registers["R4"]   = $this->R4;
-		$registers["AR1"]  = $this->AR1;
-		$registers["AR2"]  = $this->AR2;
-		$registers["MDR"]  = $this->MDR;
-		$registers["MAR"]  = $this->MAR;
-		$registers["IR"]   = $this->IR;
+		$registers["R0"]   =(String) $this->R0;
+		$registers["R1"]   =(String) $this->R1;
+		$registers["R2"]   =(String) $this->R2;
+		$registers["R3"]   =(String) $this->R3;
+		$registers["R4"]   =(String) $this->R4;
+		$registers["AR1"]  =(String) $this->AR1;
+		$registers["AR2"]  =(String) $this->AR2;
+		$registers["MDR"]  =(String) $this->MDR;
+		$registers["MAR"]  =(String) $this->MAR;
+		$registers["IR"]   =(String) $this->IR;
 		
 		return $registers;		
 	}
         
+       
 	public function showNextInstruction(){
 		$memoryIndex = $this->PC->asInt();
 		if($this->executionPhase){
@@ -118,7 +120,7 @@
 			$this->addToLog($microinstruction);			
 		}
 	}
-	public function runInstruction(BinaryString $inst){
+	public function runInstruction(Instruction $inst){
 		$microProgram   = $this->controlUnit->decode($inst);
 		foreach ($microProgram as $microinstruction){
 			$this->runMicroinstruction($microinstruction);

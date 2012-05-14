@@ -123,6 +123,16 @@ class SiteController extends Controller
             $this->render('execute',array('dataProvider'=>$dp));
         }
         
+        public function actionRegisters(){
+            $prog = $this->getProgramInstance();
+            $array = $prog->dumpRegisters();
+            
+            $json = json_encode($array);
+            echo $json;
+            Yii::app()->end();
+            
+        }
+        
         public function actionWrite()
         {
             

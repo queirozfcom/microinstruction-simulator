@@ -4,6 +4,8 @@ Yii::app()->clientScript->registerCoreScript('jquery.ui');
 Yii::app()->getClientScript()->registerCssFile('css/app/write.css');
 Yii::app()->getClientScript()->registerCssFile('css/select/ui-selectmenu.css');
 
+Yii::app()->getClientScript()->registerCssFile('css/common/common.css');
+
 Yii::app()->getClientScript()->registerScriptFile('js/site/app/write.js');
 Yii::app()->getClientScript()->registerScriptFile('js/select/ui-selectmenu.js');
 
@@ -16,7 +18,7 @@ Yii::app()->getClientScript()->registerScriptFile('js/select/ui-selectmenu.js');
         <div class="step-div">Step 1 of 2: Writing the Program</div>
         
         <div class="ui-widget-content app-half-div ui-corner-all" id="left-div">
-            
+            <div class="subtitle">New Instruction</div>
            
         <?php $form=$this->beginWidget('CActiveForm', array(
             'id'=>'add-instruction-form',
@@ -92,9 +94,12 @@ Yii::app()->getClientScript()->registerScriptFile('js/select/ui-selectmenu.js');
             
         </div>
         <div class="ui-widget-content app-half-div ui-corner-all" id="right-div">
+            <div class="subtitle">Memory Contents</div>
             <?php 
                 $this->widget('zii.widgets.grid.CGridView', array(
                     'dataProvider'=>$dataProvider,
+                    'id'=>'memory-grid',
+                    'summaryText'=>false,
                     'htmlOptions'=>array(
                       'style'=>'margin:8px;'  
                     ),
@@ -128,7 +133,7 @@ Yii::app()->getClientScript()->registerScriptFile('js/select/ui-selectmenu.js');
         ?>
         </div>
 
-        <br />
+        <br style="clear:both;"/>
     </div>
 
 </div>

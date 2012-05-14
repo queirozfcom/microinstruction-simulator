@@ -8,12 +8,7 @@
     width:32px !important;
     height:32px !important;    
 }
-#memory-grid{
-    min-height:600px;
-    max-height:600px;
-    overflow:auto;
-    padding:0px;
-}
+
 .ui-custom-icon-up{
     background-image: url('/images/arrow-090-medium.png') !important;
 }
@@ -41,21 +36,61 @@
 #left-div{
     float:left;
     width:35%;
+    text-align: center;
+    min-height: 300px;
+    max-height: 300px;
 }
 
 #right-div{
-
+    min-height: 300px;
+    max-height: 300px;
     width:61%;
-    min-height:60px;
-    max-height:700px;
-    overflow: auto;
     float:right;
 }
 
 #add-new-instruction-button{
-    margin: 8px;
+    
+}
+
+#instruction-grid{
+    min-height:210px;
+    max-height:210px;
+    overflow:auto;
+    padding:0px;
 }
 
 #controls-div{
     margin: 8px;
 }
+#bottom-div{
+    clear: both;
+    min-height: 200px;
+}
+
+#bootstrap-button{
+    
+    margin-bottom: 5px;
+}
+
+#mux-b-regs-div, #mux-a-regs-div, #memory-related-regs-div,#ir-regs-div{
+    min-height: 150px;
+    max-height: 150px;
+    min-width: 200px;
+    margin-top:10px;
+    margin-left:20px;
+    margin-right:20px;
+    margin-bottom: 5px;
+    float:right;
+}
+#memory-related-regs-div{
+    float:left;
+}
+#ir-regs-div{
+    min-height:50px;
+}
+
+.reg-contents-input{
+    font-size: 12px !important;
+    font-family: monospace;
+}
+

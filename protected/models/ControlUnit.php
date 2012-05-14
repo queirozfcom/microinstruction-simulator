@@ -9,7 +9,14 @@ require_once 'helpers/ControlUnitException.php';
 	private $clock;
   	
 	public function __construct(){
-		$this->flags         = array('z'=>0,'n'=>0,'e'=>0,'l'=>0,'g'=>0,'c'=>0);
+		$this->flags         = array(
+                                             'z'=>0,
+                                             'n'=>0,
+                                             'e'=>0,
+                                             'l'=>0,
+                                             'g'=>0,
+                                             'c'=>0
+                                            );
 		$this->decoder       = new Decoder();
 	}
 	
