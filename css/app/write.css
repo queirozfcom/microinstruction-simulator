@@ -9,7 +9,7 @@
     height:32px !important;    
 }
 #memory-grid{
-    min-height:600px;
+    min-height:60px;
     max-height:600px;
     overflow:auto;
     padding:0px;
