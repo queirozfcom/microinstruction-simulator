@@ -10,7 +10,10 @@ return array(
 	'name'=>'CPU Simulator | Microinstructions',
 
 	// preloading 'log' component
-	'preload'=>array('log'),
+	'preload'=>array(
+            'log',
+            'bootstrap'
+            ),
 
 	// autoloading model and component classes
 	'import'=>array(
@@ -28,6 +31,9 @@ return array(
 			'password'=>'1234',
 		 	// If removed, Gii defaults to localhost only. Edit carefully to taste.
 			'ipFilters'=>array('127.0.0.1','::1'),
+                        'generatorPaths'=>array(
+                            'bootstrap.gii', // since 0.9.1
+                        ),
 		),
 		
 	),
@@ -38,6 +44,10 @@ return array(
 			// enable cookie-based authentication
 			'allowAutoLogin'=>true,
 		),
+            'bootstrap'=>array(
+                'class'=>'ext.bootstrap.components.Bootstrap', // assuming you extracted bootstrap under extensions
+            ),
+            
 		// uncomment the following to enable URLs in path-format
 		/*
 		'urlManager'=>array(

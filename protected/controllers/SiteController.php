@@ -36,7 +36,8 @@ class SiteController extends Controller
                 
                 $this->setProgramInstance($prog);
                 
-                $this->render('index');
+                
+                $this->redirect(array('write'));
 	}
 
 	/**
@@ -230,6 +231,8 @@ class SiteController extends Controller
             Yii::app()->user->setState('program',$prog);
         }
         
-        
+        public function actionFoo(){
+            $this->render('foo');
+        }
         
 }

@@ -1,9 +1,13 @@
 $(document).ready(function(){
-   $(".select-input").selectmenu({
-                    style:'dropdown',
-                    menuWidth:'200',
-                    width:'200'                
-                }); 
+//   $(".select-input").selectmenu({
+//                    style:'dropdown',
+//                    menuWidth:'200',
+//                    width:'200'                
+//                }); 
+                
+   $('#add-instruction-button').click(function(){
+      $('#add-instruction-form').submit(); 
+   });
                 
    $("#NewInstructionForm_target_reg-menu li").click(function(){
       value = $("#NewInstructionForm_target_reg-button span.ui-selectmenu-status").html();

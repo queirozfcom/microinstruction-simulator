@@ -8,6 +8,13 @@
     width:32px !important;
     height:32px !important;    
 }
+
+.param-indirection{
+    margin-bottom:9px!important;
+}
+#NewInstructionForm_mnemonic{
+    margin-left:18px;
+}
 #memory-grid{
     min-height:60px;
     max-height:600px;
@@ -21,10 +28,26 @@
     background-image: url('/images/arrow-270-medium.png') !important;
 }
 
-#main-div{
+.panel-div{
     min-height:600px;
     width:100%;
     text-align: center;
+    background-color: #FBFBFB;
+    background-image: -moz-linear-gradient(top,white,whiteSmoke);
+    background-image: -ms-linear-gradient(top,white,whiteSmoke);
+    background-image: -webkit-gradient(linear,0 0,0 100%,from(white),to(whiteSmoke));
+    background-image: -webkit-linear-gradient(top,white,whiteSmoke);
+    background-image: -o-linear-gradient(top,white,whiteSmoke);
+    background-image: linear-gradient(top,white,whiteSmoke);
+    background-repeat: repeat-x;
+    border: 1px solid #DDD;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    filter: progid:dximagetransform.microsoft.gradient(startColorstr='#ffffff',endColorstr='#f5f5f5',GradientType=0);
+    -webkit-box-shadow: inset 0 1px 0 #fff;
+    -moz-box-shadow: inset 0 1px 0 #fff;
+    box-shadow: inset 0 1px 0 #fff;
 }
 
 .step-div{
@@ -35,21 +58,21 @@
 
 .app-half-div{
     text-align: left;
-    margin: 8px;
+    margin: 15px;
 }
 
 #left-div{
     float:left;
-    width:35%;
+    width:30%;
 }
 
 #right-div{
-
-    width:61%;
+    width:55%;
     min-height:60px;
     max-height:700px;
     overflow: auto;
     float:right;
+    text-align: center;
 }
 
 #add-new-instruction-button{
