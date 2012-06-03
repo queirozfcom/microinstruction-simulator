@@ -15,38 +15,54 @@
 		 */
 		public function __construct(){
 			$numberOfArguments = func_num_args();
-			if($numberOfArguments==0){
+			if($numberOfArguments===0){
 				$this->setIntegerValue(0);
-			}
-			if($numberOfArguments==1){
+			}elseif($numberOfArguments===1){
 				$length   = func_get_arg(0);
 				if(!is_int($length)) throw new BinaryStringException("length must be an int value");
 				
 				$this->length=$length;					
 				$this->setIntegerValue(0);
 		
-			}elseif($numberOfArguments==2){
+			}elseif($numberOfArguments===2){
 				$length  = func_get_arg(0);
-				if(!is_int($length)) throw new BinaryStringException("length must be an int value");
-				
+				if(!is_int($length)) {
+                                    throw new BinaryStringException("length must be an int value");
+                                }
 				$intVal  = func_get_arg(1);
-				if(!is_int($intVal)) throw new BinaryStringException("intVal must be an int value");
+                                
+                                if(!is_numeric($intVal)) {
+                                    throw new BinaryStringException("intVal must be an int value or a numeric string");
+                                }
+                                if($intVal > pow(2,32)){
+                                    //this is because php can't override the OS number limits.
+                                    throw new BinaryStringException("Number too large.");
+                                }
+                                
+                                if(is_numeric($intVal) and is_int($intVal)==false){
+                                    $intVal = intval($intVal);
+                                }
 				
-				$this->length = $length;
-				$this->setIntegerValue($intVal);
+                                $this->length = $length;
+                                $this->setIntegerValue($intVal);
 			}
 		}
 		public function getLength(){
 			return $this->length;
 		}
 		public function __toString(){
-                        $output = "";
-                        foreach($this->string as $bit){
-                            $output.=$bit." ";
-                        }
-                        return trim($output);
+//                        $output = "";
+//                        foreach($this->string as $bit){
+//                            $output.=$bit." ";
+//                        }
+//                        return trim($output);
 			//return (String)$this->string;
+                    return $this->string;
+                    
 		}
+                public function humanReadableForm(){
+                    return $this->string;
+                }
 		public function showDetailedDescription(){
 			$return = "";
 			for ($i = 0; $i < $this->length; $i++) {
@@ -59,8 +75,12 @@
 		 * @param  $num
 		 */
 		public function setIntegerValue($intVal){
-			if(!is_int($intVal)) throw new BinaryStringException("you tried to set an int value to a binary string using something which isn't an int");
-			if($intVal>pow(2,($this->length)-1)) throw new BinaryStringException("Number too large.");
+			if(!is_int($intVal)) {
+                            throw new BinaryStringException("you tried to set an int value to a binary string using something which isn't an int");
+                        }
+                        if($intVal>pow(2,($this->length)-1)){
+                            throw new BinaryStringException("Number too large.");
+                        }
 			
 			$paddedBinaryString = int2PaddedBinaryString($intVal,$this->length);
 			

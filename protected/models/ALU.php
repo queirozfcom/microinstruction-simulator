@@ -14,11 +14,11 @@ class ALU {
 	 */
 	public function operateOn(Register $a,Register $b, $opCode){
 		if($opCode==="00000001"){
-			return $this->compute("REPEATA", $a->getContent(), $b->getContent());
+			return $this->compute("SEQUALSA", $a->getContent(), $b->getContent());
 		}elseif($opCode==="00000010"){
-			return $this->compute("REPEATB",$a->getContent(), $b->getContent());
+			return $this->compute("SEQUALSB",$a->getContent(), $b->getContent());
 		}elseif($opCode==="00000011"){
-			return $this->compute("INCREMENTA",$a->getContent(),$b->getContent());
+			return $this->compute("SEQUALSINCREMENTA",$a->getContent(),$b->getContent());
 		}
 	}
 	

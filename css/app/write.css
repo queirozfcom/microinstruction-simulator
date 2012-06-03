@@ -11,7 +11,22 @@
 
 .param-indirection{
     margin-bottom:9px!important;
+    position:relative;
+    right:2px;
+    
 }
+
+#NewInstructionForm_source_reg_indirection{
+    position:relative;
+    
+}
+
+
+    
+#NewInstructionForm_source_reg{
+  
+}
+
 #NewInstructionForm_mnemonic{
     margin-left:18px;
 }
@@ -75,10 +90,21 @@
     text-align: center;
 }
 
-#add-new-instruction-button{
+#add-instruction-button{
     margin: 8px;
+    position:relative;
+    top:50px;
 }
 
 #controls-div{
     margin: 8px;
+}
+
+div.row{
+    min-height: 78px;
+    max-height:78px;
+}
+
+#error-div{
+    
 }

@@ -1,14 +1,9 @@
 <?php
 
-require_once '../../models/helpers/VOInstruction.php';
-
-
-require_once '../../models/helpers/InstructionException.php';
-
 /**
  * VOInstruction test case.
  */
-class VOInstructionTest extends PHPUnit_Framework_TestCase {
+class VOInstructionTest extends CDbTestCase {
 	
 	/**
 	 * @var VOInstruction
@@ -21,6 +16,8 @@ class VOInstructionTest extends PHPUnit_Framework_TestCase {
         
         private $arg2_is_null;
         
+        private $with_constant_2;
+        
 	/**
 	 * Prepares the environment before running a test.
 	 */
@@ -29,7 +26,7 @@ class VOInstructionTest extends PHPUnit_Framework_TestCase {
                 $this->voinst = new VOInstruction("MOV","R2",false,null,"R0",true,null);
                 $this->with_constant1 = new VOInstruction("ADD","CONSTANT",true,1000,"r0",false,null);
                 $this->arg2_is_null = new VOInstruction('SHL','R1',false,null,null,false,null);
-                
+                $this->with_constant_2 = new VOInstruction('mov','ro',false,null,'constant',false,600);
         }
 	
 	/**
@@ -83,6 +80,13 @@ class VOInstructionTest extends PHPUnit_Framework_TestCase {
             
             $this->assertTrue($vo->arg1IsIndirection());
             $this->assertTrue($vo->arg2IsIndirection());
+        }
+        public function test_const_2_is_recognized(){
+            $this->assertTrue($this->with_constant_2->arg2IsConstant());
+            
+        }
+        public function test_get_constant_2_returns_correct_value(){
+            $this->assertEquals($this->with_constant_2->getConstant2(),600);
         }
         
 

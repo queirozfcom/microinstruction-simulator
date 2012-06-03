@@ -174,33 +174,32 @@ class SiteController extends Controller
                 
                 $mnemonic = $params['mnemonic'];
                 
-                $arg1     = $params['target_reg']==="" ? null : $params['target_reg'];
+                $param1     = $params['target_param']==="" ? null : $params['target_param'];
                 
-                $indirection1 = $params['target_reg_indirection']==="0" ? false : true;
+                $indirection1 = $params['target_param_indirection']==="0" ? false : true;
                 
                 $constant1    = $params['target_constant']==="" ? null : $params['target_constant'];
                 
-                $arg2         = $params['source_reg']==="" ? null : $params['source_reg'];
+                $param2         = $params['source_param']==="" ? null : $params['source_param'];
                 
-                $indirection2 = $params['source_reg_indirection']==="0" ? false : true;
+                $indirection2 = $params['source_param_indirection']==="0" ? false : true;
                 
                 $constant2    = $params['source_constant']==="" ? null : $params['source_constant'];
                 
-                $vo = new VOInstruction($mnemonic,$arg1,$indirection1,$constant1,$arg2,$indirection2,$constant2);
+                $vo = new VOInstruction($mnemonic,$param1,$indirection1,$constant1,$param2,$indirection2,$constant2);
                 
-                $instruction = new Instruction($vo);
+                $lines = Factory::returnInstructionAndPossibleConstants($vo);
                 
                 $prog = $this->getProgramInstance();
-                $prog->appendToMemory($instruction);
-                
+                foreach ($lines as $line){
+                    $prog->appendToMemory($line);
+                }
                 $this->setProgramInstance($prog);
                 
 //                echo '<pre>';
 //                var_dump($vo);
 //                echo '</pre>';
             }
-         //   $this->layout='//layouts/column2';
-            
             $prog = $this->getProgramInstance();
 
             $dp=new CArrayDataProvider($prog->mainMemory->memoryArea,array(

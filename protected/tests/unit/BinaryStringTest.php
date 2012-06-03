@@ -1,12 +1,9 @@
 <?php
-require_once '../../models/helpers/BinaryString.php';
-
-require_once 'PHPUnit/Framework/TestCase.php';
 
 /**
  * BinaryString test case.
  */
-class BinaryStringTest extends PHPUnit_Framework_TestCase {
+class BinaryStringTest extends CDbTestCase {
 
 	private $zeroParameterBinaryString;
 	private $oneParameterBinaryString;
@@ -142,6 +139,37 @@ class BinaryStringTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals(-86, $bs->asInt());
 	}
+        public function test_negative_number_gets_written_correctly(){
+            $bs = new BinaryString(32,-45);
+            
+            $this->assertEquals($bs->__toString(),'11111111111111111111111111010011');
+        }
+        public function test_postivie_number_gets_written_correctly(){
+            $bs = new BinaryString(8,78);
+            
+            $this->assertEquals($bs->__toString(),'01001110');
+        }
+        public function test_intVal_as_numeric_string_works_too(){
+            $bs = new BinaryString(32,"678");
+            
+        }
+        public function test_complex_sum_works_if_both_numeric_strings_and_integers_are_used(){
+            $bs1 = new BinaryString(32,"-50");
+            $bs2 = new BinaryString(32,43);
+            
+            $this->assertEquals(-7,($bs2->asInt() + $bs1->asInt()));
+        }
+        
+        public function test_intVal_as_anything_not_numeric_fails(){
+            $this->setExpectedException("BinaryStringException");
+            $bs = new BinaryString(8,"fooo");
+        }
+        public function test_upper_ceiling_is_checked_upon_objects_construction(){
+            $this->setExpectedException("BinaryStringException");
+            
+            $bs = new BinaryString(8,9997775675765);
+        }
+
 
 }
 

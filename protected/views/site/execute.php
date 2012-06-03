@@ -14,27 +14,31 @@ Yii::app()->getClientScript()->registerCssFile('css/common/common.css');?>
         
         <div class="ui-widget-content app-half-div ui-corner-all" id="left-div">
             <div class="subtitle">Memory Contents</div>
-            <?php
-                $this->widget('zii.widgets.grid.CGridView', array(
-                    'dataProvider'=>$dataProvider,
+            <?php $this->widget('bootstrap.widgets.BootGridView', array(
+                    'type'=>'striped bordered',
                     'summaryText'=>false,
                     'id'=>'instruction-grid',
+                    'dataProvider'=>$dataProvider,
+                    'template'=>"{items}",
                     'htmlOptions'=>array(
-                      'style'=>'margin:8px;'  
+                        'style'=>'margin:2px;'
                     ),
-                    'selectableRows'=>1,
-                    'selectionChanged'=>'function(id){alert(\'foo\')}',
                     'columns'=>array(
                         array(
-                            'name'=>'Address',
+                            'name'=>'Address', 
+                            'header'=>'Address',
                             'value'=>'$row',
-                        ),
+                            'htmlOptions'=>array(
+                                'style'=>'width:50px;'
+                                )
+                            ),
                         array(
-                            'name'=>'Content',
-                            'value'=>'$data->humanReadableForm()',
-                        )
-                    )
-                ));
+                            'name'=>'Content', 
+                            'header'=>'Content',
+                            'value'=>'$data->humanReadableForm()'
+                            ),
+                    ),
+                )); 
             ?>
             <?php
                 $this->widget('zii.widgets.jui.CJuiButton', array(

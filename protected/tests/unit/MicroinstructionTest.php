@@ -1,14 +1,17 @@
 <?php
-
-require_once '../../models/Microinstruction.php';
-
-class MicroinstructionTest extends PHPUnit_Framework_TestCase {
+class MicroinstructionTest extends CDbTestCase {
 	public function testConstruct(){
 		$mi = new Microinstruction();
 		
-		$this->assertEquals(28, $mi->count());
+		$this->assertEquals(MyConfig::$MICROINSTRUCTIONLENGTH, $mi->count());
+		$this->assertEquals(MyConfig::$MICROINSTRUCTIONLENGTH, $mi->getLength());
+                
+                for ($i=0;$i<$mi->getLength();$i++){
+                    $this->assertEquals(0,$mi[$i]);
+                }
+                
 	}
+        
 	
-
 }
 

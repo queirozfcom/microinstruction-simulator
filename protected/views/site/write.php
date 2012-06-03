@@ -1,13 +1,10 @@
 <?php       
-//Yii::app()->clientScript->registerCoreScript('jquery.ui');
 
 Yii::app()->getClientScript()->registerCssFile('css/app/write.css');
-//Yii::app()->getClientScript()->registerCssFile('css/select/ui-selectmenu.css');
 
 Yii::app()->getClientScript()->registerCssFile('css/common/common.css');
 
 Yii::app()->getClientScript()->registerScriptFile('js/site/app/write.js');
-//Yii::app()->getClientScript()->registerScriptFile('js/select/ui-selectmenu.js');
 
 ?>
 
@@ -31,64 +28,59 @@ Yii::app()->getClientScript()->registerScriptFile('js/site/app/write.js');
         ?>           
             
             <div id="controls-div">
-                
-                <?php echo $form->errorSummary($model); ?>
-
+                <div id="error-div">
+                    <?php echo $form->error($model,'mnemonic',array('style'=>'color:red !important;')); ?>
+                    <?php echo $form->error($model,'target_param',array('style'=>'color:red !important;')); ?>
+                    <?php echo $form->error($model,'target_constant',array('style'=>'color:red !important;')); ?>
+                    <?php echo $form->error($model,'source_constant',array('style'=>'color:red !important;')); ?>
+                    
+                    <?php //echo $form->errorSummary($model); ?>
+                    <?php echo $form->error($model,'source_param',array('style'=>'color:red !important;')); ?>
+                </div>
                 <div class="row">
                         <?php echo $form->labelEx($model,'mnemonic'); ?>
                         <?php echo $form->dropDownList($model,'mnemonic',Instruction::getValidInstructions(),array(
                             'empty'=>'Please Select',
                             'class'=>'select-input'
                         )); ?>
-                        <?php echo $form->error($model,'mnemonic',array('style'=>'color:red !important;')); ?>
+                        
                 </div>
 
                 <div class="row">
-                        <?php echo $form->labelEx($model,'target_reg'); ?>
+                    <?php echo $form->labelEx($model,'target_param'); ?>
+                    
                     <a href="#" rel="tooltip" title="check this box to use this register/constant indirectly">
-                        <?php echo $form->checkBox($model,'target_reg_indirection',array('class'=>'param-indirection')); ?>
+                    <?php echo $form->checkBox($model,'target_param_indirection',array('class'=>'param-indirection')); ?>
                     </a>    
-                            <?php echo $form->textField($model,'target_constant',
-                                array(
-                                    'style'=>'float:right;position:relative;top:17px;display:none;',
-                                    'size'=>'8'
-                                    )); ?>
-                        <?php echo $form->error($model,'target_constant',array('style'=>'color:red !important;')); ?>            
-                        
-                        <?php echo $form->dropDownList($model,'target_reg', Program::getValidTargetableRegisters(),array(
+                    <?php echo $form->dropDownList($model,'target_param', Program::getValidTargetableRegisters(),array(
                             'empty'=>'Please Select',
-                            'class'=>'select-input'
                         )); ?>
-                        <?php echo $form->error($model,'target_reg',array('style'=>'color:red !important;')); ?>
+                    <?php echo $form->textField($model,'target_constant',
+                                array(
+                                    'style'=>'float:right;position:relative;right:-25px;bottom:37px;display:none;',
+                                    'class'=>'input-mini'
+                                    )); ?>
                 </div>  
                 
                 <div class="row">
-                        <?php echo $form->labelEx($model,'source_reg'); ?>
+                    <?php echo $form->labelEx($model,'source_param'); ?>
+                    
                     <a href="#" rel="tooltip" title="check this box to use this register/constant indirectly">
-                        <?php echo $form->checkBox($model,'source_reg_indirection',array('class'=>'param-indirection')); ?>
+                        <?php echo $form->checkBox($model,'source_param_indirection',array('class'=>'param-indirection')); ?>
                     </a> 
-                       <?php echo $form->textField($model,'source_constant',
-                                array(
-                                    'style'=>'float:right;position:relative;top:17px;display:none;',
-                                    'size'=>'8'
-                                    )); ?>
-                        <?php echo $form->error($model,'source_constant',array('style'=>'color:red !important;')); ?>
-                        <?php echo $form->dropDownList($model,'source_reg', Program::getValidTargetableRegisters(),array(
+                    <?php echo $form->dropDownList($model,'source_param', Program::getValidTargetableRegisters(),array(
                             'empty'=>'Please Select',
-                            'class'=>'select-input'
                         )); ?>
-                        <?php echo $form->error($model,'source_reg',array('style'=>'color:red !important;')); ?>
+                    <?php echo $form->textField($model,'source_constant',
+                                array(
+                                    'style'=>'float:right;position:relative;right:-25px;bottom:37px;display:none;',
+                                    'class'=>'input-mini'
+                        )); ?>                    
+                        
                 </div>
                 <br />
                 <div class="row">
-                    <?php  
-                    
-//                    $this->widget('zii.widgets.jui.CJuiButton', array(
-//                        'name'=>'submit',
-//                        'caption'=>'Submit',
-//                        )); 
-  
-                   $this->widget('bootstrap.widgets.BootButton', array(
+                    <?php  $this->widget('bootstrap.widgets.BootButton', array(
                         'label'=>'add instruction',
                         'htmlOptions'=>array(
                             'id'=>'add-instruction-button',
@@ -113,11 +105,17 @@ Yii::app()->getClientScript()->registerScriptFile('js/site/app/write.js');
                     'type'=>'striped bordered',
                     'dataProvider'=>$dataProvider,
                     'template'=>"{items}",
+                    'htmlOptions'=>array(
+                        'style'=>'margin:8px;'
+                    ),
                     'columns'=>array(
                         array(
                             'name'=>'Address', 
                             'header'=>'Address',
-                            'value'=>'$row'
+                            'value'=>'$row',
+                            'htmlOptions'=>array(
+                                'style'=>'width:50px;'
+                                )
                             ),
                         array(
                             'name'=>'Content', 
@@ -127,35 +125,7 @@ Yii::app()->getClientScript()->registerScriptFile('js/site/app/write.js');
                     ),
                 )); 
             ?>
-            
-            
-            <?php /*
-           
-                $this->widget('zii.widgets.grid.CGridView', array(
-                    'dataProvider'=>$dataProvider,
-                    'id'=>'memory-grid',
-                    'summaryText'=>false,
-                    'htmlOptions'=>array(
-                      'style'=>'margin:8px;'  
-                    ),
-                    'columns'=>array(
-                        array(
-                            'name'=>'Address',
-                            'value'=>'$row',
-                        ),
-                        array(
-                            'name'=>'Content',
-                            'value'=>'$data->humanReadableForm()',
-                        )
-                    )
-    
-                ));
-                
-                //var_dump($dataProvider->getData());
-             * */
-
-            ?>
-        <?php 
+            <?php 
         
 //        $this->widget('zii.widgets.jui.CJuiButton', array(
 //                    'name'=>'start_execution',

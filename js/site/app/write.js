@@ -9,18 +9,18 @@ $(document).ready(function(){
       $('#add-instruction-form').submit(); 
    });
                 
-   $("#NewInstructionForm_target_reg-menu li").click(function(){
-      value = $("#NewInstructionForm_target_reg-button span.ui-selectmenu-status").html();
-      if(value=="CONSTANT"){
+   $("#NewInstructionForm_target_param").change(function(){
+      
+      if($(this).val()=="CONSTANT"){
           $("#NewInstructionForm_target_constant").fadeIn('fast').focus();
           
       }else{
           $("#NewInstructionForm_target_constant").fadeOut('fast');
       }
    });
-   $("#NewInstructionForm_source_reg-menu li").click(function(){
-      value = $("#NewInstructionForm_source_reg-button span.ui-selectmenu-status").html();
-      if(value=="CONSTANT"){
+   $("#NewInstructionForm_source_param").change(function(){
+      
+      if($(this).val()=="CONSTANT"){
           $("#NewInstructionForm_source_constant").fadeIn('fast').focus();
       }else{
           $("#NewInstructionForm_source_constant").fadeOut('fast');
