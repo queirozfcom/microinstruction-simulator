@@ -79,6 +79,7 @@
 #left-div{
     float:left;
     width:30%;
+    
 }
 
 #right-div{
@@ -94,6 +95,7 @@
     margin: 8px;
     position:relative;
     top:50px;
+    left:85px;
 }
 
 #controls-div{

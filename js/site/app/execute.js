@@ -1,5 +1,7 @@
 $(document).ready(function(){
     $("#bootstrap-button").click(function(){
+        $("div.tooltip").hide();
+        
         var url = $(this).attr('targeturl');
         $.post(
         url,
@@ -10,6 +12,7 @@ $(document).ready(function(){
         'json');
     });
     $("#fetch-first-instruction-button").click(function(){
+        $("div.tooltip").hide();
         var url = $(this).attr('targeturl');
         $.post(
         url,
@@ -37,17 +40,13 @@ function update_fields(data){
     var bootstrap_button = '#bootstrap-button';
     var fetch_first_instruction_button = '#fetch-first-instruction-button';
     
-    if(data.execution_phase){
-        $(bootstrap_button).css('display', 'none');
-        $(fetch_first_instruction_button).css('display','inline-block');
-    }
     if(data.fetch_first){
         $(fetch_first_instruction_button).css('display','none');
     }
     
     $(current_macro_field).html(data.current_macro);
     $(RO_field+" div.reg-contents-input").html(data.R0);
-    
+    $(PC_field+" div.reg-contents-input").html(data.PC);
     
     
     

@@ -34,8 +34,7 @@ class Decoder{
 		if($alias==="fetch"){
 		/*
 		 * "fetch" means the following:
-		 *  MAR <- PC ;
-		 *  MemoryRead;
+		 *  MAR <- PC ,MemoryRead;
 		 *  MDR <- DataReturnedByMemory;
 		 *  IR  <- MDR;
 		 */			
@@ -43,12 +42,8 @@ class Decoder{
 			$tempMicro->setOne(14);
                         $tempMicro->setOne(0);
 			$tempMicro->setOne(27);
+                        $tempMicro->setOne(25);
 			$returnMicroprogram[] = $tempMicro;//MAR<-PC
-			unset($tempMicro);
-			
-			$tempMicro            = new Microinstruction();
-			$tempMicro->setOne(25);
-			$returnMicroprogram[] = $tempMicro;//memory read
 			unset($tempMicro);
 			
 			$tempMicro            = new Microinstruction();
@@ -84,34 +79,225 @@ class Decoder{
             }
 	}
 	private function decodeMOVInstruction(Instruction $inst){
-            
+            $returnMicroprogram = array();
+
             if($inst->hasIndirection()){
-                
-            }else{//simpler case: no indirection
-                
                 if($inst->hasConstant()){
+                    if($inst->getParam1()!=="CONSTANT" and $inst->getParam2()==="CONSTANT"){
+                        //MNEM(REG,[CONST])
+                        $returnMicroprogram[] = new Microinstruction('increment_pc');                      
+                        $returnMicroprogram[] = new Microinstruction('pc_to_mar_read');
+                        $returnMicroprogram[] = new Microinstruction('data_to_mdr');
+                        $returnMicroprogram[] = new Microinstruction('mdr_to_mar_read');
+                        
+                        $mi = new Microinstruction;
+                        self::setMuxValAndALUValFromSourceRegister('MDR', $mi);
+                        $mi[self::getTargetMicroinstructionIndexFromRegister($inst->getParam1())] = 1;
+                        
+                        $returnMicroprogram[] = $mi;
+                        
+                        return $returnMicroprogram;
+                                                
+                    }elseif($inst->getParam1()!=="CONSTANT" and $inst->getParam2()==="CONSTANT" and $inst->getIndirection1() and $inst->getIndirection2()){
+                        //MNEM([REG],[CONST])
+                        
+                        
+                        
+                    }elseif($inst->getParam1()!=="CONSTANT" and $inst->getParam2()==="CONSTANT" and $inst->getIndirection1() and !$inst->getIndirection2()){
+                        //MNEM([REG],CONST)
+                        
+                        
+                        
+                    }elseif($inst->getParam1()==="CONSTANT" and $inst->getParam2()==="CONSTANT" and $inst->getIndirection1() and !$inst->getIndirection2()){
+                        //MNEM([CONST],CONST)
+                        
+                        
+                        
+                    }elseif($inst->getParam1()==="CONSTANT" and $inst->getParam2()==="CONSTANT" and $inst->getIndirection1() and $inst->getIndirection2()){
+                        //MNEM([CONST],[CONST])
+                        
+                        
+                        
+                    }elseif($inst->getParam1()==='CONSTANT' and $inst->getParam2()!=="CONSTANT" and $inst->getIndirection1() and !$inst->getIndirection2()){
+                        //MNEM([CONST],REG)
+                        
+                        
+                        
+                    }elseif($inst->getParam1()==='CONSTANT' and $inst->getParam2()!=="CONSTANT" and $inst->getIndirection1() and $inst->getIndirection2()){
+                        //MNEM([CONST],[REG])
+                        
+                        
+                        
+                    }
                     
-                }else{//still simpler case: no constants and no indirections
-                    
-                    if(self::getSideFromSourceName($inst->getArg1())==self::getSideFromSourceName($inst->getArg2())){
-                    
-                    }else{//simpler still. the regs are on different sides so mov can be done in one cpu cycle
+                }else{//indirection but no constants
+                    if($inst->getIndirection1() and $inst->getIndirection2()){
+                        //MNEM([REG],[REG])
+                        
+                        $mi = new Microinstruction;
+                        $reg2 = $inst->getParam2();
+                        self::setMuxValAndALUValFromSourceRegister($reg2, $mi);
+                        $mi->setOne(27,25);
+                        
+                        $returnMicroprogram[] = $mi;
+                        
+                        unset($mi);
+                        
+                        $mi = new Microinstruction('data_to_mdr');
+                        $returnMicroprogram[] = $mi;
+                        unset($mi);
+                        
+                        $mi = new Microinstruction;
+                        $reg1 = $inst->getParam1();
+                        
+                        self::setMuxValAndALUValFromSourceRegister($reg1, $mi);
+                        
+                        $mi->setOne(27,26);
+                        
+                        $returnMicroprogram[] = $mi;
+                        
+                        return $returnMicroprogram;
+                        
+                    }elseif($inst->getIndirection1()){
+                        //MNEM([REG],REG)
+                        $mi = new Microinstruction;
+                        $reg2 = $inst->getParam2();
+                        
+                        self::setMuxValAndALUValFromSourceRegister($reg2, $mi);
+                        
+                        $mi->setOne(23,24);
+                        
+                        $returnMicroprogram[] = $mi;
+                        
+                        unset($mi);
+                        
                         $mi = new Microinstruction;
                         
-                        $mi->setTargetRegister($inst->getArg1());
-                        $mi->setSourceRegister($inst->getArg2());
-                        $sourceSide = self::getSideFromSourceName($inst->getArg2());
+                        $reg1 = $inst->getParam1();
                         
-                        $mi->setALUCode('SEQUALS'.$sourceSide);
+                        self::setMuxValAndALUValFromSourceRegister($reg1, $mi);
+                        
+                        $mi->setOne(27,26);
+                        
+                        $returnMicroprogram[] = $mi;
+                        
+                        
+                        return $returnMicroprogram;
+                        
+                    }elseif($inst->getIndirection2()){
+                        //MNEM(REG,[REG])
+                        $mi = new Microinstruction;
+                        
+                        $reg2 = $inst->getParam2();
+                        
+                        self::setMuxValAndALUValFromSourceRegister($reg2, $mi);
+                        
+                        //MAR is to receive the data
+                        $mi[27] =1;
+                        $mi[25] =1;
+                        
+                        $returnMicroprogram[] = $mi;
+                        
+                        unset($mi);
+                        
+                        $mi = new Microinstruction;
+                        
+                        $mi[22] = 1;
+                        $mi[24] = 1;
+                        $returnMicroprogram[] = $mi;
+                        
+                        unset($mi);
+                        
+                        $mi = new Microinstruction;
+                        $mi[12] = 1;
+                        $mi[0]  = 1;
+                        $mi[self::getTargetMicroinstructionIndexFromRegister($inst->getParam1())] = 1;
+                        
+                        $returnMicroprogram[] = $mi;
+                        
+                        return $returnMicroprogram;
+                        
+                    }else{
+                        throw new DecoderException('Unknown format found');
                     }
                 }
-                
+            }else{//simpler case: no indirection
+                if($inst->hasConstant()){
+                    // if it's no indirection and constants, there can be only one way:
+                    // MNEM(REG,CONST);
+                    $mi = new Microinstruction('increment_pc');
+                    
+                    $returnMicroprogram[] = $mi;
+                    unset($mi);                    
+                    $mi = new Microinstruction('pc_to_mar_read');
+                    
+                    $returnMicroprogram[] = $mi;
+                    unset($mi);
+                    
+                    $mi = new Microinstruction('data_to_mdr');
+                    $returnMicroprogram[] = $mi;
+                    unset($mi);
+                    
+                    $mi = new Microinstruction;
+                    $mi[12]=1;
+                    $mi->setIntValueStartingAt(ALU::returnOpCodeForOperation('S=A'), 8, 0);
+                    $mi[self::getTargetMicroinstructionIndexFromRegister($inst->getParam1())]=1;
+                    
+                    $returnMicroprogram[] = $mi;
+                    
+                    return $returnMicroprogram;
+                    
+                }else{//still simpler case: no constants and no indirections
+                        //MNEM(REG,REG)
+                        $mi = new Microinstruction;
+                        
+                        $reg1 = $inst->getParam1();//target
+                        $reg2 = $inst->getParam2();//source
+                        
+                        self::setMuxValAndALUValFromSourceRegister($reg2,$mi);
+                        
+                        if($reg1==='MDR'){
+                            $mi[23] = 1;
+                        }
+                        
+                        $mi[self::getTargetMicroinstructionIndexFromRegister($reg1)] = 1;
+                        
+                        $returnMicroprogram[] = $mi;
+                        
+                        return $returnMicroprogram;
+                }
             }
 	}
 	
-	private function decodeADDInstruction(Instruction $inst){
+        private function decodeADDInstruction(Instruction $inst){
 		 
 	}
+        
+        private static function setMuxValAndALUValFromSourceRegister($regName,$mi){
+            $sideSource = self::getSideFromSourceName($regName);
+                        
+            $muxVal = self::getMUXValueFromRegister($regName);
+            
+            if($sideSource == 'B'){
+                $mi[21]  = $muxVal{0};
+                $mi[20]  = $muxVal{1};
+                $mi[19]  = $muxVal{2};
+
+                $intALUOpCode = ALU::returnOpCodeForOperation('S=B');
+            }elseif($sideSource == 'A'){
+                $mi[14]  = $muxVal{0};
+                $mi[13]  = $muxVal{1};
+                $mi[12]  = $muxVal{2};
+
+                $intALUOpCode = ALU::returnOpCodeForOperation('S=A');
+            }else{
+                throw new DecoderException('Unsupported side. Must be either A or B.');
+            }
+            $mi->setIntValueStartingAt($intALUOpCode, 8, 0);
+            
+        }
+        
+	
 	
 	private static function getSideFromSourceName($regName){
             switch (strtoupper($regName)) {
@@ -174,6 +360,48 @@ class Decoder{
                     break;
                 default:
                     throw new DecoderException('Unsupported register set as source to MUX');
+            }
+        }
+        private static function getTargetMicroinstructionIndexFromRegister($regname){
+            if(!is_string($regname)){
+                throw new DecoderException('Register names must be strings.');
+            }
+            switch (strtoupper($regname)) {
+                case 'R0':
+                    return 8;
+                    break;
+                case 'R1':
+                    return 9;
+                    break;
+                case 'PC':
+                    return 10;
+                    break;
+                case 'AR1':
+                    return 11;
+                    break;
+                case 'R2':
+                    return 15;
+                    break;
+                case 'R3':
+                    return 16;
+                    break;
+                case 'R4':
+                    return 17;
+                    break;
+                case 'AR2':
+                    return 18;
+                    break;
+                case 'MAR':
+                    return 27;
+                    break;
+                case 'IR':
+                    return 28;
+                    break;
+                case 'MDR':
+                    return 24;
+                    break;
+                default:
+                    throw new DecoderException('Unsupported register name');
             }
         }
         

@@ -61,17 +61,17 @@
 		$this->ALU          = new ALU();
 		$this->mainMemory   = new MainMemory();
 		$this->controlUnit  = new ControlUnit();
-		$this->R0           = new Register();
-		$this->R1           = new Register();
-		$this->R2           = new Register();
-		$this->R3           = new Register();
-		$this->R4           = new Register();
-		$this->AR1          = new Register();
-		$this->AR2          = new Register();
-		$this->PC           = new Register();
-		$this->IR           = new Register();
-		$this->MDR          = new Register();
-		$this->MAR          = new Register();
+		$this->R0           = new Register(new BinaryString(32,0));
+		$this->R1           = new Register(new BinaryString(32,0));
+		$this->R2           = new Register(new BinaryString(32,0));
+		$this->R3           = new Register(new BinaryString(32,0));
+		$this->R4           = new Register(new BinaryString(32,0));
+		$this->AR1          = new Register(new BinaryString(32,0));
+		$this->AR2          = new Register(new BinaryString(32,0));
+		$this->PC           = new Register(new BinaryString(32,0));
+		$this->IR           = new Register(new BinaryString(32,0));
+		$this->MDR          = new Register(new BinaryString(32,0));
+		$this->MAR          = new Register(new BinaryString(32,0));
 	}
 	/**
 	 * Returns an associative array where each key is a register and its value is that register's content
@@ -86,6 +86,8 @@
 		$output["R2"]   =(String) $this->R2;
 		$output["R3"]   =(String) $this->R3;
 		$output["R4"]   =(String) $this->R4;
+		$output["PC"]   =(String) $this->PC;
+                
 		$output["AR1"]  =(String) $this->AR1;
 		$output["AR2"]  =(String) $this->AR2;
 		$output["MDR"]  =(String) $this->MDR;
@@ -93,7 +95,6 @@
 		$output["IR"]   =(String) $this->IR;
 		$output['current_micro'] = $this->currentMicroinstruction;
                 $output['current_macro'] = $this->currentInstruction;
-                $output['execution_phase'] = $this->executionPhase;
                 $output['fetch_first'] = $this->fetchFirst;
                 
 		return $output;		
@@ -102,9 +103,7 @@
        
 	public function showNextInstruction(){
 		$memoryIndex = $this->PC->asInt();
-		if($this->executionPhase){
-			echo $this->mainMemory[$memoryIndex];
-		}
+		echo $this->mainMemory[$memoryIndex];
 	}
 	/**
 	 * Start routine, tells the program to fetch the first instruction in the $mainMemory 
@@ -112,14 +111,11 @@
 	 */
 	public function bootstrap(){
 		$this->setCurrentInstruction("bootstrap");
-		$this->executionPhase    = true;
-		
-		$this->PC->setContent(new BinaryString(0));
+		$this->PC->setContent(new BinaryString(32,0));
 	}
         public function fetchFirst(){
             $this->fetch();
             $this->fetchFirst = true;
-            
         }
         
 	public function fetch(){

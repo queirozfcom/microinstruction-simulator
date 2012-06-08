@@ -114,14 +114,22 @@ class SiteController extends Controller
             if(is_null(Yii::app()->user->getState('program'))){
                 $this->redirect(array('write'));
             }
-            $dp=new CArrayDataProvider($this->getProgramInstance()->mainMemory->memoryArea,array(
+            $prog = $this->getProgramInstance();
+            $bootstrap = $prog->bootstrapPerformed;
+            
+            
+            $dp=new CArrayDataProvider($prog->mainMemory->memoryArea,array(
                     'keyField'=>false,
                     'pagination'=>array(
                         'pageSize'=>30,
                     ),
                 ));
             
-            $this->render('execute',array('dataProvider'=>$dp));
+            $this->render('execute',
+                    array(
+                        'dataProvider'=>$dp,
+                        'bootstrap'=>$bootstrap,
+                        ));
         }
         
         public function actionBootstrap(){
@@ -130,20 +138,18 @@ class SiteController extends Controller
                 $prog = $this->getProgramInstance();
                 $prog->bootstrap();
                 $this->setProgramInstance($prog);
-                
                 $this->dumpInfoAsJson($prog);
             }
             else
                 throw new CHttpException(400,'Invalid request. Please do not repeat this request again.');
 
         }
-        public function actionfetchfirst(){
+        public function actionFetchfirst(){
             if(Yii::app()->request->isPostRequest)
             {
                 $prog = $this->getProgramInstance();
                 $prog->fetchFirst();
                 $this->setProgramInstance($prog);
-                
                 $this->dumpInfoAsJson($prog);
             }
             else
@@ -218,7 +224,6 @@ class SiteController extends Controller
             
                 if(is_null(Yii::app()->user->getState('program'))){
                    $prog = new Program(); 
-                   //$prog->mainMemory->append(new Instruction('ADD','R1','R2'));
     
                 }else{
                     $prog = Yii::app()->user->getState('program');

@@ -163,13 +163,15 @@ class BinaryStringTest extends CDbTestCase {
         public function test_intVal_as_anything_not_numeric_fails(){
             $this->setExpectedException("BinaryStringException");
             $bs = new BinaryString(8,"fooo");
+            
         }
         public function test_upper_ceiling_is_checked_upon_objects_construction(){
             $this->setExpectedException("BinaryStringException");
             
             $bs = new BinaryString(8,9997775675765);
+            
+            
         }
-
 
 }
 

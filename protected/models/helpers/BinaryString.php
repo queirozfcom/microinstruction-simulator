@@ -42,7 +42,7 @@
                                 if(is_numeric($intVal) and is_int($intVal)==false){
                                     $intVal = intval($intVal);
                                 }
-				
+                                
                                 $this->length = $length;
                                 $this->setIntegerValue($intVal);
 			}
@@ -52,12 +52,13 @@
 		}
 		public function __toString(){
 //                        $output = "";
-//                        foreach($this->string as $bit){
-//                            $output.=$bit." ";
+//                        
+//                        foreach($this as $index=>$value){
+//                            $output.=$value." ";
 //                        }
 //                        return trim($output);
-			//return (String)$this->string;
-                    return $this->string;
+			
+                    return (String)$this->string;
                     
 		}
                 public function humanReadableForm(){

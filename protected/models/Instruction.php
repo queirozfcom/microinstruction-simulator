@@ -42,7 +42,7 @@
                 public static function getValidInstructions(){
                     $output = array();
                     foreach(self::$validMnemonics as $mnemonic){
-                        $output[$mnemonic]=$mnemonic;
+                        $output[$mnemonic]= $mnemonic;
                     }
                     return $output;
                 }
@@ -60,6 +60,9 @@
                         
                     if(is_null($this->param2) and $this->requiresTwoArguments()){
                         throw new InstructionException('Missing argument 2 for instruction that needs 2 arguments');
+                    }
+                    if($this->param1==="CONSTANT" and !$this->indirection1){
+                        throw new InstructionException('Cannot use a direct CONSTANT as target for an Instruction.');
                     }
       
                 }
@@ -266,14 +269,6 @@
 			}
 		}
 		
-                private function setConstant1($intValue){
-                    $this->arg1 = $intValue;
-                    $this->setIntValueStartingAt($intValue, 11, 1);
-                }
-                private function setConstant2($intValue){
-                    $this->arg2 = $intValue;
-                    $this->setIntValueStartingAt($intValue, 11, 14);
-                }
                 public function humanReadableForm(){
                     $output = "";
                     
@@ -283,7 +278,7 @@
                     
                     $output .= $this->indirection1? "[":"";
                     
-                    $output .= is_numeric($this->param1)? "#".$this->param1 : $this->param1;
+                    $output .= ($this->param1==="CONSTANT")? "#".$this->param1 : $this->param1;
                         
                     $output .= $this->indirection1? "]":"";
                     
@@ -296,7 +291,7 @@
                     
                     $output .= $this->indirection2? "[":"";
                     
-                    $output .= is_numeric($this->param2)? "#".$this->param2 : $this->param2;
+                    $output .= ($this->param2==="CONSTANT")? "#".$this->param2 : $this->param2;
                         
                     $output .= $this->indirection2? "]":"";
                     
@@ -305,7 +300,7 @@
                     return $output;
                 }
                 public function hasConstant(){
-                    if(is_numeric($this->param1) or is_numeric($this->param2)){
+                    if(($this->param1==='CONSTANT') or ($this->param2==='CONSTANT')){
                         return true;
                     }else{
                         return false;

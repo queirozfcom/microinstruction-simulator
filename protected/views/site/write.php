@@ -8,12 +8,12 @@ Yii::app()->getClientScript()->registerScriptFile('js/site/app/write.js');
 
 ?>
 
-<div class="ui-widget">
+<div>
     <div class="panel-div ui-corner-all " id="main-div">
         
         <div class="step-div">Step 1 of 2: Writing the Program</div>
         
-        <div class="well app-half-div ui-corner-all" id="left-div">
+        <div class="well app-half-div " id="left-div">
             <div class="subtitle">New Instruction</div>
            
         <?php $form=$this->beginWidget('CActiveForm', array(

@@ -9,13 +9,23 @@
 	 */
 	class Register implements ArrayAccess{
 		private $content;
-		const DATAWORDLENGTHINBITS=16;
+		private $DATAWORDLENGTHINBITS=32;
+                
+                
+                public function __construct($contents) {
+                    if(!is_a($contents,'BinaryString')){
+                        throw new RegisterException('Cannot set contents to a Register with anything other than a BinaryString');
+                    }
+                    $this->setContent($contents);
+                    
+                }
+                
 		/**
 		 * Place a piece of binary data in this register
 		 * @param BinaryString
 		 */
 		public function setContent($param) {
-			if(!$param instanceof BinaryString) throw new RegisterException("Registers can only store Binary Data -> BinaryString objects");
+			if(!is_a($param,'BinaryString')) throw new RegisterException("Registers can only store Binary Data -> BinaryString objects");
 			$this->content = $param;
 		}
 		public function __toString(){

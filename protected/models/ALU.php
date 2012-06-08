@@ -5,7 +5,29 @@ class ALU {
 	public function __construct() {
 		//todo
 	}
-	/**
+	public static function returnOpCodeForOperation($operation){
+            if(!is_string($operation)){
+                throw new ALUException('Operation must be a valid string');
+            }
+            switch ($operation) {
+                case 'S=A':
+                    return 1;
+                    break;
+                case 'S=B':
+                    return 2;
+                    break;
+                case 'S=A+1':
+                    return 3;
+                    break;
+                case 'S=B+1':
+                    return 4;
+                    break;
+                default:
+                    throw new ALUException('Unsupported operation');
+            }
+        }
+        
+        /**
 	 * IMPORTANT: THIS WILL RETURN EITHER A BINARYSTRING OR AN INSTRUCTION!!
 	 * 
 	 * @param Register $a
@@ -13,13 +35,7 @@ class ALU {
 	 * @param String $opCode
 	 */
 	public function operateOn(Register $a,Register $b, $opCode){
-		if($opCode==="00000001"){
-			return $this->compute("SEQUALSA", $a->getContent(), $b->getContent());
-		}elseif($opCode==="00000010"){
-			return $this->compute("SEQUALSB",$a->getContent(), $b->getContent());
-		}elseif($opCode==="00000011"){
-			return $this->compute("SEQUALSINCREMENTA",$a->getContent(),$b->getContent());
-		}
+
 	}
 	
 	/**
@@ -45,7 +61,6 @@ class ALU {
 				return $arg2;
 				break;
 			case "INCREMENTA":
-				if ($arg1 instanceof Instruction) throw new UnexpectedValueException("Can't increment an Instruction");
 				return $this->increment($arg1);
 			case "ADD":
 				return $this->add($arg1,$arg2);
