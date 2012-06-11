@@ -83,7 +83,7 @@ class Decoder{
 
             if($inst->hasIndirection()){
                 if($inst->hasConstant()){
-                    if($inst->getParam1()!=="CONSTANT" and $inst->getParam2()==="CONSTANT"){
+                    if($inst->getParam1()!=="CONSTANT" and $inst->getParam2()==="CONSTANT" and !$inst->getIndirection1() and $inst->getIndirection2()){
                         //MNEM(REG,[CONST])
                         $returnMicroprogram[] = new Microinstruction('increment_pc');                      
                         $returnMicroprogram[] = new Microinstruction('pc_to_mar_read');
@@ -91,8 +91,9 @@ class Decoder{
                         $returnMicroprogram[] = new Microinstruction('mdr_to_mar_read');
                         
                         $mi = new Microinstruction;
-                        self::setMuxValAndALUValFromSourceRegister('MDR', $mi);
-                        $mi[self::getTargetMicroinstructionIndexFromRegister($inst->getParam1())] = 1;
+                        $mi->setMuxAndALUValueForMOVFromSourceRegister('MDR');
+                        //$mi[self::getTargetMicroinstructionIndexFromRegister($inst->getParam1())] = 1;
+                        $mi->setTargetIndexFromTargetRegister($inst->getParam1());
                         
                         $returnMicroprogram[] = $mi;
                         
@@ -100,33 +101,163 @@ class Decoder{
                                                 
                     }elseif($inst->getParam1()!=="CONSTANT" and $inst->getParam2()==="CONSTANT" and $inst->getIndirection1() and $inst->getIndirection2()){
                         //MNEM([REG],[CONST])
+                        $returnMicroprogram[] = new Microinstruction('increment_pc');
+                        $returnMicroprogram[] = new Microinstruction('pc_to_mar_read');
+                        $returnMicroprogram[] = new Microinstruction('data_to_mdr');
+                        
+                        $mi = new Microinstruction;
+                        $mi->setMuxAndALUValueForMOVFromSourceRegister('MDR');
+                        $targetAR = self::getOppositeARFromRegisterName($inst->getParam1());
+                        $mi->setTargetIndexFromTargetRegister($targetAR);
+                        
+                        $returnMicroprogram[] = $mi;
+                        
+                        unset($mi);
+                        $mi = new Microinstruction;
+                        $mi->setTargetIndexFromTargetRegister('MAR');
+                        $mi->setMuxAndALUValueForMOVFromSourceRegister($inst->getParam1());
+                        $mi[25]=1;
+                        
+                        $returnMicroprogram[] = $mi;
+                        
+                        unset($mi);
+                        
+                        $returnMicroprogram[]= new Microinstruction('data_to_mdr');
+                        
+                        $mi = new Microinstruction('mdr_to_mar_read');
+                        $mi[25] = 0;
+                        $returnMicroprogram[] = $mi;
+                        
+                        unset($mi);
+                        
+                        $mi = new Microinstruction;
+                        $mi->setMuxAndALUValueForMOVFromSourceRegister($targetAR);
+                        $mi->setTargetIndexFromTargetRegister('MDR');
+                        $mi->setWrite();
+                        
+                        $returnMicroprogram[] = $mi;
+                        
+                        return $returnMicroprogram;
                         
                         
                         
                     }elseif($inst->getParam1()!=="CONSTANT" and $inst->getParam2()==="CONSTANT" and $inst->getIndirection1() and !$inst->getIndirection2()){
                         //MNEM([REG],CONST)
+                        $returnMicroprogram[] = new Microinstruction('increment_pc');
+                        $returnMicroprogram[] = new Microinstruction('pc_to_mar_read');
+                        $returnMicroprogram[] = new Microinstruction('data_to_mdr');
                         
+                        $mi = new Microinstruction;
+                        $mi->setMuxAndALUValueForMOVFromSourceRegister($inst->getParam1());
+                        $mi->setTargetIndexFromTargetRegister('mar');
+                        $mi->setWrite();
                         
+                        $returnMicroprogram[] = $mi;
+                        
+                        return $returnMicroprogram;
                         
                     }elseif($inst->getParam1()==="CONSTANT" and $inst->getParam2()==="CONSTANT" and $inst->getIndirection1() and !$inst->getIndirection2()){
                         //MNEM([CONST],CONST)
+                        $returnMicroprogram[] = new Microinstruction('increment_pc');    
+                        $returnMicroprogram[] = new Microinstruction('pc_to_mar_read');
+                        $returnMicroprogram[] = new Microinstruction('data_to_mdr');
                         
+                        $mi = new Microinstruction;
+                        $mi->setMuxAndALUValueForMOVFromSourceRegister('MDR');
+                        $mi->setTargetIndexFromTargetRegister('AR1');
+                        
+                        $returnMicroprogram[] = $mi;
+                        
+                        $returnMicroprogram[] = new Microinstruction('increment_pc');
+                        
+                        $returnMicroprogram[] = new Microinstruction('pc_to_mar_read');
+                        
+                        $returnMicroprogram[] = new Microinstruction('data_to_mdr');
+                        
+                        $mi = new Microinstruction;
+                        $mi->setMuxAndALUValueForMOVFromSourceRegister('AR1');
+                        $mi->setTargetIndexFromTargetRegister('MAR');
+                        $mi->setWrite();
+                        
+                        $returnMicroprogram[] = $mi;
+                        
+                        return $returnMicroprogram;                        
                         
                         
                     }elseif($inst->getParam1()==="CONSTANT" and $inst->getParam2()==="CONSTANT" and $inst->getIndirection1() and $inst->getIndirection2()){
                         //MNEM([CONST],[CONST])
+                        $returnMicroprogram[] =new Microinstruction('increment_pc');
+                        $returnMicroprogram[] =new Microinstruction('pc_to_mar_read');
+                        $returnMicroprogram[] =new Microinstruction('data_to_mdr');
                         
+                        $mi = new Microinstruction;
+                        $mi->setMuxAndALUValueForMOVFromSourceRegister('mdr');
+                        $mi->setTargetIndexFromTargetRegister('ar1');
+                        $returnMicroprogram[] = $mi;
+                        
+                        $returnMicroprogram[] = new Microinstruction('increment_pc');//5
+                        $returnMicroprogram[] = new Microinstruction('pc_to_mar_read');
+                        $returnMicroprogram[] = new Microinstruction('data_to_mdr');
+                        $returnMicroprogram[] = new Microinstruction('mdr_to_mar_read');
+                        $returnMicroprogram[] = new Microinstruction('data_to_mdr');
+                        
+                        $mi = new Microinstruction;
+                        $mi->setMuxAndALUValueForMOVFromSourceRegister('AR1');
+                        $mi->setTargetIndexFromTargetRegister('mar');
+                        $mi->setWrite();
+                        
+                        $returnMicroprogram[] = $mi;
+                        
+                        return $returnMicroprogram;
                         
                         
                     }elseif($inst->getParam1()==='CONSTANT' and $inst->getParam2()!=="CONSTANT" and $inst->getIndirection1() and !$inst->getIndirection2()){
                         //MNEM([CONST],REG)
+                        $returnMicroprogram[] = new Microinstruction('increment_pc');
+                        $returnMicroprogram[] = new Microinstruction('pc_to_mar_read');
+                        $returnMicroprogram[] = new Microinstruction('data_to_mdr');
+                        $returnMicroprogram[] = new Microinstruction('mdr_to_mar');
                         
+                        $mi= new Microinstruction;
+                        $mi->setMuxAndALUValueForMOVFromSourceRegister($inst->getParam2());
+                        $mi->setTargetIndexFromTargetRegister('mdr');
+                        $mi->setWrite();
+                        
+                        $returnMicroprogram[] = $mi;
+                        
+                        return $returnMicroprogram;
                         
                         
                     }elseif($inst->getParam1()==='CONSTANT' and $inst->getParam2()!=="CONSTANT" and $inst->getIndirection1() and $inst->getIndirection2()){
                         //MNEM([CONST],[REG])
                         
+                        $returnMicroprogram[] =new Microinstruction('increment_pc');
+                        $returnMicroprogram[] =new Microinstruction('pc_to_mar_read');
+                        $returnMicroprogram[] =new Microinstruction('data_to_mdr');
                         
+                        
+                        $mi = new Microinstruction;
+                        $targetAR = self::getOppositeARFromRegisterName($inst->getParam2());
+                        $mi->setMuxAndALUValueForMOVFromSourceRegister('MDR');
+                        $mi->setTargetIndexFromTargetRegister($targetAR);
+                        
+                        $returnMicroprogram[] = $mi;
+                        
+                        $mi = new Microinstruction;
+                        $mi->setMuxAndALUValueForMOVFromSourceRegister($inst->getParam2());
+                        $mi->setTargetIndexFromTargetRegister('MAR');
+                        $mi->setRead();
+                        
+                        $returnMicroprogram[] = $mi;
+                        
+                        $returnMicroprogram[] = new Microinstruction('data_to_mdr');
+                        
+                        $mi= new Microinstruction;
+                        $mi->setMuxAndALUValueForMOVFromSourceRegister($targetAR);
+                        $mi->setTargetIndexFromTargetRegister('mar');
+                        $mi->setWrite();
+                        
+                        return $returnMicroprogram;
                         
                     }
                     
@@ -136,7 +267,7 @@ class Decoder{
                         
                         $mi = new Microinstruction;
                         $reg2 = $inst->getParam2();
-                        self::setMuxValAndALUValFromSourceRegister($reg2, $mi);
+                        $mi->setMuxAndALUValueForMOVFromSourceRegister($reg2);
                         $mi->setOne(27,25);
                         
                         $returnMicroprogram[] = $mi;
@@ -150,7 +281,7 @@ class Decoder{
                         $mi = new Microinstruction;
                         $reg1 = $inst->getParam1();
                         
-                        self::setMuxValAndALUValFromSourceRegister($reg1, $mi);
+                        $mi->setMuxAndALUValueForMOVFromSourceRegister($reg1);
                         
                         $mi->setOne(27,26);
                         
@@ -163,7 +294,7 @@ class Decoder{
                         $mi = new Microinstruction;
                         $reg2 = $inst->getParam2();
                         
-                        self::setMuxValAndALUValFromSourceRegister($reg2, $mi);
+                        $mi->setMuxAndALUValueForMOVFromSourceRegister($reg2);
                         
                         $mi->setOne(23,24);
                         
@@ -175,7 +306,7 @@ class Decoder{
                         
                         $reg1 = $inst->getParam1();
                         
-                        self::setMuxValAndALUValFromSourceRegister($reg1, $mi);
+                        $mi->setMuxAndALUValueForMOVFromSourceRegister($reg1);
                         
                         $mi->setOne(27,26);
                         
@@ -190,7 +321,7 @@ class Decoder{
                         
                         $reg2 = $inst->getParam2();
                         
-                        self::setMuxValAndALUValFromSourceRegister($reg2, $mi);
+                        $mi->setMuxAndALUValueForMOVFromSourceRegister($reg2);
                         
                         //MAR is to receive the data
                         $mi[27] =1;
@@ -211,7 +342,7 @@ class Decoder{
                         $mi = new Microinstruction;
                         $mi[12] = 1;
                         $mi[0]  = 1;
-                        $mi[self::getTargetMicroinstructionIndexFromRegister($inst->getParam1())] = 1;
+                        $mi->setTargetIndexFromTargetRegister($inst->getParam1());
                         
                         $returnMicroprogram[] = $mi;
                         
@@ -241,7 +372,7 @@ class Decoder{
                     $mi = new Microinstruction;
                     $mi[12]=1;
                     $mi->setIntValueStartingAt(ALU::returnOpCodeForOperation('S=A'), 8, 0);
-                    $mi[self::getTargetMicroinstructionIndexFromRegister($inst->getParam1())]=1;
+                    $mi->setTargetIndexFromTargetRegister($inst->getParam1());
                     
                     $returnMicroprogram[] = $mi;
                     
@@ -254,13 +385,9 @@ class Decoder{
                         $reg1 = $inst->getParam1();//target
                         $reg2 = $inst->getParam2();//source
                         
-                        self::setMuxValAndALUValFromSourceRegister($reg2,$mi);
+                        $mi->setMuxAndALUValueForMOVFromSourceRegister($reg2);
                         
-                        if($reg1==='MDR'){
-                            $mi[23] = 1;
-                        }
-                        
-                        $mi[self::getTargetMicroinstructionIndexFromRegister($reg1)] = 1;
+                        $mi->setTargetIndexFromTargetRegister($reg1);
                         
                         $returnMicroprogram[] = $mi;
                         
@@ -273,34 +400,43 @@ class Decoder{
 		 
 	}
         
-        private static function setMuxValAndALUValFromSourceRegister($regName,$mi){
-            $sideSource = self::getSideFromSourceName($regName);
-                        
-            $muxVal = self::getMUXValueFromRegister($regName);
-            
-            if($sideSource == 'B'){
-                $mi[21]  = $muxVal{0};
-                $mi[20]  = $muxVal{1};
-                $mi[19]  = $muxVal{2};
-
-                $intALUOpCode = ALU::returnOpCodeForOperation('S=B');
-            }elseif($sideSource == 'A'){
-                $mi[14]  = $muxVal{0};
-                $mi[13]  = $muxVal{1};
-                $mi[12]  = $muxVal{2};
-
-                $intALUOpCode = ALU::returnOpCodeForOperation('S=A');
-            }else{
-                throw new DecoderException('Unsupported side. Must be either A or B.');
-            }
-            $mi->setIntValueStartingAt($intALUOpCode, 8, 0);
-            
-        }
         
-	
-	
-	private static function getSideFromSourceName($regName){
+	public static function getOppositeARFromRegisterName($regName){
             switch (strtoupper($regName)) {
+                case 'R0':
+                    return 'AR2';
+                    break;
+                case 'R1':
+                    return 'AR2';
+                    break;
+                case 'PC';
+                    return 'AR2';
+                    break;
+                case 'AR1':
+                    throw new DecoderException('Trying to get opposite AR from AR?');
+                    break;
+                case 'R2':
+                    return 'AR1';
+                    break;
+                case 'R3':
+                    return 'AR1';
+                    break;
+                case 'R4':
+                    return 'AR1';
+                    break;
+                case 'AR2':
+                    throw new DecoderException('Trying to get opposite AR from AR?');
+                    break;
+                default:
+                    throw new DecoderException('Unsupported register set as source to ALU');
+            }
+        }
+	
+	public static function getSideFromSourceName($regName){
+            switch (strtoupper($regName)) {
+                case 'MDR':
+                    return 'A';
+                    break;
                 case 'R0':
                     return 'A';
                     break;
@@ -329,7 +465,7 @@ class Decoder{
                     throw new DecoderException('Unsupported register set as source to ALU');
             }
 	}
-        private static function getMUXValueFromRegister($regName){
+        public static function getMUXValueFromRegister($regName){
             switch ($regName) {
                 case 'MDR':
                     return '001';
@@ -362,7 +498,7 @@ class Decoder{
                     throw new DecoderException('Unsupported register set as source to MUX');
             }
         }
-        private static function getTargetMicroinstructionIndexFromRegister($regname){
+        public static function getTargetMicroinstructionIndexFromRegister($regname){
             if(!is_string($regname)){
                 throw new DecoderException('Register names must be strings.');
             }

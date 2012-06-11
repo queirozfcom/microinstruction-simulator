@@ -22,6 +22,40 @@ class MicroinstructionTest extends CDbTestCase {
             $mi = new Microinstruction("foo bar kajfh__");
         }
         
+        public function test_set_mux_and_alu_value(){
+            $mi = new Microinstruction;
+            $mi->setMuxAndALUValueForMOVFromSourceRegister('MDR');
+            
+            
+            $this->assertEquals(1,$mi[0]);
+            $this->assertEquals(1,$mi[12]);
+            $this->assertEquals(0,$mi[13]);
+            $this->assertEquals(0,$mi[14]);
+            
+            $mi2 = new Microinstruction;
+            $mi2->setMuxAndALUValueForMOVFromSourceRegister('AR2');
+            
+            $this->assertEquals(1,$mi2[21]);
+            $this->assertEquals(0,$mi2[20]);
+            $this->assertEquals(0,$mi2[19]);
+            $this->assertEquals(1,$mi2[1]);
+            
+        }
+        public function test_set_target_register(){
+            $mi = new Microinstruction;
+            $mi->setTargetIndexFromTargetRegister('r0');
+            $this->assertEquals(1,$mi[8]);
+            
+            $mi= new Microinstruction;
+            $mi->setTargetIndexFromTargetRegister('R2');
+            $this->assertEquals(1,$mi[15]);
+            
+            $mi = new Microinstruction;
+            $mi->setTargetIndexFromTargetRegister('MDR');
+            $this->assertEquals(1,$mi[23]);
+            $this->assertEquals(1,$mi[24]);
+        }
+        
         
 	
 }

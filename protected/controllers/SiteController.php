@@ -115,7 +115,7 @@ class SiteController extends Controller
                 $this->redirect(array('write'));
             }
             $prog = $this->getProgramInstance();
-            $bootstrap = $prog->bootstrapPerformed;
+            //$bootstrap = $prog->bootstrapPerformed;
             
             
             $dp=new CArrayDataProvider($prog->mainMemory->memoryArea,array(
@@ -128,7 +128,7 @@ class SiteController extends Controller
             $this->render('execute',
                     array(
                         'dataProvider'=>$dp,
-                        'bootstrap'=>$bootstrap,
+                     //   'bootstrap'=>$bootstrap,
                         ));
         }
         

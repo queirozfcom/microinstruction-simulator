@@ -245,10 +245,108 @@ class DecoderTest extends CDbTestCase{
         
     }
     
+    public function test_get_opposite_ar(){
+        $obj = new Decoder;
+        
+        $method = self::getMethod('getOppositeARFromRegisterName');
+        
+        $inst = new Instruction('mov','r0',false,'constant',false);
+        
+        $ar = $method->invoke($obj,'r0');
+        
+        $this->assertEquals('AR2',$ar);
+    }
+    
     public function test__REG____CONST__(){
         //[REG],[CONST]
-        dsaigfo
-        sdl
+        $obj = new Decoder;
+        
+        $method = self::getMethod('decodeMovInstruction');
+        
+        $inst = new Instruction('mov','r0',true,'constant',true);
+        
+        $mp = $method->invoke($obj,$inst);
+        
+        $this->assertEquals(8,count($mp));
+        
+        $mi0 = $mp[0];
+        $mi1 = $mp[1];
+        $mi2 = $mp[2];
+        $mi3 = $mp[3];
+        $mi4 = $mp[4];
+        $mi5 = $mp[5];
+        $mi6 = $mp[6];
+        $mi7 = $mp[7];
+        
+        
+        $this->assertTrue($mi0 instanceof Microinstruction);
+        
+        $this->assertTrue($mi1 instanceof Microinstruction);
+        
+        $this->assertTrue($mi2 instanceof Microinstruction);
+        
+        $this->assertTrue($mi3 instanceof Microinstruction);
+        
+        $this->assertTrue($mi4 instanceof Microinstruction);
+        
+        $this->assertTrue($mi5 instanceof Microinstruction);
+        
+        $this->assertTrue($mi6 instanceof Microinstruction);
+        
+        $this->assertTrue($mi7 instanceof Microinstruction);
+        
+        
+        
+    }
+    public function test_4(){
+        //MNEM[const],const
+        $obj = new Decoder;
+        
+        $method = self::getMethod('decodeMovInstruction');
+        
+        $inst = new Instruction('mov','constant',true,'constant',false);
+        
+        $mp = $method->invoke($obj,$inst);
+        
+        $this->assertEquals(8,count($mp));
+        
+        $mi0 = $mp[0];
+        $mi1 = $mp[1];
+        $mi2 = $mp[2];
+        $mi3 = $mp[3];
+        $mi4 = $mp[4];
+        $mi5 = $mp[5];
+        $mi6 = $mp[6];
+        $mi7 = $mp[7];
+        
+        
+        $this->assertTrue($mi0 instanceof Microinstruction);
+        $this->assertEquals(new Microinstruction('increment_pc'),$mi0);
+        
+        $this->assertTrue($mi1 instanceof Microinstruction);
+        $this->assertEquals(new Microinstruction('pc_to_mar_read'),$mi1);
+        
+        $this->assertTrue($mi2 instanceof Microinstruction);
+        $this->assertEquals(new Microinstruction('data_to_mdr'),$mi2);
+        
+        $this->assertTrue($mi3 instanceof Microinstruction);
+        $this->assertEquals(1,$mi3[11]);
+        $this->assertEquals(1,$mi3[0]);
+        
+        $this->assertTrue($mi4 instanceof Microinstruction);
+        $this->assertEquals(new Microinstruction('increment_pc'),$mi4);
+        
+        $this->assertTrue($mi5 instanceof Microinstruction);
+        $this->assertEquals(new Microinstruction('pc_to_mar_read'),$mi5);
+        
+        $this->assertTrue($mi6 instanceof Microinstruction);
+        $this->assertEquals(new Microinstruction('data_to_mdr'),$mi6);
+        
+        $this->assertTrue($mi7 instanceof Microinstruction);
+        $this->assertEquals(1,$mi7[26]);
+        $this->assertEquals(1,$mi7[27]);
+        $this->assertEquals(1,$mi7[0]);
+        
     }
     
 }
