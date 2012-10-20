@@ -89,7 +89,7 @@ class Decoder{
                         $returnMicroprogram[] = new Microinstruction('pc_to_mar_read');
                         $returnMicroprogram[] = new Microinstruction('data_to_mdr');
                         $returnMicroprogram[] = new Microinstruction('mdr_to_mar_read');
-                        
+                        $returnMicroprogram[] = new Microinstruction('data_to_mdr');
                         $mi = new Microinstruction;
                         $mi->setMuxAndALUValueForMOVFromSourceRegister('MDR');
                         //$mi[self::getTargetMicroinstructionIndexFromRegister($inst->getParam1())] = 1;
@@ -257,6 +257,8 @@ class Decoder{
                         $mi->setTargetIndexFromTargetRegister('mar');
                         $mi->setWrite();
                         
+                        $returnMicroprogram[] = $mi;
+                        
                         return $returnMicroprogram;
                         
                     }
@@ -331,17 +333,15 @@ class Decoder{
                         
                         unset($mi);
                         
-                        $mi = new Microinstruction;
                         
-                        $mi[22] = 1;
-                        $mi[24] = 1;
+                        //data to mdr
+                        $mi = new Microinstruction('data_to_mdr');
                         $returnMicroprogram[] = $mi;
                         
                         unset($mi);
                         
                         $mi = new Microinstruction;
-                        $mi[12] = 1;
-                        $mi[0]  = 1;
+                        $mi->setMuxAndALUValueForMOVFromSourceRegister('MDR');
                         $mi->setTargetIndexFromTargetRegister($inst->getParam1());
                         
                         $returnMicroprogram[] = $mi;
@@ -466,7 +466,7 @@ class Decoder{
             }
 	}
         public static function getMUXValueFromRegister($regName){
-            switch ($regName) {
+            switch (strtoupper($regName)) {
                 case 'MDR':
                     return '001';
                     break;
@@ -495,7 +495,7 @@ class Decoder{
                     return '100';
                     break;
                 default:
-                    throw new DecoderException('Unsupported register set as source to MUX');
+                    throw new DecoderException('Unsupported register set as source to MUX: '.$regName );
             }
         }
         public static function getTargetMicroinstructionIndexFromRegister($regname){

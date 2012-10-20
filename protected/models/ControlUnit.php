@@ -1,8 +1,4 @@
 <?php
-require_once 'Microinstruction.php';
-require_once 'Decoder.php';
-require_once 'helpers/ControlUnitException.php';
-
   class ControlUnit {
   	private $decoder;
 	private $flags;

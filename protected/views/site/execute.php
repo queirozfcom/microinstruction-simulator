@@ -44,19 +44,31 @@ Yii::app()->getClientScript()->registerCssFile('css/common/common.css');?>
             <?php
             
                     $this->widget('bootstrap.widgets.BootButton', array(
-                        'label'=>'fetch first instruction',
+                        'label'=>'reset PC',
                         'htmlOptions'=>array(
-                            'id'=>'fetch-first-instruction-button',
-                           // 'style'=>'display:none;',
-                            'targeturl'=>$this->createUrl('site/fetchfirst'),
+                            'id'=>'reset-button',
+                           
+                            'targeturl'=>$this->createUrl('site/reset'),
                             'rel'=>'tooltip',
-                            'data-title'=>'Perform fetching of first Macro from Memory and place that Macro into the Instruction Register to prepare for program Execution'
+                            'data-title'=>'Reset the Execution but keep Memory Contents intact.'
                         ),                        
-                        'type'=>'primary', // '', 'primary', 'info', 'success', 'warning', 'danger' or 'inverse'
+                        'type'=>'danger', // '', 'primary', 'info', 'success', 'warning', 'danger' or 'inverse'
+                        'size'=>'normal', // '', 'large', 'small' or 'mini'
+                    ));             
+            
+                    $this->widget('bootstrap.widgets.BootButton', array(
+                        'label'=>'run next instruction',
+                        'htmlOptions'=>array(
+                            'id'=>'run-next-instruction-button',
+                            'targeturl'=>$this->createUrl('site/run_next_instruction'),
+                            'rel'=>'tooltip',
+                            'data-title'=>'Fetch the instruction from Memory and run it.'
+                        ),                        
+                        'type'=>'inverse', // '', 'primary', 'info', 'success', 'warning', 'danger' or 'inverse'
                         'size'=>'normal', // '', 'large', 'small' or 'mini'
                     )); 
             
-            
+                    
             /*
                 $this->widget('zii.widgets.jui.CJuiButton', array(
                     'name'=>'fetch-first-instruction-button',
@@ -77,7 +89,12 @@ Yii::app()->getClientScript()->registerCssFile('css/common/common.css');?>
         <div class="well app-half-div ui-corner-all" id="right-div">
             <div class="subtitle">Current Instruction: <br /><span id="current-instruction-span">&nbsp;</span></div>
             <div class="subtitle">Associated Microprogram: <span id="current-microinstruction-span"><br /><br /><br /><br /></span></div>
-            
+            <div class="subtitle" id="log">
+                LOG:<br />
+                <div id="log-contents">
+                    
+                </div>
+            </div>
         </div>
         
         <div class="well app-half-div" id="bottom-div">
@@ -87,25 +104,25 @@ Yii::app()->getClientScript()->registerCssFile('css/common/common.css');?>
                 <div class="display-div" id="r2-contents">
                     R2:<br />
                     <div class="reg-contents-input">
-                        00000000000000000000000000000000
+                        <span rel="tooltip" title="0">00000000000000000000000000000000</span>
                     </div>
                 </div>
                 <div class="display-div" id="r3-contents" >
                     R3:<br />
                     <div class="reg-contents-input">
-                        00000000000000000000000000000000
+                        <span rel="tooltip" title="0">00000000000000000000000000000000</span>
                     </div>
                 </div>
                 <div class="display-div" id="r4-contents">
                     R4:<br />
                     <div class="reg-contents-input">
-                        00000000000000000000000000000000
+                        <span rel="tooltip" title="0">00000000000000000000000000000000</span>
                     </div>
                 </div>
                 <div class="display-div" id="ar2-contents">
                     AR2:
                     <div class="reg-contents-input">
-                        00000000000000000000000000000000
+                        <span rel="tooltip" title="0">00000000000000000000000000000000</span>
                     </div>
                 </div>
             </div>
@@ -113,25 +130,25 @@ Yii::app()->getClientScript()->registerCssFile('css/common/common.css');?>
                 <div class="display-div" id="r0-contents">
                     R0:<br />
                     <div class="reg-contents-input">
-                        00000000000000000000000000000000
+                        <span rel="tooltip" title="0">00000000000000000000000000000000</span>
                     </div>
                 </div>
                 <div class="display-div" id="r1-contents" >
                     R1:<br />
                     <div class="reg-contents-input">
-                        00000000000000000000000000000000
+                        <span rel="tooltip" title="0">00000000000000000000000000000000</span>
                     </div>
                 </div>
                 <div class="display-div" id="pc-contents">
                     PC:<br />
                     <div class="reg-contents-input">
-                        00000000000000000000000000000000
+                        <span rel="tooltip" title="0">00000000000000000000000000000000</span>
                     </div>
                 </div>
                 <div class="display-div" id="ar1-contents">
                     AR1:
                     <div class="reg-contents-input">
-                        00000000000000000000000000000000
+                        <span rel="tooltip" title="0">00000000000000000000000000000000</span>
                     </div>
                 </div>
             </div>
@@ -139,22 +156,23 @@ Yii::app()->getClientScript()->registerCssFile('css/common/common.css');?>
                 <div class="display-div" id="mdr-contents">
                     MDR:<br />
                     <div class="reg-contents-input">
-                        00000000000000000000000000000000
+                        <span rel="tooltip" title="0">00000000000000000000000000000000</span>
                     </div>
                 </div>
                 <div class="display-div" id="mar-contents" >
                     MAR:<br />
                     <div class="reg-contents-input">
-                        00000000000000000000000000000000
+                        <span rel="tooltip" title="0">00000000000000000000000000000000</span>
                     </div>
                 </div>
+                
             </div>
             <br style="clear:both;" />
             <div id="ir-regs-div">
                 <div class="display-div" id="ir-contents">
                     IR:<br />
                     <div class="reg-contents-input">
-                        00000000000000000000000000000000
+                        <span rel="tooltip" title="0">00000000000000000000000000000000</span>
                     </div>
                 </div>
             </div>    

@@ -31,6 +31,11 @@
 		public function __toString(){
 			return (String) $this->content;
 		}
+                
+                public function humanReadableForm(){
+                    return $this->content->humanReadableForm();
+                }
+                
 		public function asInt(){
 			return $this->content->asInt();
 		}

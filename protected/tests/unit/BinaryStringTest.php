@@ -170,6 +170,24 @@ class BinaryStringTest extends CDbTestCase {
             
             $bs = new BinaryString(8,9997775675765);
             
+        }
+        
+        public function test_get_int_value_starting_at_and_ending_at(){
+            $bs = new BinaryString(32,511);
+            
+            $this->assertEquals(511, $bs->asInt());
+            
+            $this->assertEquals(31,$bs->getIntValueStartingAt(5,0));
+            
+            $this->assertEquals(3,$bs->getIntValueStartingAt(2, 0));
+            
+            $this->assertEquals(1,$bs->getIntValueStartingAt(1,0));
+            
+            $bs = new BinaryString(32);
+            
+            $bs->setOne(0,1,3,5,7);
+            
+            $this->assertEquals(11,$bs->getIntValueStartingAt(4, 0));
             
         }
 

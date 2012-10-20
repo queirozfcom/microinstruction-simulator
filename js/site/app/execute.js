@@ -1,28 +1,27 @@
 $(document).ready(function(){
-    $("#bootstrap-button").click(function(){
+    $("#reset-button").click(function(){
         $("div.tooltip").hide();
         
         var url = $(this).attr('targeturl');
-        $.post(
-        url,
-        "",
-        function(data){
-           update_fields(data); 
-        },
-        'json');
+        call(url);
     });
-    $("#fetch-first-instruction-button").click(function(){
+    $("#run-next-instruction-button").click(function(){
         $("div.tooltip").hide();
         var url = $(this).attr('targeturl');
+        call(url);
+    });
+    $("[rel=tooltip]").tooltip();
+});
+
+function call(url){
         $.post(
         url,
         "",
         function(data){
            update_fields(data); 
         },
-        'json');
-    });
-});
+        'json');      
+}
 
 function update_fields(data){
     var RO_field = '#r0-contents';
@@ -37,17 +36,34 @@ function update_fields(data){
     var MAR_field = '#mar-contents';
     var MDR_field = '#mdr-contents';
     var current_macro_field = '#current-instruction-span';
-    var bootstrap_button = '#bootstrap-button';
-    var fetch_first_instruction_button = '#fetch-first-instruction-button';
-    
-    if(data.fetch_first){
-        $(fetch_first_instruction_button).css('display','none');
-    }
+    var log = '#log-contents';
     
     $(current_macro_field).html(data.current_macro);
-    $(RO_field+" div.reg-contents-input").html(data.R0);
     $(PC_field+" div.reg-contents-input").html(data.PC);
     
     
+    $(RO_field+" div.reg-contents-input").html(data.R0);
+    $(R1_field+" div.reg-contents-input").html(data.R1);
+    $(R2_field+" div.reg-contents-input").html(data.R2);
+    $(R3_field+" div.reg-contents-input").html(data.R3);
+    $(R4_field+" div.reg-contents-input").html(data.R4);
     
+    $(AR1_field+" div.reg-contents-input").html(data.AR1);
+    $(AR2_field+" div.reg-contents-input").html(data.AR2);
+    
+    
+    
+    $(MAR_field+" div.reg-contents-input").html(data.MAR);
+    $(MDR_field+" div.reg-contents-input").html(data.MDR);
+    
+    $(IR_field+" div.reg-contents-input").html(data.IR);
+    
+    $(log).html("");
+    for(var i=0;i<data.log.length;i++){
+        $(log).append(data.log[i]+'<br />');    
+    }
+    
+    $(log).scrollTop($(log)[0].scrollHeight);
+   
+    $("[rel=tooltip]").tooltip();
 }

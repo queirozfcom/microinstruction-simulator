@@ -23,7 +23,7 @@ class MainMemoryTest extends PHPUnit_Framework_TestCase{
     }
     
     public function testAppendInstruction(){
-       $instr = new Instruction('ADD','R1','R2');
+       $instr = new Instruction("add", 'r1', false, 'r2', false);
        $this->memory->append($instr);
         
        $this->assertEquals($instr, $this->memory[0]);    

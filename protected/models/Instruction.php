@@ -48,9 +48,7 @@
                 }
                                 
 		public function __construct($mnem,$param1,$ind1,$param2,$ind2){
-                    for($i=0;$i<$this->length-1;$i++){
-                        $this[$i]=0;
-                    }
+                    $this->setIntegerValue(0);
                                           
                     $this->setMnemonic($mnem);
                     $this->setParam1($param1);

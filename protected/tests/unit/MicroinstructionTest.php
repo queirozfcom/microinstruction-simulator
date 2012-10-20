@@ -57,6 +57,46 @@ class MicroinstructionTest extends CDbTestCase {
         }
         
         
+        public function test_get_mux_values(){
+            $mi = new Microinstruction('increment_pc');
+            
+            $muxaval = $mi->getMUXAValue();
+            
+            $this->assertEquals('100',$muxaval);
+            
+        }
+        
+        public function test_get_alu_operation_code(){
+            $mi = new Microinstruction;
+            
+            $mi[0]=1;
+            
+            $this->assertEquals(1,$mi->getALUOperationCode());
+            
+            
+            unset($mi);
+            
+            $mi= new Microinstruction;
+            
+            $mi->setOne(1);
+            
+            $this->assertEquals(2,$mi->getALUOperationCode());
+            
+            
+            
+            
+            
+        }
+        /*
+        public function test_set_alu_operation_code(){
+            $mi = new Microinstruction;
+            $mi->setAluOpCodeFromDescription('S=A');
+            
+            $opcode = $mi->getALUOperationCode();
+            
+            $this->assertEquals(1,$opcode);
+            
+        }*/
 	
 }
 

@@ -70,6 +70,7 @@
     float:right;
     margin-right:8px;
     margin-bottom: 8px;
+    
 }
 
 #instruction-grid{
@@ -88,7 +89,9 @@
     min-height: 200px;
 }
 
-#bootstrap-button,#fetch-first-instruction-button{
+#reset-button,#run-next-instruction-button{
+    margin-left: 2px;
+    margin-right:2px;
     position:relative;
     top:20px;
 }
@@ -105,6 +108,12 @@
     margin-bottom: 5px;
     float:right;
 }
+
+#mux-a-regs-div{
+    position: relative;
+    right:50px;
+}
+
 #memory-related-regs-div{
     float:left;
 }
@@ -124,4 +133,12 @@
 #current-microinstruction-span{
     color:black;
     font-family: monospace;
+}
+
+#log-contents{
+    max-height:170px;
+    
+    overflow-y: scroll;
+    font-size: 12px !important;
+    font-family: monospace;  
 }

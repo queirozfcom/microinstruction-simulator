@@ -128,7 +128,6 @@ class DecoderTest extends CDbTestCase{
         $this->AssertEquals(1,$mp[0][19]);
         $this->AssertEquals(1,$mp[0][1]);
         
-        
         $this->AssertEquals(1,$mp[1][20]);
         $this->AssertEquals(1,$mp[1][1]);
         $this->AssertEquals(1,$mp[1][27]);
@@ -347,6 +346,18 @@ class DecoderTest extends CDbTestCase{
         $this->assertEquals(1,$mi7[27]);
         $this->assertEquals(1,$mi7[0]);
         
+    }
+    
+    public function testRegToConstBothIndirected(){
+        //MOV([CONST],[REG])
+        
+        $obj = new Decoder;
+        
+        $method = self::getMethod('decodeMovInstruction');
+        
+        $inst = new Instruction('mov','constant',true,'r3',true);
+        
+        $mp = $method->invoke($obj,$inst);
     }
     
 }

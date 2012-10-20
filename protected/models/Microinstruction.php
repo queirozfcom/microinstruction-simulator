@@ -38,6 +38,11 @@
                             $this[0]=1;
                             $this[27]=1;
                             break;
+                        case 'mdr_to_ir':
+                            $this[12]=1;
+                            $this[0]=1;
+                            $this[28]=1;
+                            break;
                         default:
                             throw new MicroinstructionException('Unsupported alias: '.$alias);
                     }
@@ -123,7 +128,30 @@
                     }
                 }
                 */
+                
+                public function getTargetRegIndex(){
+                    $targetRegisterIndexes = array(27,28,8,9,10,11,15,16,17,18);
+                    
+                    foreach($targetRegisterIndexes as $index){
+                        if($this[$index]==1){
+                            return $index;
+                        }
+                    }
+                                   
+                    if($this[24]==1){
+                        if($this[23]==1 and $this[22]==0){
+                            return 24;
+                        }else{
+                            throw new MicroinstructionException('You\'re trying to send a value to MDR but you haven\'t set MUX C value accordingly. If this is an operation of type LOAD DATA TO MDR, you should handle that first in  Program::runMicroinstruction() function ');
+                        }
+                    }
+                    
+                    
+                }
+                
                 public function setWrite(){
+                    //syslog(LOG_ALERT,'setwrite');
+                    
                     $this[26]=1;
                     $this[25]=0;
                 }
@@ -204,23 +232,38 @@
                 }
                 
 		public function isMemoryRead(){
-		
+                    if($this[26]==0 and $this[25]==1){
+                        return true;
+                    }else{
+                        return false;
+                    }
 		}
 		public function isMemoryWrite(){
-		
+                    if($this[26]==1 and $this[25]==0){
+                        return true;
+                    }else{
+                        return false;
+                    }
 		}
 		public function isLoadReadDataIntoMDR(){
 
 		}
 		public function getALUOperationCode(){
-
+                    return $this->getIntValueStartingAt(8, 0);
 		}
-		public function getMUXACode(){ 
-
+		public function getMUXAValue(){ 
+                    return $this[14].$this[13].$this[12];
 		}
-		public function getMUXBCode(){
-			
+		public function getMUXBValue(){
+                    return $this[21].$this[20].$this[19];
 		}
+                
+                public function isMUXAActive(){
+                    //returns true if MUX A value is != 0
+                }
+                public function isMUXBActive(){
+                    
+                }
 		
 	}
 

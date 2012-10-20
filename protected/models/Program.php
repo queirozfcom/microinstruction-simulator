@@ -1,225 +1,345 @@
 <?php
- require_once 'MainMemory.php'; 
- require_once 'Register.php'; 
- require_once 'ControlUnit.php';
- require_once 'ALU.php';
- 
- class Program {
-     
-        public static function getValidTargetableRegisters(){
-            $output = array();
-            foreach(self::$targetableRegisters as $registerName){
-                $output[$registerName]=$registerName;
+
+class Program {
+
+    public static function getValidTargetableRegisters() {
+        $output = array();
+        foreach (self::$targetableRegisters as $registerName) {
+            $output[$registerName] = $registerName;
+        }
+        return $output;
+    }
+
+    private static $targetableRegisters = array('R0', 'R1', 'R2', 'R3', 'R4', 'CONSTANT');
+    //registers begin
+    private $R0;
+    private $R1;
+    private $R2;
+    private $R3;
+    private $R4;
+    private $AR1;
+    private $AR2;
+    private $MDR; //memory data register
+    private $MAR; //memory address register
+    private $IR;
+    private $PC;
+    //registers end
+    private $ALU;
+    private $mainMemory;
+    private $controlUnit;
+    //other
+    private $currentMicroinstruction;
+    private $currentInstruction;
+    private $nextInstruction;
+    public $executionPhase = false;
+    private $log = array();
+    private $fetchFirst = false;
+
+    public function appendToMemory(BinaryString $bs) {
+        $this->mainMemory->append($bs);
+    }
+
+    public function reset() {
+        $this->PC = new Register(new BinaryString(32, 0));
+        $this->log = array();
+    }
+
+    public function addToLog(Microinstruction $micro) {
+        $this->log[] = $micro;
+    }
+
+    public function __get($a) {
+        return $this->$a;
+    }
+
+    public function getLog() {
+        if (isset($this->log)) {
+            return $this->log;
+        }
+    }
+
+    public function __construct() {
+        $this->ALU = new ALU();
+        $this->mainMemory = new MainMemory();
+        $this->controlUnit = new ControlUnit();
+        $this->R0 = new Register(new BinaryString(32, 0));
+        $this->R1 = new Register(new BinaryString(32, 0));
+        $this->R2 = new Register(new BinaryString(32, 0));
+        $this->R3 = new Register(new BinaryString(32, 0));
+        $this->R4 = new Register(new BinaryString(32, 0));
+        $this->AR1 = new Register(new BinaryString(32, 0));
+        $this->AR2 = new Register(new BinaryString(32, 0));
+        $this->PC = new Register(new BinaryString(32, 0));
+        $this->IR = new Register(new BinaryString(32, 0));
+        $this->MDR = new Register(new BinaryString(32, 0));
+        $this->MAR = new Register(new BinaryString(32, 0));
+    }
+
+    /**
+     * Returns an associative array where each key is a register and its value is that register's content
+     * For testing purposes mainly.
+     * @return array The registers and their values
+     */
+    public function dumpInfo() {
+
+        $output = array();
+        $output["R0"] = $this->R0;
+        $output["R1"] = $this->R1;
+        $output["R2"] = $this->R2;
+        $output["R3"] = $this->R3;
+        $output["R4"] = $this->R4;
+        $output["PC"] = $this->PC;
+
+        $output["AR1"] = $this->AR1;
+        $output["AR2"] = $this->AR2;
+        $output["MDR"] = $this->MDR;
+        $output["MAR"] = $this->MAR;
+        $output["IR"] = $this->IR;
+
+        $output['log'] = array_map(function($e) {
+                    return ($e->__toString());
+                }, $this->log);
+
+        return $output;
+    }
+
+    public function showNextInstruction() {
+        
+    }
+
+    public function runNextInstruction() {
+        $this->fetch();
+        $this->runInstruction($this->IR->getContent());
+        $this->incrementPC();
+    }
+
+    /**
+     * Start routine, tells the program to fetch the first instruction in the $mainMemory 
+     * and bring it over to the IR Register.
+     */
+    public function fetch() {
+        $this->setCurrentInstruction("fetch");
+
+        $fetchMicroprogram = $this->controlUnit->decode("fetch");
+
+        foreach ($fetchMicroprogram as $microinstruction) {
+            $this->runMicroinstruction($microinstruction);
+        }
+    }
+
+    private function runInstruction(Instruction $inst) {
+        $this->setCurrentInstruction($inst);
+        $microProgram = $this->controlUnit->decode($inst);
+        foreach ($microProgram as $microinstruction) {
+            $this->runMicroinstruction($microinstruction);
+        }
+    }
+
+    /**
+     * This function will  take microinstructions from the decoder as arguments 
+     * and execute the ACTUAL WORK, that is move data from/to registers, and so on
+     * whatever the microinstruction "instructs".
+     * The microinstructions that "arrive" here from the decoder will be of 4 types mainly:
+     * - microinstructions to move data from one register to another, passing through the ALU
+     * - microinstructions that tell the ALU to perform some calculation on its operands (A,B) and
+     *   load the result in a target Register
+     * - move read data from last memory read into MDR
+     * - microinstructions that require a memory read- or write- routine. 
+     * 
+     * @param Microinstruction $microinstruction
+     */
+    private function runMicroinstruction(Microinstruction $microinstruction) {
+        $this->setCurrentMicroinstruction($microinstruction);
+        $this->addToLog($microinstruction);
+
+        if ($microinstruction == new Microinstruction('pc_to_mar_read')) {
+            $this->MAR->setContent($this->PC->getContent());
+            $this->performMemoryRead();
+        } elseif($microinstruction == new Microinstruction('mdr_to_mar')){
+            $this->MAR->setContent($this->MDR->getContent());
+        } elseif($microinstruction == new Microinstruction('mdr_to_mar_read')) {
+            $this->MAR->setContent($this->MDR->getContent());
+            $this->performMemoryRead();
+        } elseif ($microinstruction == new Microinstruction('data_to_mdr')) {
+            $this->MDR->setContent($this->mainMemory->getReturnedValue());
+        } elseif ($microinstruction == new Microinstruction('mdr_to_ir')) {
+            $this->IR->setContent($this->MDR->getContent());
+        } elseif ($microinstruction == new Microinstruction('increment_pc')) {
+            $this->PC->setContent(new BinaryString(32, $this->PC->getContent()->asInt() + 1));
+        } else {
+            //syslog(LOG_ALERT, 'lastif');
+            $targetRegName = self::getRegisterNameFromTargetIndex($microinstruction->getTargetRegIndex());
+            
+            //syslog(LOG_ALERT,$targetRegName);
+            
+            $leftRegName   = self::getRegisterNameFromMUXAValue($microinstruction->getMUXAValue());
+            $rightRegName  = self::getRegisterNameFromMUXBValue($microinstruction->getMUXBValue());
+            
+            $ALUOpCode = $microinstruction->getALUOperationCode();
+
+            if (is_null($leftRegName)) {
+                $leftReg = null;
+                $leftRegContents = null;
+            } else {
+                $leftReg = $this->$leftRegName;
+                $leftRegContents = $leftReg->getContent();
             }
-            return $output;
-        }     
-        private static $targetableRegisters = array('R0','R1','R2','R3','R4','CONSTANT');
+
+            if (is_null($rightRegName)) {
+                $rightReg = null;
+                $rightRegContents = null;
+            } else {
+                $rightReg = $this->$rightRegName;
+                $rightRegContents = $rightReg->getContent();
+            }
+
+            //result is a BinaryString
+            $result = $this->ALU->operateOn($leftRegContents, $rightRegContents, $ALUOpCode);
+
+            $this->$targetRegName->setContent($result);
+            
+            if($microinstruction->isMemoryRead()){
+                $this->performMemoryRead();
+            }
+            
+            if($microinstruction->isMemoryWrite()){
+                //syslog(LOG_ALERT, 'ismemorywrite');
+                $this->performMemoryWrite();
+            }
+        }
+    }
+    
+    private static function getRegisterNameFromTargetIndex($index){
+        //$index is an integer
         
- 	//registers begin
-	private $R0;
-	private $R1;
-	private $R2;
-	private $R3;
-	private $R4;
-	private $AR1;
-	private $AR2;
-	
-	private $MDR;//memory data register
-	private $MAR;//memory address register
-	
-	private $IR;
-	private $PC;
-	//registers end
-	private $ALU;
-	private $mainMemory;
-	private $controlUnit;
-	//other
-	private $currentMicroinstruction;
-	private $currentInstruction;
-	private $nextInstruction;
-	public  $executionPhase = false;
-	private $microInstructionLog;
-	private $fetchFirst = false;
-        
-        public function appendToMemory(BinaryString $bs){
-            $this->mainMemory->append($bs);
+        switch ($index) {
+            case 8:
+                return 'R0';
+            case 9:
+                return 'R1';
+            case 10:
+                return 'PC';
+            case 11:
+                return 'AR1';
+            case 15:
+                return 'R2';
+            case 16:
+                return 'R3';
+            case 17:
+                return 'R4';
+            case 18:
+                return 'AR2';
+            case 24:
+                return 'MDR';
+            case 27:
+                return 'MAR';
+            case 28:
+                return 'IR';
+            default:
+                throw new ProgramException("Invalid target Index: $index");
         }
         
-	public function addToLog(Microinstruction $micro){
-		$this->microInstructionLog[] = $micro;
-	}
-	public function __get($a){
-		return $this->$a;
-	}
-	public function getLog(){
-		if(isset($this->microInstructionLog) ){
-			 return $this->microInstructionLog;
-		}
-	}
-	
-	public function __construct(){
-		$this->ALU          = new ALU();
-		$this->mainMemory   = new MainMemory();
-		$this->controlUnit  = new ControlUnit();
-		$this->R0           = new Register(new BinaryString(32,0));
-		$this->R1           = new Register(new BinaryString(32,0));
-		$this->R2           = new Register(new BinaryString(32,0));
-		$this->R3           = new Register(new BinaryString(32,0));
-		$this->R4           = new Register(new BinaryString(32,0));
-		$this->AR1          = new Register(new BinaryString(32,0));
-		$this->AR2          = new Register(new BinaryString(32,0));
-		$this->PC           = new Register(new BinaryString(32,0));
-		$this->IR           = new Register(new BinaryString(32,0));
-		$this->MDR          = new Register(new BinaryString(32,0));
-		$this->MAR          = new Register(new BinaryString(32,0));
-	}
-	/**
-	 * Returns an associative array where each key is a register and its value is that register's content
-	 * For testing purposes mainly.
-	 * @return array The registers and their values
-	 */
-	public function dumpInfo(){
-                        
-		$output         = array();
-		$output["R0"]   =(String) $this->R0;
-		$output["R1"]   =(String) $this->R1;
-		$output["R2"]   =(String) $this->R2;
-		$output["R3"]   =(String) $this->R3;
-		$output["R4"]   =(String) $this->R4;
-		$output["PC"]   =(String) $this->PC;
-                
-		$output["AR1"]  =(String) $this->AR1;
-		$output["AR2"]  =(String) $this->AR2;
-		$output["MDR"]  =(String) $this->MDR;
-		$output["MAR"]  =(String) $this->MAR;
-		$output["IR"]   =(String) $this->IR;
-		$output['current_micro'] = $this->currentMicroinstruction;
-                $output['current_macro'] = $this->currentInstruction;
-                $output['fetch_first'] = $this->fetchFirst;
-                
-		return $output;		
-	}
-        
-       
-	public function showNextInstruction(){
-		$memoryIndex = $this->PC->asInt();
-		echo $this->mainMemory[$memoryIndex];
-	}
-	/**
-	 * Start routine, tells the program to fetch the first instruction in the $mainMemory 
-	 * and bring it over to the IR Register.
-	 */
-	public function bootstrap(){
-		$this->setCurrentInstruction("bootstrap");
-		$this->PC->setContent(new BinaryString(32,0));
-	}
-        public function fetchFirst(){
-            $this->fetch();
-            $this->fetchFirst = true;
+    }
+    
+    private static function getRegisterNameFromMUXAValue($MUXAValue) {
+        switch ($MUXAValue) {
+            case '000':
+                return null;
+            case '001':
+                return 'MDR';
+            case '010':
+                return 'R0';
+            case '011':
+                return 'R1';
+            case '100':
+                return 'PC';
+            case '101':
+                return 'AR1';
+            default:
+                throw new ProgramException("$MUXAValue is not a valid state for MUX A");
+                break;
         }
+    }
+
+    private static function getRegisterNameFromMUXBValue($MUXBValue) {
+        switch ($MUXBValue) {
+            case '000':
+                return null;
+            case '001':
+                return 'R2';
+            case '010':
+                return 'R3';
+            case '011':
+                return 'R4';
+            case '100':
+                return 'AR2';
+            default:
+                throw new ProgramException("$MUXBValue is not a valid state for MUX B");
+                break;
+        }
+    }
+
+    /**
+     * For GUI purposes...
+     * @param Microinstruction $micro
+     */
+    private function setCurrentMicroinstruction(Microinstruction $micro) {
+        $this->currentMicroinstruction = $micro;
+    }
+
+    /**
+     * 
+     * Enter description here ...
+     * @param String|Instruction $param
+     */
+    private function setCurrentInstruction($param) {
+        $this->currentInstruction = $param;
+    }
+
+    /**
+     * For a microinstruction that involves moving data, the ALU will be used, and therefore we must
+     * set a target register, where the ALU output will be placed.
+     * @param Microinstruction $micro
+     */
+    private function returnEnabledRegisterToReceiveData(Microinstruction $micro) {
         
-	public function fetch(){
-		$this->setCurrentInstruction("fetch");
-		
-		$bootstrapMicroprogram  = $this->controlUnit->decode("fetch");
-		foreach ($bootstrapMicroprogram as $microinstruction){
-			$this->runMicroinstruction($microinstruction);
-			$this->addToLog($microinstruction);			
-		}
-	}
-	public function runInstruction(Instruction $inst){
-		$microProgram   = $this->controlUnit->decode($inst);
-		foreach ($microProgram as $microinstruction){
-			$this->runMicroinstruction($microinstruction);
-			$this->addToLog($microinstruction);
-		}
-	}
- 	/**
-	 * This function will  take microinstructions from the decoder as arguments 
-	 * and execute the ACTUAL WORK, that is move data from/to registers, and so on
-	 * whatever the microinstruction "instructs".
-	 * The microinstructions that "arrive" here from the decoder will be of 4 types mainly:
-	 * - microinstructions to move data from one register to another, passing through the ALU
-	 * - microinstructions that tell the ALU to perform some calculation on its operands (A,B) and
-	 *   load the result in a target Register
-	 * - move read data from last memory read into MDR
-	 * - microinstructions that require a memory read- or write- routine. 
-	 * 
-	 * @param Microinstruction $microinstruction
-	 */
-	private function runMicroinstruction(Microinstruction $microinstruction){
-		$this->setCurrentMicroinstruction($microinstruction);
+    }
 
+    /**
+     * This takes whatever is in MAR and feeds it to the memory. To access the returned data, do
+     * $mainMemory->getReturnedValue();
+     */
+    private function performMemoryRead() {
+        
+        //syslog(LOG_ALERT,'memread');
+        $intval = $this->MAR->asInt();
+        $this->mainMemory->performRead($intval);
+    }
 
-		if ($microinstruction->isMemoryRead()) {
+    /**
+     * This function does the following:
+     * Writes the contents of $this->memDataReg on the memory, on line $this->memAddrReg
+     */
+    private function performMemoryWrite() {
+        $index = $this->MAR->asInt();
+        $data = $this->MDR->getContent();
+        
+        //syslog(LOG_ALERT,'memwrite');
+        $this->mainMemory->performWrite($index, $data);
+    }
 
-		}elseif($microinstruction->isMemoryWrite()){
+    /**
+     * This function gets the last piece of data returned from a memory read and places it
+     * in the MDR register
+     */
+    private function loadReadDataIntoMDR() {
+        
+    }
 
-		}elseif($microinstruction->isLoadReadDataIntoMDR()){
-		
-		}else{
-			
-			/*the microinstruction is neither a memory read nor write, or load read data into MDR,so
-			* it involves passing data around, and will also include performing an ALU operation (in fact,
-			* even if it's just a simple MOV, it will require ALU involvement because we will tell it
-			* to output the inputs, [S=A or S=B])
-			*/
-			
-		}			
-	}
-	/**
-	 * For GUI purposes...
-	 * @param Microinstruction $micro
-	 */
-	private function setCurrentMicroinstruction(Microinstruction $micro){
-		$this->currentMicroinstruction=$micro;
-	}
-	/**
-	 * 
-	 * Enter description here ...
-	 * @param String|Instruction $param
-	 */
-	private function setCurrentInstruction($param){
-		$this->currentInstruction=$param;
-	}
-	/**
-	 * For a microinstruction that involves moving data, the ALU will be used, and therefore we must
-	 * set a target register, where the ALU output will be placed.
-	 * @param Microinstruction $micro
-	 */
-	private function returnEnabledRegisterToReceiveData(Microinstruction $micro){
+    public function incrementPC() {
+        $this->runMicroinstruction(new Microinstruction('increment_pc'));
+    }
 
-	}
-	/**
-	 *This takes whatever is in MAR and feeds it to the memory. To access the returned data, do
-	 *$mainMemory->getReturnedValue();
-	 */
-	private function performMemoryRead(){
+}
 
-	}
-	/**
-	 * This function does the following:
-	 * Writes the contents of $this->memDataReg on the memory, on line $this->memAddrReg
-	 */
-	private function performMemoryWrite(){
-
-	}
-	/**
-	 * This function gets the last piece of data returned from a memory read and places it
-	 * in the MDR register
-	 */
-	private function loadReadDataIntoMDR(){
-
-	}
-
-	public function incrementPC(){
-		$microProgram=$this->controlUnit->decode("incrementPC");
-		foreach ($microProgram as $microinstruction){
-			$this->runMicroinstruction($microinstruction);
-			$this->addToLog($microinstruction);
-		}
-		
-	}
- }
-  
- ?>
+?>

@@ -62,7 +62,7 @@
                     
 		}
                 public function humanReadableForm(){
-                    return $this->string;
+                    return $this->asInt();
                 }
 		public function showDetailedDescription(){
 			$return = "";
@@ -212,6 +212,20 @@
 				$this[$i+$startingIndex] = $reversedString[$i];
 			}
 		}
+                
+                public function getIntValueStartingAt($length,$startingIndex){
+                    if($startingIndex+$length>$this->length){
+                        throw new BinaryStringException('$startingIndex + $length cannot exceed this BinaryString\' length');
+                    }
+                    
+                    $string = "";
+                    for($i=0;$i<=$length-1;$i++){
+                        $string.= $this[$i];
+                    }
+                    
+                    $reversedString = strrev($string);
+                    return bindec($reversedString);
+                }
                 
                 
 	}
