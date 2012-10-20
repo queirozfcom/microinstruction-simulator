@@ -182,6 +182,38 @@
                     }
                     $this->setIntValueStartingAt($intALUOpCode, 8, 0);
                 }
+                public function setMuxAndALUValueForADDFromSourceRegister($targetReg,$sourceReg){
+                    $targetSide = Decoder::getSideFromSourceName($targetReg);
+                    $sourceSide = Decoder::getSideFromSourceName($sourceReg);
+                        
+                    if($sourceSide===$targetSide){
+                        throw new MicroinstructionException('Can\'t add two registers that are on the same side. Please move one of them to an Auxiliary Register (AR1 or AR2)');
+                    }
+                    
+                    $targetMuxVal = Decoder::getMUXValueFromRegister($targetReg);
+                    $sourceMuxVal = Decoder::getMUXValueFromRegister($sourceReg);
+                    
+                    if($targetSide == 'B'){
+                        $this[21]  = $targetMuxVal{0};
+                        $this[20]  = $targetMuxVal{1};
+                        $this[19]  = $targetMuxVal{2};
+                        
+                        $this[14]  = $sourceMuxVal{0};
+                        $this[13]  = $sourceMuxVal{1};
+                        $this[12]  = $sourceMuxVal{2};
+                    }else{
+                        $this[14]  = $targetMuxVal{0};
+                        $this[13]  = $targetMuxVal{1};
+                        $this[12]  = $targetMuxVal{2};
+
+                        $this[21]  = $sourceMuxVal{0};
+                        $this[20]  = $sourceMuxVal{1};
+                        $this[19]  = $sourceMuxVal{2};
+                    }
+                    $intALUOpCode = ALU::returnOpCodeForOperation('S=A+B');
+                    
+                    $this->setIntValueStartingAt($intALUOpCode, 8, 0);
+                }
                 
                 public function setTargetIndexFromTargetRegister($regname){
                     if(!is_string($regname)){

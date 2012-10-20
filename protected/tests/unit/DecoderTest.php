@@ -348,17 +348,19 @@ class DecoderTest extends CDbTestCase{
         
     }
     
-    public function testRegToConstBothIndirected(){
-        //MOV([CONST],[REG])
-        
+    public function testDecodeAddRegRegDifferentSides(){
         $obj = new Decoder;
         
-        $method = self::getMethod('decodeMovInstruction');
+        $method = self::getMethod('decodeAddInstruction');
         
-        $inst = new Instruction('mov','constant',true,'r3',true);
+        $inst = new Instruction('add','r0',false,'r3',false);
         
         $mp = $method->invoke($obj,$inst);
+        
+        $this->assertEquals(1,count($mp));
     }
+    
+    
     
 }
 

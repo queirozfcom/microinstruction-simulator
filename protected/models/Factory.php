@@ -1,5 +1,16 @@
 <?php
-
+/**
+ * Given a VO with parameters, this class will, through it's sole method,
+ * return the set of Instructions/BinaryStrings that amount to that VO.
+ * 
+ * For example, if given a VO like this: MOV([R3],900) , this class's method will return
+ * one Instruction that is equal to MOV([R3],#CONST) and a BinaryString amounting to the 
+ * constant value, in this case, 900, in binary form.
+ * 
+ * The output of this class' method is an array of Instructions that can, each, be appended to
+ * the program's MainMemory.
+ * 
+ */
 class Factory{
     public static function returnInstructionAndPossibleConstants(VOInstruction $vo){
         $output = array();

@@ -26,6 +26,9 @@ class ALU {
             case 'S=B+1':
                 return 4;
                 break;
+            case 'S=A+B':
+                return 5;
+                break;
             default:
                 throw new ALUException('Unsupported operation: ' . $operation);
         }

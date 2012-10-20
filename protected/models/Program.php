@@ -167,10 +167,8 @@ class Program {
         } elseif ($microinstruction == new Microinstruction('increment_pc')) {
             $this->PC->setContent(new BinaryString(32, $this->PC->getContent()->asInt() + 1));
         } else {
-            //syslog(LOG_ALERT, 'lastif');
-            $targetRegName = self::getRegisterNameFromTargetIndex($microinstruction->getTargetRegIndex());
             
-            //syslog(LOG_ALERT,$targetRegName);
+            $targetRegName = self::getRegisterNameFromTargetIndex($microinstruction->getTargetRegIndex());
             
             $leftRegName   = self::getRegisterNameFromMUXAValue($microinstruction->getMUXAValue());
             $rightRegName  = self::getRegisterNameFromMUXBValue($microinstruction->getMUXBValue());

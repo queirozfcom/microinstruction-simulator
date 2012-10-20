@@ -298,7 +298,7 @@ class ProgramTest extends CDbTestCase {
 
         $this->assertEquals(50, $p->R4->asInt());
     }
-    
+
     public function testLastCase() {
         //MOV(R1,100)
         //MOV(R3,50)
@@ -327,21 +327,168 @@ class ProgramTest extends CDbTestCase {
         foreach ($lines4 as $line) {
             $p->appendToMemory($line);
         }
-        
+
         $p->runNextInstruction();
         $p->runNextInstruction();
         $p->runNextInstruction();
         $p->runNextInstruction();
-        
+
         $this->assertEquals($p->IR->getContent(), new Instruction('mov', 'constant', true, 'r3', true));
-        
+
         //($p->controlUnit->decode($p->IR->getContent()));
-        
+
         $this->assertEquals(50, $p->R3->asInt());
+
+        $this->assertEquals(100, $p->mainMemory[50]->asInt());
+
+        $this->assertEquals(100, $p->mainMemory[75]->asInt());
+    }
+
+    /**
+     * ADD
+     */
+    public function testAddRegistersOnDifferentSide() {
+        //add(r0,r3)
+        $p = new Program;
+
+        $lines1 = Factory::returnInstructionAndPossibleConstants(new VOInstruction('mov', 'r0', false, null, 'constant', false, 2));
+
+        foreach ($lines1 as $line) {
+            $p->appendToMemory($line);
+        }
+
+        $lines2 = Factory::returnInstructionAndPossibleConstants(new VOInstruction('mov', 'r3', false, null, 'constant', false, 3));
+
+        foreach ($lines2 as $line) {
+            $p->appendToMemory($line);
+        }
+
+        $lines3 = Factory::returnInstructionAndPossibleConstants(new VOInstruction('add', 'r0', false, null, 'r3', false, null));
+
+        foreach ($lines3 as $line) {
+            $p->appendToMemory($line);
+        }
+
+        $p->runNextInstruction();
+        $p->runNextInstruction();
+        $p->runNextInstruction();
+
+        $this->assertEquals(5, $p->R0->asInt());
+    }
+
+    public function testAddRegistersOnSameSide() {
+        //add(r0,r1)
+        $p = new Program;
+
+        $lines1 = Factory::returnInstructionAndPossibleConstants(new VOInstruction('mov', 'r0', false, null, 'constant', false, 15));
+
+        foreach ($lines1 as $line) {
+            $p->appendToMemory($line);
+        }
+
+        $lines2 = Factory::returnInstructionAndPossibleConstants(new VOInstruction('mov', 'r1', false, null, 'constant', false, 3000));
+
+        foreach ($lines2 as $line) {
+            $p->appendToMemory($line);
+        }
+
+        $lines3 = Factory::returnInstructionAndPossibleConstants(new VOInstruction('add', 'r0', false, null, 'r1', false, null));
+
+        foreach ($lines3 as $line) {
+            $p->appendToMemory($line);
+        }
+
+        $p->runNextInstruction();
+        $p->runNextInstruction();
+        $p->runNextInstruction();
+
+        $this->assertEquals(3000, $p->AR2->asInt());
+
+        $this->assertEquals(3015, $p->R0->asInt());
+    }
+
+    public function testAddConstToReg() {
+        //mov(r4,8)
+        //add(r4,8892)
+        $p = new Program;
+
+        $lines1 = Factory::returnInstructionAndPossibleConstants(new VOInstruction('mov', 'r4', false, null, 'constant', false, 8));
+
+        foreach ($lines1 as $line) {
+            $p->appendToMemory($line);
+        }
         
-        $this->assertEquals(100,$p->mainMemory[50]->asInt());
+        $lines2 = Factory::returnInstructionAndPossibleConstants(new VOInstruction('add', 'r4', false, null, 'constant', false, 8892));
+
+        foreach ($lines2 as $line) {
+            $p->appendToMemory($line);
+        }
         
-        $this->assertEquals(100,$p->mainMemory[75]->asInt());
+        $p->runNextInstruction();
+        $p->runNextInstruction();
+        
+        $this->assertEquals(8900, $p->R4->asInt());
+        
+    }
+    public function testAddConstToRegOnLeftSide() {
+        //mov(r0,5)
+        //add(r0,10)
+        $p = new Program;
+
+        $lines1 = Factory::returnInstructionAndPossibleConstants(new VOInstruction('mov', 'r0', false, null, 'constant', false, 5));
+
+        foreach ($lines1 as $line) {
+            $p->appendToMemory($line);
+        }
+        
+        $lines2 = Factory::returnInstructionAndPossibleConstants(new VOInstruction('add', 'r0', false, null, 'constant', false, 10));
+
+        foreach ($lines2 as $line) {
+            $p->appendToMemory($line);
+        }
+        
+        $p->runNextInstruction();
+        $p->runNextInstruction();
+        
+        $this->assertEquals(10, $p->MDR->asInt());
+        
+        $this->assertEquals(10, $p->AR2->asInt());
+        
+        $this->assertEquals(15, $p->R0->asInt());
+        
+    }
+    public function testAddIndirectedConstToRegOnLeftSide() {
+        //mov(r0,20)
+        //mov([100],40)
+        //add(r0,[100])
+        $p = new Program;
+
+        $lines1 = Factory::returnInstructionAndPossibleConstants(new VOInstruction('mov', 'r0', false, null, 'constant', false, 20));
+
+        foreach ($lines1 as $line) {
+            $p->appendToMemory($line);
+        }
+        $lines2 = Factory::returnInstructionAndPossibleConstants(new VOInstruction('mov', 'constant', true, 100, 'constant', false, 40));
+
+        foreach ($lines2 as $line) {
+            $p->appendToMemory($line);
+        }
+        
+        $lines3 = Factory::returnInstructionAndPossibleConstants(new VOInstruction('add', 'r0', false, null, 'constant', true, 100));
+
+        foreach ($lines3 as $line) {
+            $p->appendToMemory($line);
+        }
+        
+        $p->runNextInstruction();
+        $p->runNextInstruction();
+        $p->runNextInstruction();
+        
+        $this->assertEquals(60, $p->R0->asInt());
+        
+//        $this->assertEquals(10, $p->AR2->asInt());
+//        
+//        $this->assertEquals(15, $p->R0->asInt());
         
     }
 
