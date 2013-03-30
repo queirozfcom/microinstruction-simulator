@@ -79,16 +79,17 @@
 #left-div{
     float:left;
     width:30%;
-    
+    margin-right:2px;
 }
 
 #right-div{
-    width:55%;
+    width:54%;
     min-height:60px;
     max-height:700px;
     overflow: auto;
     float:right;
     text-align: center;
+    margin-left:2px;
 }
 
 #add-instruction-button{

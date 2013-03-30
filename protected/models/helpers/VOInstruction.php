@@ -48,6 +48,16 @@
 			$this->indirection2 = $indirection2;
 			$this->constant2    = $constant2;
 		}
+                
+                public function representsABranch(){
+                    if(strtoupper($this->mnemonic)==='BRZ' || strtoupper($this->mnemonic)==='BRN' ||
+                            strtoupper($this->mnemonic)==='BRE' || strtoupper($this->mnemonic)==='BRL' ||
+                            strtoupper($this->mnemonic)==='BRG')
+                        return true;
+                    else 
+                        return false;
+                }
+                
 		/**
 		 * @return the $mnemonic
 		 */

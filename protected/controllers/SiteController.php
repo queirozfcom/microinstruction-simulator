@@ -78,7 +78,18 @@ class SiteController extends Controller {
         }else
             throw new CHttpException(400, 'Invalid request. Please do not repeat this request again.');
     }
+    
+    public function actionRun_everything(){
+                if (Yii::app()->request->isPostRequest) {
+            $prog = $this->getProgramInstance();
+            $prog->run();
+            $this->setProgramInstance($prog);
+            $this->dumpInfoAsJson($prog);
+        }else
+            throw new CHttpException(400, 'Invalid request. Please do not repeat this request again.');
 
+    }
+    
 //        public function actionBootstrap(){
 //            
 //      }

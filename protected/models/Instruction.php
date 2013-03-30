@@ -10,6 +10,8 @@ class Instruction extends BinaryString {
         'MOV',
         'ADD',
         'SUB',
+        'MUL',
+        'DIV',
         'AND',
         'OR',
         'NAND',
@@ -17,7 +19,7 @@ class Instruction extends BinaryString {
         'XOR',
         'CMP',
         'CLR',
-        'NEG',
+        'NOT',
         'SHL',
         'SHR',
         'BRZ',
@@ -53,20 +55,32 @@ class Instruction extends BinaryString {
      * @param type $ind2
      * @throws InstructionException
      */
-    public function __construct($mnem, $param1, $ind1, $param2, $ind2) {
-        $this->setIntegerValue(0);
+    public function __construct() {
 
-        $this->setMnemonic($mnem);
-        $this->setParam1($param1);
-        $this->setIndirection1($ind1);
-        $this->setParam2($param2);
-        $this->setIndirection2($ind2);
+        if (func_num_args() === 5) {
+            //normal usage
+            $this->setIntegerValue(0);
 
-        if (is_null($this->param2) and $this->requiresTwoArguments()) {
-            throw new InstructionException('Missing argument 2 for instruction that needs 2 arguments');
-        }
-        if ($this->param1 === "CONSTANT" and !$this->indirection1) {
-            throw new InstructionException('Cannot use a direct CONSTANT as target for an Instruction.');
+            $this->setMnemonic(func_get_arg(0));
+            $this->setParam1(func_get_arg(1));
+            $this->setIndirection1(func_get_arg(2));
+            $this->setParam2(func_get_arg(3));
+            $this->setIndirection2(func_get_arg(4));
+
+            if (is_null($this->param2) && $this->requiresTwoArguments())
+                throw new InstructionException('Missing argument 2 for instruction that needs 2 arguments');
+
+            if ($this->param1 === "CONSTANT" && !$this->indirection1 && !$this->isBranch())
+                throw new InstructionException('Cannot use a direct CONSTANT as target for an Instruction.');
+        }elseif (func_num_args() === 2) {
+            //branch-type instructions
+            //normal usage
+            $this->setIntegerValue(0);
+
+            $this->setMnemonic(func_get_arg(0));
+            $this->setParam1('constant');
+            $this->setBranchOffset(func_get_arg(1));
+            
         }
     }
 
@@ -94,32 +108,109 @@ class Instruction extends BinaryString {
         return $this->mnemonic;
     }
 
-    private function requiresTwoArguments() {
-        return !$this->requiresOnlyOneArgument();
+    public function humanReadableForm() {
+        $output = "";
+
+        $output .= $this->mnemonic;
+
+        $output .= "(";
+
+        $output .= $this->indirection1 ? "[" : "";
+
+        $output .= ($this->param1 === "CONSTANT") ? "#" . $this->param1 : $this->param1;
+
+        $output .= $this->indirection1 ? "]" : "";
+
+        if (is_null($this->param2)) {
+            $output .= ")";
+            return $output;
+        }
+
+        $output .= ",";
+
+        $output .= $this->indirection2 ? "[" : "";
+
+        $output .= ($this->param2 === "CONSTANT") ? "#" . $this->param2 : $this->param2;
+
+        $output .= $this->indirection2 ? "]" : "";
+
+        $output .= ")";
+
+        return $output;
     }
 
-    public function hasIndirection() {
-        return $this->indirection1 or $this->indirection2;
-    }
-
-    private function requiresOnlyOneArgument() {
-        $arr = array('CLR',
-            'NEG',
-            'SHL',
-            'SHR',
-            'BRZ',
-            'BRN',
-            'BRE',
-            'BRL',
-            'BRG',
-            'BRC');
-        if (in_array(strtoupper($this->mnemonic), $arr)) {
+    public function hasConstant() {
+        if (($this->param1 === 'CONSTANT') or ($this->param2 === 'CONSTANT')) {
             return true;
         } else {
             return false;
         }
     }
 
+    private function requiresTwoArguments() {
+        return !$this->requiresOnlyOneArgument();
+    }
+
+    public function hasIndirection() {
+        return $this->indirection1 || $this->indirection2;
+    }
+
+    public function isBranch() {
+
+        if ($this->mnemonic === 'BRZ' || $this->mnemonic === 'BRN' || $this->mnemonic === 'BRE' || $this->mnemonic === 'BRL' || $this->mnemonic === 'BRG')
+            return true;
+        else
+            return false;
+    }
+    
+    public function getBranchOffset(){
+        $negativeOffset=$this->getIntValueStartingAt(7, 14);
+        $positiveOffset=$this->getIntValueStartingAt(7, 0);
+        
+        if( $negativeOffset!==0  && $positiveOffset!==0)
+                throw new InstructionException('A Branch Instruction should have either a positive offset or a negative offset. We found a Instruction that has both. Negative offset='.$negativeOffset.' and positive offset='.$positiveOffset.'.');
+        
+        if($negativeOffset===0)
+            return $positiveOffset;
+        elseif($positiveOffset===0)
+            return $negativeOffset*(-1);
+        else
+            throw new InstructionException('One branch offset should be a nonzero integer and the other should be zero');
+        
+    }
+    
+    private function requiresOnlyOneArgument() {
+        $arr = array('CLR',
+            'NOT',
+            'SHL',
+            'SHR',
+            'BRZ',
+            'BRN',
+            'BRE',
+            'BRL',
+            'BRG');
+        if (in_array(strtoupper($this->mnemonic), $arr)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    private function setBranchOffset($offset){
+        if(!is_int($offset) && is_numeric($offset))
+            $offset = intval($offset);
+        
+        if($offset===0)
+            throw new InstructionException('Nonzero Integer needed. '.$offset.' found.');
+        
+        if ($offset<0){
+            $this->setIntValueStartingAt($offset*(-1), 7, 14);
+        }
+        elseif($offset>0)
+            $this->setIntValueStartingAt($offset, 7, 0);
+        
+    }
+    
     private function setIndirection1($value) {
         if (!is_bool($value)) {
             throw new InstructionException('indirection1 value must be a boolean');
@@ -174,8 +265,14 @@ class Instruction extends BinaryString {
             case "CONSTANT":
                 $this->setIntValueStartingAt(8, 5, 7);
                 break;
+            case "MAR":
+                $this->setIntValueStartingAt(9, 5, 7);
+                break;
+            case "MDR":
+                $this->setIntValueStartingAt(10, 5, 7);
+                break;
             default:
-                throw new InstructionException('Invalid Param1');
+                throw new InstructionException('Invalid Param1: ' . $param);
         }
     }
 
@@ -213,7 +310,7 @@ class Instruction extends BinaryString {
                 $this->param2 = null;
                 break;
             default:
-                throw new InstructionException('Invalid Param2');
+                throw new InstructionException('Invalid Param2: ' . $param);
         }
     }
 
@@ -229,95 +326,59 @@ class Instruction extends BinaryString {
             case "SUB":
                 $this->setIntValueStartingAt(3, 6, 26);
                 break;
-            case "AND":
+            case "MUL":
                 $this->setIntValueStartingAt(4, 6, 26);
                 break;
-            case "OR":
+            case "DIV":
                 $this->setIntValueStartingAt(5, 6, 26);
                 break;
-            case "NAND":
+            case "AND":
                 $this->setIntValueStartingAt(6, 6, 26);
                 break;
-            case "NOR":
+            case "OR":
                 $this->setIntValueStartingAt(7, 6, 26);
                 break;
-            case "XOR":
+            case "NAND":
                 $this->setIntValueStartingAt(8, 6, 26);
                 break;
-            case "CMP":
+            case "NOR":
                 $this->setIntValueStartingAt(9, 6, 26);
                 break;
-            case "CLR":
+            case "XOR":
                 $this->setIntValueStartingAt(10, 6, 26);
                 break;
-            case "NEG":
+            case "CMP":
                 $this->setIntValueStartingAt(11, 6, 26);
                 break;
-            case "SHL":
+            case "CLR":
                 $this->setIntValueStartingAt(12, 6, 26);
                 break;
-            case "SHR":
+            case "NOT":
                 $this->setIntValueStartingAt(13, 6, 26);
                 break;
-            case "BRZ":
+            case "SHL":
                 $this->setIntValueStartingAt(14, 6, 26);
                 break;
-            case "BRN":
+            case "SHR":
                 $this->setIntValueStartingAt(15, 6, 26);
                 break;
-            case "BRE":
+            case "BRZ":
                 $this->setIntValueStartingAt(16, 6, 26);
                 break;
-            case "BRL":
+            case "BRN":
                 $this->setIntValueStartingAt(17, 6, 26);
                 break;
-            case "BRG":
+            case "BRE":
                 $this->setIntValueStartingAt(18, 6, 26);
                 break;
-            case "BRC":
+            case "BRL":
                 $this->setIntValueStartingAt(19, 6, 26);
+                break;
+            case "BRG":
+                $this->setIntValueStartingAt(20, 6, 26);
                 break;
             default:
                 throw new InstructionException("Invalid Mnemonic for this machine.");
-        }
-    }
-
-    public function humanReadableForm() {
-        $output = "";
-
-        $output .= $this->mnemonic;
-
-        $output .= "(";
-
-        $output .= $this->indirection1 ? "[" : "";
-
-        $output .= ($this->param1 === "CONSTANT") ? "#" . $this->param1 : $this->param1;
-
-        $output .= $this->indirection1 ? "]" : "";
-
-        if (is_null($this->param2)) {
-            $output .= ")";
-            return $output;
-        }
-
-        $output .= ",";
-
-        $output .= $this->indirection2 ? "[" : "";
-
-        $output .= ($this->param2 === "CONSTANT") ? "#" . $this->param2 : $this->param2;
-
-        $output .= $this->indirection2 ? "]" : "";
-
-        $output .= ")";
-
-        return $output;
-    }
-
-    public function hasConstant() {
-        if (($this->param1 === 'CONSTANT') or ($this->param2 === 'CONSTANT')) {
-            return true;
-        } else {
-            return false;
         }
     }
 

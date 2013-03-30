@@ -1,10 +1,15 @@
-<?php       
+<?php    
 
-Yii::app()->getClientScript()->registerCssFile('css/app/write.css');
+$this->breadcrumbs=[
+    'Program Writing'
+];
 
-Yii::app()->getClientScript()->registerCssFile('css/common/common.css');
 
-Yii::app()->getClientScript()->registerScriptFile('js/site/app/write.js');
+Yii::app()->getClientScript()->registerCssFile(Yii::app()->baseUrl.'/css/app/write.css');
+
+Yii::app()->getClientScript()->registerCssFile(Yii::app()->baseUrl.'/css/common/common.css');
+
+Yii::app()->getClientScript()->registerScriptFile(Yii::app()->baseUrl.'/js/site/app/write.js');
 
 ?>
 

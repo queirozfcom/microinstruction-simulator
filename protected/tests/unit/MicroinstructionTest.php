@@ -8,10 +8,6 @@ class MicroinstructionTest extends CDbTestCase {
         $this->assertEquals(0, $mi[23]);
     }
 
-    public function test_echo_string_thing() {
-        
-    }
-
     public function test_parametrized_construct() {
         $mi = new Microinstruction("data_to_mdr");
 
@@ -84,46 +80,6 @@ class MicroinstructionTest extends CDbTestCase {
 
         $this->assertEquals(2, $mi->getALUOperationCode());
     }
-
-    public function testSetMuxAndALUValueForADDFromSourceRegister() {
-        $m = new Microinstruction();
-
-//            $this->setExpectedException('MicroInstructionException');
-//            
-//            $m->setMuxAndALUValueForADDFromSourceRegister('R1', 'AR1');
-
-        $m->setMuxAndALUValueForADDFromSourceRegister('R0', 'R3');
-
-        $this->assertEquals(0, $m[14]);
-        $this->assertEquals(1, $m[13]);
-        $this->assertEquals(0, $m[12]);
-
-        $this->assertEquals(0, $m[21]);
-        $this->assertEquals(1, $m[20]);
-        $this->assertEquals(0, $m[19]);
-
-        $m = new Microinstruction;
-
-        $m->setMuxAndALUValueForADDFromSourceRegister('R4', 'R0');
-
-        $this->assertEquals(0, $m[14]);
-        $this->assertEquals(1, $m[13]);
-        $this->assertEquals(0, $m[12]);
-
-        $this->assertEquals(0, $m[21]);
-        $this->assertEquals(1, $m[20]);
-        $this->assertEquals(1, $m[19]);
-    }
-
-    /*
-      public function test_set_alu_operation_code(){
-      $mi = new Microinstruction;
-      $mi->setAluOpCodeFromDescription('S=A');
-
-      $opcode = $mi->getALUOperationCode();
-
-      $this->assertEquals(1,$opcode);
-
-      } */
+    
 }
 

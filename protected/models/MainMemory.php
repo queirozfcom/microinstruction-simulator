@@ -39,11 +39,11 @@ class MainMemory implements ArrayAccess, Countable {
 
     public function offsetGet($offset) {
 
-        if ($offset > $this->NUMBEROFLINES) {
-            throw new MainMemoryException('Maximum number of lines is ' . $this->NUMBEROFLINES);
-        }
-
-        return $this->memoryArea[$offset];
+        if ($offset > $this->NUMBEROFLINES) 
+            throw new MainMemoryException("Invalid offset: {$offset}. Maximum number of lines is {$this->NUMBEROFLINES}.");
+        
+            if(isset($this->memoryArea[$offset]))    
+                return $this->memoryArea[$offset];
     }
 
     public function offsetExists($offset) {
@@ -100,10 +100,12 @@ class MainMemory implements ArrayAccess, Countable {
      * @param Instruction $instruction
      */
     public function append($binaryString) {
-        if (!$binaryString instanceof BinaryString)
+        if (!$binaryString instanceof BinaryString){
             throw new MainMemoryException("memory only supports Binary Strings as data");
-        if ($binaryString->getLength() != $this->MAXIMUMBITSPERLINE)
+        }
+        if ($binaryString->getLength() != $this->MAXIMUMBITSPERLINE){
             throw new MainMemoryException("memory must support data word length");
+        }
         $this->memoryArea[] = $binaryString;
     }
 

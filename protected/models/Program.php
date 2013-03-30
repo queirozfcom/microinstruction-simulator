@@ -10,7 +10,14 @@ class Program {
         return $output;
     }
 
-    private static $targetableRegisters = array('R0', 'R1', 'R2', 'R3', 'R4', 'CONSTANT');
+    private $flags = [
+        'Z' => false,
+        'N' => false,
+        'E' => false,
+        'L' => false,
+        'G' => false
+    ];
+    private static $targetableRegisters = ['R0', 'R1', 'R2', 'R3', 'R4', 'CONSTANT'];
     //registers begin
     private $R0;
     private $R1;
@@ -34,6 +41,16 @@ class Program {
     public $executionPhase = false;
     private $log = array();
     private $fetchFirst = false;
+
+    public function run() {
+        while (true) {
+            try {
+                $this->runNextInstruction();
+            } catch (Exception $exc) {//program has ended
+                return;
+            }
+        }
+    }
 
     public function appendToMemory(BinaryString $bs) {
         $this->mainMemory->append($bs);
@@ -103,14 +120,27 @@ class Program {
         return $output;
     }
 
-    public function showNextInstruction() {
-        
-    }
-
     public function runNextInstruction() {
         $this->fetch();
-        $this->runInstruction($this->IR->getContent());
+
+        $nextInstruction = $this->IR->getContent();
+        
+        if (get_class($nextInstruction) === 'BinaryString') 
+            throw new ProgramException('End of program reached');
+        
+        $this->runInstruction($nextInstruction);
         $this->incrementPC();
+    }
+
+    public function incrementPC() {
+        $this->runMicroinstruction(new Microinstruction('increment_pc'));
+    }
+
+    public function getFlag($flag) {
+        if (!in_array(strtoupper($flag), array_keys($this->flags)))
+            throw new ProgramException("Flag $flag is not valid for this machine");
+
+        return $this->flags[$flag];
     }
 
     /**
@@ -121,7 +151,7 @@ class Program {
         $this->setCurrentInstruction("fetch");
 
         $fetchMicroprogram = $this->controlUnit->decode("fetch");
-
+        
         foreach ($fetchMicroprogram as $microinstruction) {
             $this->runMicroinstruction($microinstruction);
         }
@@ -152,64 +182,92 @@ class Program {
         $this->setCurrentMicroinstruction($microinstruction);
         $this->addToLog($microinstruction);
 
-        if ($microinstruction == new Microinstruction('pc_to_mar_read')) {
-            $this->MAR->setContent($this->PC->getContent());
-            $this->performMemoryRead();
-        } elseif($microinstruction == new Microinstruction('mdr_to_mar')){
-            $this->MAR->setContent($this->MDR->getContent());
-        } elseif($microinstruction == new Microinstruction('mdr_to_mar_read')) {
-            $this->MAR->setContent($this->MDR->getContent());
-            $this->performMemoryRead();
-        } elseif ($microinstruction == new Microinstruction('data_to_mdr')) {
-            $this->MDR->setContent($this->mainMemory->getReturnedValue());
-        } elseif ($microinstruction == new Microinstruction('mdr_to_ir')) {
-            $this->IR->setContent($this->MDR->getContent());
-        } elseif ($microinstruction == new Microinstruction('increment_pc')) {
-            $this->PC->setContent(new BinaryString(32, $this->PC->getContent()->asInt() + 1));
+        if ($microinstruction->isBranch()) {
+            $this->evaluateBranch($microinstruction); //if flag is set, perform branch
         } else {
-            
-            $targetRegName = self::getRegisterNameFromTargetIndex($microinstruction->getTargetRegIndex());
-            
-            $leftRegName   = self::getRegisterNameFromMUXAValue($microinstruction->getMUXAValue());
-            $rightRegName  = self::getRegisterNameFromMUXBValue($microinstruction->getMUXBValue());
-            
-            $ALUOpCode = $microinstruction->getALUOperationCode();
-
-            if (is_null($leftRegName)) {
-                $leftReg = null;
-                $leftRegContents = null;
-            } else {
-                $leftReg = $this->$leftRegName;
-                $leftRegContents = $leftReg->getContent();
-            }
-
-            if (is_null($rightRegName)) {
-                $rightReg = null;
-                $rightRegContents = null;
-            } else {
-                $rightReg = $this->$rightRegName;
-                $rightRegContents = $rightReg->getContent();
-            }
-
-            //result is a BinaryString
-            $result = $this->ALU->operateOn($leftRegContents, $rightRegContents, $ALUOpCode);
-
-            $this->$targetRegName->setContent($result);
-            
-            if($microinstruction->isMemoryRead()){
+            if ($microinstruction == new Microinstruction('pc_to_mar_read')) {
+                $this->MAR->setContent($this->PC->getContent());
                 $this->performMemoryRead();
-            }
-            
-            if($microinstruction->isMemoryWrite()){
-                //syslog(LOG_ALERT, 'ismemorywrite');
-                $this->performMemoryWrite();
+            } elseif ($microinstruction == new Microinstruction('mdr_to_mar'))
+                $this->MAR->setContent($this->MDR->getContent());
+            elseif ($microinstruction == new Microinstruction('mdr_to_mar_read')) {
+                $this->MAR->setContent($this->MDR->getContent());
+                $this->performMemoryRead();
+            } elseif ($microinstruction == new Microinstruction('data_to_mdr'))
+                $this->MDR->setContent($this->mainMemory->getReturnedValue());
+            elseif ($microinstruction == new Microinstruction('mdr_to_ir'))
+                $this->IR->setContent($this->MDR->getContent());
+            elseif ($microinstruction == new Microinstruction('increment_pc'))
+                $this->PC->setContent(new BinaryString(32, $this->PC->getContent()->asInt() + 1));
+            else {
+
+                $targetRegName = self::getRegisterNameFromTargetIndex($microinstruction->getTargetRegIndex());
+                $leftRegName = self::getRegisterNameFromMUXAValue($microinstruction->getMUXAValue());
+                $rightRegName = self::getRegisterNameFromMUXBValue($microinstruction->getMUXBValue());
+
+                $ALUOpCode = $microinstruction->getALUOperationCode();
+
+                if (is_null($leftRegName)) {
+                    $leftReg = null;
+                    $leftRegContents = null;
+                } else {
+                    $leftReg = $this->$leftRegName;
+                    $leftRegContents = $leftReg->getContent();
+                }
+
+                if (is_null($rightRegName)) {
+                    $rightReg = null;
+                    $rightRegContents = null;
+                } else {
+                    $rightReg = $this->$rightRegName;
+                    $rightRegContents = $rightReg->getContent();
+                }
+
+                $this->resetFlags();
+                //result is a BinaryString
+                $result = $this->ALU->operateOn($leftRegContents, $rightRegContents, $ALUOpCode);
+                
+                $this->setFlags($result);
+                
+                
+                if (!ALU::isCMPOperation($ALUOpCode)) {
+                    //CMP is the same as SUB but no results are stored in the target register
+
+                    $this->$targetRegName->setContent($result);
+
+                    if ($microinstruction->isMemoryRead())
+                        $this->performMemoryRead();
+
+                    if ($microinstruction->isMemoryWrite())
+                        $this->performMemoryWrite();
+                }
             }
         }
     }
-    
-    private static function getRegisterNameFromTargetIndex($index){
+
+    private function evaluateBranch(Microinstruction $microinstruction) {
+
+        $branchFlag = $microinstruction->getBranchFlagType();
+
+        $offset = $microinstruction->getBranchOffset();
+
+        if ($this->flags[$branchFlag]) {
+
+            $currentPCContentsAsInt = $this->PC->asInt();
+
+            $newPCContentsAsInt = $currentPCContentsAsInt + ($offset);
+
+            $newPCContents = new BinaryString();
+            $newPCContents->setIntegerValue($newPCContentsAsInt);
+
+            $this->PC->setContent($newPCContents);
+
+        }
+    }
+
+    private static function getRegisterNameFromTargetIndex($index) {
         //$index is an integer
-        
+
         switch ($index) {
             case 8:
                 return 'R0';
@@ -236,9 +294,8 @@ class Program {
             default:
                 throw new ProgramException("Invalid target Index: $index");
         }
-        
     }
-    
+
     private static function getRegisterNameFromMUXAValue($MUXAValue) {
         switch ($MUXAValue) {
             case '000':
@@ -308,7 +365,7 @@ class Program {
      * $mainMemory->getReturnedValue();
      */
     private function performMemoryRead() {
-        
+
         //syslog(LOG_ALERT,'memread');
         $intval = $this->MAR->asInt();
         $this->mainMemory->performRead($intval);
@@ -321,7 +378,7 @@ class Program {
     private function performMemoryWrite() {
         $index = $this->MAR->asInt();
         $data = $this->MDR->getContent();
-        
+
         //syslog(LOG_ALERT,'memwrite');
         $this->mainMemory->performWrite($index, $data);
     }
@@ -334,8 +391,28 @@ class Program {
         
     }
 
-    public function incrementPC() {
-        $this->runMicroinstruction(new Microinstruction('increment_pc'));
+    private function setFlags(BinaryString $result) {
+
+        //TODO a flag CARRy? como fazer isso? não fazer.
+
+        if ($result->asInt() === 0) {
+            $this->flags['Z'] = true;
+            $this->flags['E'] = true;
+        } elseif ($result->asInt() < 0) {
+            $this->flags['N'] = true;
+            $this->flags['L'] = true;
+        } elseif ($result->asInt() > 0)
+            $this->flags['G'] = true;
+        else
+            throw new ProgramException('Something is wrong: the number "' . $result->asInt() . '" looks like it\'s not an Integer. What is it, then?');
+    }
+
+    private function resetFlags() {
+        $this->flags['Z'] = false;
+        $this->flags['N'] = false;
+        $this->flags['E'] = false;
+        $this->flags['L'] = false;
+        $this->flags['G'] = false;
     }
 
 }

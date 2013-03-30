@@ -195,7 +195,6 @@ class DecoderTest extends CDbTestCase{
         $inst = new Instruction('mov','constant',false,'r0',true);
         $mp = $method->invoke($obj,$inst);
     }
-    
     public function test_constant_no_indirection(){
         $obj = new Decoder;
         
@@ -232,7 +231,6 @@ class DecoderTest extends CDbTestCase{
         $this->assertEquals(1,$m3[0]);
         
     }
-    
     public function test_constant_no_indirection2(){
         $obj = new Decoder;
         
@@ -243,7 +241,6 @@ class DecoderTest extends CDbTestCase{
         $mp = $method->invoke($obj,$inst);
         
     }
-    
     public function test_get_opposite_ar(){
         $obj = new Decoder;
         
@@ -255,7 +252,6 @@ class DecoderTest extends CDbTestCase{
         
         $this->assertEquals('AR2',$ar);
     }
-    
     public function test__REG____CONST__(){
         //[REG],[CONST]
         $obj = new Decoder;
@@ -318,7 +314,6 @@ class DecoderTest extends CDbTestCase{
         $mi6 = $mp[6];
         $mi7 = $mp[7];
         
-        
         $this->assertTrue($mi0 instanceof Microinstruction);
         $this->assertEquals(new Microinstruction('increment_pc'),$mi0);
         
@@ -347,21 +342,44 @@ class DecoderTest extends CDbTestCase{
         $this->assertEquals(1,$mi7[0]);
         
     }
-    
+    public function testDecodeMovToMar(){
+        $obj = new Decoder;
+        
+        $method = self::getMethod('decodeMovInstruction');
+        
+        $inst = new Instruction('mov','mar',false,'r3',false);
+        
+        $mp = $method->invoke($obj,$inst);
+        
+        $this->assertEquals(1,count($mp));
+
+    }
+    //ADD-INSTRUCTION TESTS
     public function testDecodeAddRegRegDifferentSides(){
         $obj = new Decoder;
         
-        $method = self::getMethod('decodeAddInstruction');
+        $method = self::getMethod('decodeArithmeticInstruction');
         
         $inst = new Instruction('add','r0',false,'r3',false);
         
         $mp = $method->invoke($obj,$inst);
         
         $this->assertEquals(1,count($mp));
-    }
-    
-    
-    
+        
+        }
+    public function testDecodeCmp(){
+         
+        $obj = new Decoder;
+        
+        $method = self::getMethod('decodeArithmeticInstruction');
+        
+        $inst = new Instruction('cmp','r0',false,'r3',false);
+        
+        $mp = $method->invoke($obj,$inst);
+        
+         
+     }   
+        
 }
 
 ?>

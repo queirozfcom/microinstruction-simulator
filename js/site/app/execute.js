@@ -10,6 +10,14 @@ $(document).ready(function(){
         var url = $(this).attr('targeturl');
         call(url);
     });
+    $("#run-everything-button").click(function(){
+        $("div.tooltip").hide();
+        var url = $(this).attr('targeturl');
+        call(url);
+    });
+
+
+
     $("[rel=tooltip]").tooltip();
 });
 

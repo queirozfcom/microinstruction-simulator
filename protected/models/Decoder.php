@@ -12,6 +12,8 @@ class Decoder {
      *  but, in special circumstances, such as for commonly used routines (instruction 
      *  fetching, PC upgrade,and so on) a String alias can be used.
      * 
+     * @param Array an optional array of flags. Some instructions need flags 
+     * 
      * @return array A Microinstruction array, i.e. a microProgram
      */
     public function decode($instruction) {
@@ -64,18 +66,134 @@ class Decoder {
     /**
      * 
      * Tests what kind of Instruction it was sent. Then redirects to the correct method
-     * to decode that particular kind (mov,add,sub, etc) of Instruction.
+     * to decode that particular kind (mov,add,sub, etc) of Instruction, and then returns the Microprogram.
      * @param Instruction $inst
      * 
-     * @return Array Microprogram
+     * @return Array Microprogram -> an Array of Microinstructions
      */
     private function getMicroprogramFromInstruction(Instruction $inst) {
+        
+        
         if ($inst->getMnemonic() == 'MOV') {
             return $this->decodeMOVInstruction($inst);
-        } elseif ($inst->getMnemonic() == 'ADD') {
-            return $this->decodeADDInstruction($inst);
-        } else {
+        } elseif ($inst->getMnemonic() === 'ADD' || $inst->getMnemonic() === "SUB" ||
+                $inst->getMnemonic() === "MUL" || $inst->getMnemonic() === "AND" ||
+                $inst->getMnemonic() === "OR" || $inst->getMnemonic() === "NAND" ||
+                $inst->getMnemonic() === "NOR" || $inst->getMnemonic() === "XOR" ||
+                $inst->getMnemonic() === "CMP") {
+            return $this->decodeArithmeticInstruction($inst);
+        } elseif ($inst->getMnemonic() === 'SHL' || $inst->getMnemonic() === 'SHR' || $inst->getMnemonic() === 'NOT' ) {
+            return $this->decodeOneOperandInstruction($inst);
+        } elseif($inst->getMnemonic()==='BRZ' || $inst->getMnemonic()==='BRN' || 
+                $inst->getMnemonic()==='BRE' || $inst->getMnemonic()==='BRL' || 
+                $inst->getMnemonic()==='BRG') {
+            return $this->decodeBranchInstruction($inst);
+        }
+        else
             throw new DecoderException('not able to decode instruction whose mnemonic is ' . $inst->getMnemonic());
+        
+    }
+    
+    private function decodeBranchInstruction(Instruction $inst){
+        
+        $returnMicroprogram=[];
+        if ($inst->isBranch() && $inst->hasConstant()){
+            
+            //just one micro. A special kind of micro.
+            $branchType = $inst->getMnemonic();
+            $offset = $inst->getBranchOffset();
+            
+            $m = new Microinstruction();
+            
+            $m->setBranchType($branchType);
+            $m->setBranchOffset($offset);
+            
+            $returnMicroprogram[] = $m;
+        }
+       
+        return $returnMicroprogram;
+    }
+    
+    private function decodeOneOperandInstruction(Instruction $inst) {
+        $returnMicroprogram = [];
+
+        if ($inst->hasIndirection()) {
+            if ($inst->hasConstant()) {
+                $returnMicroprogram[] = new Microinstruction('increment_pc');
+                $returnMicroprogram[] = new Microinstruction('pc_to_mar_read');
+                $returnMicroprogram[] = new Microinstruction('data_to_mdr');
+                $returnMicroprogram[] = new Microinstruction('mdr_to_mar_read');
+                $returnMicroprogram[] = new Microinstruction('data_to_mdr');
+
+                $mi = new Microinstruction;
+                $mi->setMuxAndALUValueForMOVFromSourceRegister('MDR');
+                $mi->setTargetIndexFromTargetRegister('AR2');
+
+                $returnMicroprogram[] = $mi;
+
+                $mi = new Microinstruction();
+                $mi->setMuxAndALUValueFromSourceRegisterAndMnemonic('AR2', $inst->getMnemonic());
+                $mi->setTargetIndexFromTargetRegister('AR2');
+
+                $returnMicroprogram[] = $mi;
+
+                //now place the value back into the right register, I mean, memory line
+
+                $mi = new Microinstruction;
+                $mi->setMuxAndALUValueForMOVFromSourceRegister('AR2');
+                $mi->setTargetIndexFromTargetRegister('MDR');
+                $mi->setWrite();
+
+                $returnMicroprogram[] = $mi;
+
+                return $returnMicroprogram;
+            } else {
+                $mi = new Microinstruction();
+                $mi->setMuxAndALUValueForMOVFromSourceRegister($inst->getParam1());
+                $mi->setTargetIndexFromTargetRegister('MAR');
+                $mi->setRead();
+
+                $returnMicroprogram[] = $mi;
+
+                $returnMicroprogram[] = new Microinstruction('data_to_mdr');
+
+
+                $mi = new Microinstruction;
+                $mi->setMuxAndALUValueForMOVFromSourceRegister('MDR');
+                $mi->setTargetIndexFromTargetRegister('AR2');
+
+                $returnMicroprogram[] = $mi;
+
+                $mi = new Microinstruction;
+                $mi->setMuxAndALUValueFromSourceRegisterAndMnemonic('AR2', $inst->getMnemonic());
+                $mi->setTargetIndexFromTargetRegister('AR2');
+
+                $returnMicroprogram[] = $mi;
+
+                //now place the value back into the right register
+
+                $mi = new Microinstruction;
+                $mi->setMuxAndALUValueForMOVFromSourceRegister('AR2');
+                $mi->setTargetIndexFromTargetRegister('MDR');
+                $mi->setWrite();
+
+                $returnMicroprogram[] = $mi;
+
+                return $returnMicroprogram;
+            }
+        } else {
+            if ($inst->hasConstant()) {
+                throw new DecoderException('not able to shift a pure number. It should be either an indirected constant or a register');
+            } else {
+                $mi = new Microinstruction;
+
+                $mi->setMuxAndALUValueFromSourceRegisterAndMnemonic($inst->getParam1(), $inst->getMnemonic());
+                $mi->setTargetIndexFromTargetRegister($inst->getParam1());
+
+                $returnMicroprogram[] = $mi;
+
+                return $returnMicroprogram;
+            }
         }
     }
 
@@ -380,61 +498,201 @@ class Decoder {
         }
     }
 
-    private function decodeADDInstruction(Instruction $inst) {
+    private function decodeArithmeticInstruction(Instruction $inst) {
+        $mnemonic = $inst->getMnemonic();
+        
         $returnMicroprogram = array();
 
         if ($inst->hasIndirection()) {
             if ($inst->hasConstant()) {
                 if ($inst->getParam1() !== "CONSTANT" and $inst->getParam2() === "CONSTANT" and !$inst->getIndirection1() and $inst->getIndirection2()) {
-                    //ADD(REG,[CONST])
+                    //ARIT(REG,[CONST])
                     $returnMicroprogram[] = new Microinstruction('increment_pc');
                     $returnMicroprogram[] = new Microinstruction('pc_to_mar_read');
                     $returnMicroprogram[] = new Microinstruction('data_to_mdr');
                     $returnMicroprogram[] = new Microinstruction('mdr_to_mar_read');
                     $returnMicroprogram[] = new Microinstruction('data_to_mdr');
 
-                    foreach ($this->decode(new Instruction('add', $inst->getParam1(), false, 'mdr', false)) as $line) {
+                    foreach ($this->decode(new Instruction($mnemonic, $inst->getParam1(), false, 'mdr', false)) as $line) {
                         $returnMicroprogram[] = $line;
                     }
 
                     return $returnMicroprogram;
-                    
                 } elseif ($inst->getParam1() !== "CONSTANT" and $inst->getParam2() === "CONSTANT" and $inst->getIndirection1() and $inst->getIndirection2()) {
-                    //ADD([REG],[CONST])
+                    //ARIT([REG],[CONST])
                     $returnMicroprogram[] = new Microinstruction('increment_pc');
                     $returnMicroprogram[] = new Microinstruction('pc_to_mar_read');
                     $returnMicroprogram[] = new Microinstruction('data_to_mdr');
                     $returnMicroprogram[] = new Microinstruction('mdr_to_mar_read');
-                    $returnMicroprogram[] = new Microinstruction('data_to_mdr');
-                    
-                    foreach($this->decode(new Instruction('mov', 'ar2' , false, 'mdr' , false)) as $line){
+                    $returnMicroprogram[] = new Microinstruction('data_to_mdr'); //mdr contains the value in memory position defined by CONSTANT
+
+                    foreach ($this->decode(new Instruction('mov', 'ar2', false, 'mdr', false)) as $line) {
                         $returnMicroprogram[] = $line;
-                    }                    
-                    
-                    
+                    }
+
+                    $lines = $this->decode(new Instruction('mov', 'mar', false, $inst->getParam1(), false));
+
+                    $lines[0]->setRead();
+
+                    $returnMicroprogram[] = $lines[0];
+
+                    $returnMicroprogram[] = new Microinstruction('data_to_mdr');
+
+                    $lines = $this->decode(new Instruction($mnemonic, 'mdr', false, 'ar2', false));
+
+                    $lines[0]->setWrite();
+
+                    $returnMicroprogram[] = $lines[0];
+
                     return $returnMicroprogram;
                 } elseif ($inst->getParam1() !== "CONSTANT" and $inst->getParam2() === "CONSTANT" and $inst->getIndirection1() and !$inst->getIndirection2()) {
                     //MNEM([REG],CONST)
+                    $returnMicroprogram[] = new Microinstruction('increment_pc');
+                    $returnMicroprogram[] = new Microinstruction('pc_to_mar_read');
+                    $returnMicroprogram[] = new Microinstruction('data_to_mdr');
 
+                    foreach ($this->decode(new Instruction('mov', 'ar2', false, 'mdr', false)) as $line) {
+                        $returnMicroprogram[] = $line;
+                    }
+
+                    $lines = $this->decode(new Instruction('mov', 'mar', false, $inst->getParam1(), false));
+
+                    $lines[0]->setRead();
+
+                    $returnMicroprogram[] = $lines[0];
+
+                    $returnMicroprogram[] = new Microinstruction('data_to_mdr');
+
+                    $lines = $this->decode(new Instruction($mnemonic, 'mdr', false, 'ar2', false));
+
+                    $lines[0]->setWrite();
+
+                    $returnMicroprogram[] = $lines[0];
 
                     return $returnMicroprogram;
                 } elseif ($inst->getParam1() === "CONSTANT" and $inst->getParam2() === "CONSTANT" and $inst->getIndirection1() and !$inst->getIndirection2()) {
                     //MNEM([CONST],CONST)
+                    $returnMicroprogram[] = new Microinstruction('increment_pc');
+                    $returnMicroprogram[] = new Microinstruction('pc_to_mar_read');
+                    $returnMicroprogram[] = new Microinstruction('data_to_mdr');
 
+                    //need to save the value of mdr so we can use it later on 
+                    foreach ($this->decode(new Instruction('mov', 'ar1', false, 'mdr', false)) as $line) {
+                        $returnMicroprogram[] = $line;
+                    }
+
+                    $returnMicroprogram[] = new Microinstruction('mdr_to_mar_read');
+                    $returnMicroprogram[] = new Microinstruction('data_to_mdr'); //mdr contains the value in memory position defined by CONSTANT
+
+
+
+                    foreach ($this->decode(new Instruction('mov', 'ar2', false, 'mdr', false)) as $line) {
+                        $returnMicroprogram[] = $line;
+                    }
+
+                    $returnMicroprogram[] = new Microinstruction('increment_pc');
+                    $returnMicroprogram[] = new Microinstruction('pc_to_mar_read');
+                    $returnMicroprogram[] = new Microinstruction('data_to_mdr');
+
+                    foreach ($this->decode(new Instruction('mov', 'mar', false, 'ar1', false)) as $line) {
+                        $returnMicroprogram[] = $line;
+                    }
+
+                    $lines = $this->decode(new Instruction($mnemonic, 'mdr', false, 'ar2', false));
+
+                    $lines[0]->setWrite();
+
+                    $returnMicroprogram[] = $lines[0];
 
                     return $returnMicroprogram;
                 } elseif ($inst->getParam1() === "CONSTANT" and $inst->getParam2() === "CONSTANT" and $inst->getIndirection1() and $inst->getIndirection2()) {
                     //MNEM([CONST],[CONST])
+                    $returnMicroprogram[] = new Microinstruction('increment_pc');
+                    $returnMicroprogram[] = new Microinstruction('pc_to_mar_read');
+                    $returnMicroprogram[] = new Microinstruction('data_to_mdr');
 
+                    //need to save the value of mdr so we can use it later on 
+                    foreach ($this->decode(new Instruction('mov', 'ar1', false, 'mdr', false)) as $line) {
+                        $returnMicroprogram[] = $line;
+                    }
+
+                    $returnMicroprogram[] = new Microinstruction('mdr_to_mar_read');
+                    $returnMicroprogram[] = new Microinstruction('data_to_mdr'); //mdr contains the value in memory position defined by CONSTANT
+
+
+
+                    foreach ($this->decode(new Instruction('mov', 'ar2', false, 'mdr', false)) as $line) {
+                        $returnMicroprogram[] = $line;
+                    }
+
+                    $returnMicroprogram[] = new Microinstruction('increment_pc');
+                    $returnMicroprogram[] = new Microinstruction('pc_to_mar_read');
+                    $returnMicroprogram[] = new Microinstruction('data_to_mdr');
+                    $returnMicroprogram[] = new Microinstruction('mdr_to_mar_read');
+                    $returnMicroprogram[] = new Microinstruction('data_to_mdr'); //mdr contains the value in memory position defined by CONSTANT
+
+                    foreach ($this->decode(new Instruction('mov', 'mar', false, 'ar1', false)) as $line) {
+                        $returnMicroprogram[] = $line;
+                    }
+
+                    $lines = $this->decode(new Instruction($mnemonic, 'mdr', false, 'ar2', false));
+
+                    $lines[0]->setWrite();
+
+                    $returnMicroprogram[] = $lines[0];
 
                     return $returnMicroprogram;
                 } elseif ($inst->getParam1() === 'CONSTANT' and $inst->getParam2() !== "CONSTANT" and $inst->getIndirection1() and !$inst->getIndirection2()) {
                     //MNEM([CONST],REG)
+//                    foreach ($this->decode(new Instruction('mov', 'ar2', false, 'mdr', false)) as $line) {
+//                        $returnMicroprogram[] = $line;
+//                    }
 
+                    $returnMicroprogram[] = new Microinstruction('increment_pc');
+                    $returnMicroprogram[] = new Microinstruction('pc_to_mar_read');
+                    $returnMicroprogram[] = new Microinstruction('data_to_mdr');
+
+                    $returnMicroprogram[] = new Microinstruction('mdr_to_mar_read');
+                    $returnMicroprogram[] = new Microinstruction('data_to_mdr'); //mdr contains the value in memory position defined by CONSTANT
+
+                    $lines = $this->decode(new Instruction($mnemonic, 'mdr', false, $inst->getParam2(), false));
+
+                    $sizeOfMicroInstructionArray = count($lines);
+
+                    $lines[$sizeOfMicroInstructionArray - 1]->setWrite();
+
+                    foreach ($lines as $line) {
+                        $returnMicroprogram[] = $line;
+                    }
 
                     return $returnMicroprogram;
                 } elseif ($inst->getParam1() === 'CONSTANT' and $inst->getParam2() !== "CONSTANT" and $inst->getIndirection1() and $inst->getIndirection2()) {
                     //MNEM([CONST],[REG])
+
+                    $lines = $this->decode(new Instruction('mov', 'mar', false, $inst->getParam2(), false));
+
+                    $lines[0]->setRead();
+
+                    $returnMicroprogram[] = $lines[0];
+
+                    $returnMicroprogram[] = new Microinstruction('data_to_mdr');
+
+                    foreach ($this->decode(new Instruction('mov', 'ar2', false, 'mdr', false)) as $line) {
+                        $returnMicroprogram[] = $line;
+                    }
+
+                    $returnMicroprogram[] = new Microinstruction('increment_pc');
+                    $returnMicroprogram[] = new Microinstruction('pc_to_mar_read');
+                    $returnMicroprogram[] = new Microinstruction('data_to_mdr');
+
+                    $returnMicroprogram[] = new Microinstruction('mdr_to_mar_read');
+                    $returnMicroprogram[] = new Microinstruction('data_to_mdr'); //mdr contains the value in memory position defined by CONSTANT
+
+                    $lines = $this->decode(new Instruction($mnemonic, 'mdr', false, 'ar2', false));
+
+                    $lines[0]->setWrite();
+
+                    $returnMicroprogram[] = $lines[0];
 
                     return $returnMicroprogram;
                 }
@@ -442,15 +700,72 @@ class Decoder {
                 if ($inst->getIndirection1() and $inst->getIndirection2()) {
                     //MNEM([REG],[REG])
 
-                    $returnMicroprogram[] = $mi;
+                    $lines = $this->decode(new Instruction('mov', 'mar', false, $inst->getParam2(), false));
+
+                    $lines[0]->setRead();
+
+                    $returnMicroprogram[] = $lines[0];
+
+                    $returnMicroprogram[] = new Microinstruction('data_to_mdr');
+
+                    foreach ($this->decode(new Instruction('mov', 'ar2', false, 'mdr', false)) as $line) {
+                        $returnMicroprogram[] = $line;
+                    }
+
+                    $lines = $this->decode(new Instruction('mov', 'mar', false, $inst->getParam1(), false));
+
+                    $lines[0]->setRead();
+
+                    $returnMicroprogram[] = $lines[0];
+
+                    $returnMicroprogram[] = new Microinstruction('data_to_mdr');
+
+                    $lines = $this->decode(new Instruction($mnemonic, 'mdr', false, 'ar2', false));
+
+                    $lines[0]->setWrite();
+
+                    $returnMicroprogram[] = $lines[0];
 
                     return $returnMicroprogram;
                 } elseif ($inst->getIndirection1()) {
                     //MNEM([REG],REG)
 
+                    $lines = $this->decode(new Instruction('mov', 'mar', false, $inst->getParam1(), false));
+
+                    $lines[0]->setRead();
+
+                    $returnMicroprogram[] = $lines[0];
+
+                    $returnMicroprogram[] = new Microinstruction('data_to_mdr');
+
+                    $lines = $this->decode(new Instruction($mnemonic, 'mdr', false, $inst->getParam2(), false));
+
+                    $sizeOfMicroInstructionArray = count($lines);
+
+                    $lines[$sizeOfMicroInstructionArray - 1]->setWrite();
+
+                    foreach ($lines as $line) {
+                        $returnMicroprogram[] = $line;
+                    }
+
                     return $returnMicroprogram;
                 } elseif ($inst->getIndirection2()) {
                     //MNEM(REG,[REG])
+                    $lines = $this->decode(new Instruction('mov', 'mar', false, $inst->getParam2(), false));
+
+                    $lines[0]->setRead();
+
+                    $returnMicroprogram[] = $lines[0];
+
+                    $returnMicroprogram[] = new Microinstruction('data_to_mdr');
+
+                    $lines = $this->decode(new Instruction($mnemonic, $inst->getParam1(), false, 'mdr', false));
+
+                    $sizeOfMicroInstructionArray = count($lines);
+
+                    foreach ($lines as $line) {
+                        $returnMicroprogram[] = $line;
+                    }
 
                     return $returnMicroprogram;
                 } else {
@@ -461,20 +776,14 @@ class Decoder {
             if ($inst->hasConstant()) {
                 // if it's no indirection and constants, there can be only one way:
                 // ADD(REG,CONST);
-                $mi = new Microinstruction('increment_pc');
 
-                $returnMicroprogram[] = $mi;
-                unset($mi);
-                $mi = new Microinstruction('pc_to_mar_read');
+                $returnMicroprogram[] = new Microinstruction('increment_pc');
 
-                $returnMicroprogram[] = $mi;
-                unset($mi);
+                $returnMicroprogram[] = new Microinstruction('pc_to_mar_read');
 
-                $mi = new Microinstruction('data_to_mdr');
-                $returnMicroprogram[] = $mi;
-                unset($mi);
+                $returnMicroprogram[] = new Microinstruction('data_to_mdr');
 
-                foreach ($this->decode(new Instruction('add', $inst->getParam1(), false, 'mdr', false)) as $line) {
+                foreach ($this->decode(new Instruction($mnemonic, $inst->getParam1(), false, 'mdr', false)) as $line) {
                     $returnMicroprogram[] = $line;
                 }
 
@@ -486,9 +795,7 @@ class Decoder {
                 $reg1 = $inst->getParam1(); //target
                 $reg2 = $inst->getParam2(); //source
 
-                if (self::getSideFromSourceName($reg1) !== self::getSideFromSourceName($reg2)) {
-                    $mi->setMuxAndALUValueForADDFromSourceRegister($reg1, $reg2);
-                } else {
+                if (self::getSideFromSourceName($reg1) === self::getSideFromSourceName($reg2)) {
                     $ar = self::getOppositeARFromRegisterName($reg2);
 
                     foreach ($this->decodeMOVInstruction(new Instruction('mov', $ar, false, $reg2, false)) as $micro) {
@@ -496,8 +803,11 @@ class Decoder {
                     }
 
                     $mi = new Microinstruction;
-                    $mi->setMuxAndALUValueForADDFromSourceRegister($reg1, $ar);
+
+                    $reg2 = $ar;
                 }
+
+                $mi->setMuxAndALUValueFromSourceRegisterAndMnemonic($reg1, $reg2, $mnemonic);
                 $mi->setTargetIndexFromTargetRegister($reg1);
 
                 $returnMicroprogram[] = $mi;
@@ -571,7 +881,7 @@ class Decoder {
                 return 'B';
                 break;
             default:
-                throw new DecoderException('Unsupported register set as source to ALU');
+                throw new DecoderException('Unsupported register set as source to ALU: '.  strtoupper($regName) );
         }
     }
 

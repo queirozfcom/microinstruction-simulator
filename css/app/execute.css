@@ -29,12 +29,7 @@
     -moz-box-shadow: inset 0 1px 0 #fff;
     box-shadow: inset 0 1px 0 #fff;
 }
-.ui-custom-icon-up{
-    background-image: url('/images/arrow-090-medium.png') !important;
-}
-.ui-custom-icon-down{
-    background-image: url('/images/arrow-270-medium.png') !important;
-}
+
 
 #main-div{
     min-height:600px;
@@ -54,7 +49,7 @@
 
 #left-div{
     float:left;
-    width:39%;
+    width:38%;
     margin-left:8px;
     margin-bottom: 8px;
     text-align: center;
@@ -88,14 +83,6 @@
     clear: both;
     min-height: 200px;
 }
-
-#reset-button,#run-next-instruction-button{
-    margin-left: 2px;
-    margin-right:2px;
-    position:relative;
-    top:20px;
-}
-
 
 
 #mux-b-regs-div, #mux-a-regs-div, #memory-related-regs-div,#ir-regs-div{
@@ -141,4 +128,8 @@
     overflow-y: scroll;
     font-size: 12px !important;
     font-family: monospace;  
+}
+
+a.btn{
+    font-size: 0.8em;
 }
