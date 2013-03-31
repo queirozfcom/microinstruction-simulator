@@ -1,13 +1,3 @@
-.ui-custom-icon-plus{
-    background-image: url('/images/plus.png') !important;
-}
-.ui-custom-icon-tick-32{
-    background-image: url('/images/tick-32.png') !important;
-    left: 16px !important;
-    top:16px !important;
-    width:32px !important;
-    height:32px !important;    
-}
 .panel-div{
     min-height:600px;
     width:100%;
@@ -31,42 +21,6 @@
 }
 
 
-#main-div{
-    min-height:600px;
-    width:100%;
-    text-align: center;
-}
-
-.step-div{
-    margin: 10px;
-    font-size: 20px;
-    font-weight: bold;
-}
-
-.app-half-div{
-    text-align: left;
-}
-
-#left-div{
-    float:left;
-    width:38%;
-    margin-left:8px;
-    margin-bottom: 8px;
-    text-align: center;
-    min-height: 300px;
-    max-height: 300px;
-    
-}
-
-#right-div{
-    min-height: 300px;
-    max-height: 300px;
-    width:50%;
-    float:right;
-    margin-right:8px;
-    margin-bottom: 8px;
-    
-}
 
 #instruction-grid{
     min-height:235px;
@@ -123,8 +77,8 @@
 }
 
 #log-contents{
-    max-height:170px;
-    
+    max-height:260px;
+    min-height: 260px;
     overflow-y: scroll;
     font-size: 12px !important;
     font-family: monospace;  

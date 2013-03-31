@@ -1,62 +1,61 @@
 <?php
-
-$this->breadcrumbs=[
-    'Program Execution'
+$this->breadcrumbs = [
+    'Writing the Program' => ['/site/write'],
+    'Running the Program'
 ];
 
 Yii::app()->clientScript->registerCoreScript('jquery.ui');
-
 Yii::app()->getClientScript()->registerScriptFile('js/site/app/execute.js');
-
-Yii::app()->getClientScript()->registerCssFile(Yii::app()->baseUrl.'/css/app/execute.css');
-Yii::app()->getClientScript()->registerCssFile(Yii::app()->baseUrl.'/css/common/common.css');
+Yii::app()->getClientScript()->registerCssFile(Yii::app()->baseUrl . '/css/app/execute.css');
 ?>
-<div>
-    <div class="container panel-div"id="main-div">
+<div class="container">
+    <div class="container-fluid well">
+        <div class="row-fluid" style="text-align:center;">
+            <h2>Step 2 of 2: Running the Program</h2>
+        </div>
 
-        <div class="step-div">Step 2 of 2: Executing the Program</div>
-
-        <div class="well app-half-div" id="left-div">
-            <div class="subtitle">Memory Contents</div>
-            <?php
-            $this->widget('bootstrap.widgets.BootGridView', array(
-                'type' => 'striped bordered',
-                'summaryText' => false,
-                'id' => 'instruction-grid',
-                'dataProvider' => $dataProvider,
-                'template' => "{items}",
-                'htmlOptions' => array(
-                    'style' => 'margin:2px;'
-                ),
-                'columns' => array(
-                    array(
-                        'name' => 'Address',
-                        'header' => 'Address',
-                        'value' => '$row',
-                        'htmlOptions' => array(
-                            'style' => 'width:50px;'
-                        )
+        <div class="row-fluid">
+            <div class="well span6">
+                <div class="subtitle">Memory Contents</div>
+                <?php
+                $this->widget('bootstrap.widgets.BootGridView', array(
+                    'type' => 'striped bordered',
+                    'summaryText' => false,
+                    'id' => 'instruction-grid',
+                    'dataProvider' => $dataProvider,
+                    'template' => "{items}",
+                    'htmlOptions' => array(
+                        'style' => 'margin:2px;'
                     ),
-                    array(
-                        'name' => 'Content',
-                        'header' => 'Content',
-                        'value' => '$data->humanReadableForm()'
+                    'columns' => array(
+                        array(
+                            'name' => 'Address',
+                            'header' => 'Address',
+                            'value' => '$row',
+                            'htmlOptions' => array(
+                                'style' => 'width:50px;'
+                            )
+                        ),
+                        array(
+                            'name' => 'Content',
+                            'header' => 'Content',
+                            'value' => '$data->humanReadableForm()'
+                        ),
                     ),
-                ),
-            ));
-            ?>
+                ));
+                ?>
 
-            <div class="controls controls-row">
+                <div class="controls controls-row">
 
                     <?php
                     $this->widget('bootstrap.widgets.BootButton', array(
                         'label' => 'reset PC',
                         'htmlOptions' => array(
                             'id' => 'reset-button',
-                            'class'=>'span1',
+                            'class' => 'span4',
                             'targeturl' => $this->createUrl('site/reset'),
                             'rel' => 'tooltip',
-                            'data-title' => 'Reset the Execution but keep Memory Contents intact.'
+                            'data-title' => 'Reset PC (Program Counter) but keep Memory and Register Contents intact.'
                         ),
                         'type' => 'danger', // '', 'primary', 'info', 'success', 'warning', 'danger' or 'inverse'
                         'size' => 'normal', // '', 'large', 'small' or 'mini'
@@ -66,11 +65,11 @@ Yii::app()->getClientScript()->registerCssFile(Yii::app()->baseUrl.'/css/common/
                     $this->widget('bootstrap.widgets.BootButton', array(
                         'label' => 'run next instruction',
                         'htmlOptions' => array(
-                            'class'=>'span1',
+                            'class' => 'span4',
                             'id' => 'run-next-instruction-button',
                             'targeturl' => $this->createUrl('site/run_next_instruction'),
                             'rel' => 'tooltip',
-                            'data-title' => 'Fetch the instruction from Memory and run it.'
+                            'data-title' => 'Fetch the next Instruction from Memory and run it.'
                         ),
                         'type' => 'inverse', // '', 'primary', 'info', 'success', 'warning', 'danger' or 'inverse'
                         'size' => 'normal', // '', 'large', 'small' or 'mini'
@@ -81,11 +80,11 @@ Yii::app()->getClientScript()->registerCssFile(Yii::app()->baseUrl.'/css/common/
                     $this->widget('bootstrap.widgets.BootButton', array(
                         'label' => 'run program',
                         'htmlOptions' => array(
-                            'class'=>'span1',
+                            'class' => 'span4',
                             'id' => 'run-everything-button',
                             'targeturl' => $this->createUrl('site/run_everything'),
                             'rel' => 'tooltip',
-                            'data-title' => 'Fetch the instruction from Memory and run it.'
+                            'data-title' => 'Run the whole thing. Program stops automatically when the PC reaches the last valid Memory line.'
                         ),
                         'type' => 'success', // '', 'primary', 'info', 'success', 'warning', 'danger' or 'inverse'
                         'size' => 'medium', // '', 'large', 'small' or 'mini'
@@ -93,12 +92,12 @@ Yii::app()->getClientScript()->registerCssFile(Yii::app()->baseUrl.'/css/common/
                     ?>
 
 
-            </div>
+                </div>
 
-        </div>
-        <div class="well app-half-div ui-corner-all" id="right-div">
-            <div class="subtitle">Current Instruction: <br /><span id="current-instruction-span">&nbsp;</span></div>
-            <div class="subtitle">Associated Microprogram: <span id="current-microinstruction-span"><br /><br /><br /><br /></span></div>
+            </div>
+                    <div class="well span6" style="min-height: 337px;">
+            <!--<div class="subtitle">Current Instruction: <br /><span id="current-instruction-span">&nbsp;</span></div>-->
+            <!--<div class="subtitle">Associated Microprogram: <span id="current-microinstruction-span"><br /><br /><br /><br /></span></div>-->
             <div class="subtitle" id="log">
                 LOG:<br />
                 <div id="log-contents">
@@ -106,6 +105,10 @@ Yii::app()->getClientScript()->registerCssFile(Yii::app()->baseUrl.'/css/common/
                 </div>
             </div>
         </div>
+        </div>    
+
+
+
 
         <div class="well app-half-div" id="bottom-div">
             <div class="subtitle">Register Contents</div>

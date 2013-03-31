@@ -80,17 +80,17 @@ class Bootstrap extends CApplicationComponent
 		if (php_sapi_name() === 'cli')
 			return;
 
-		if ($this->coreCss)
-			$this->registerCss();
-
-		if ($this->responsiveCss)
-			$this->registerResponsiveCss();
-
-		if ($this->yiiCss)
-			$this->registerYiiCss();
-
-		if ($this->enableJS)
-			$this->registerCoreScripts();
+//		if ($this->coreCss)
+//			$this->registerCss();
+//
+//		if ($this->responsiveCss)
+//			$this->registerResponsiveCss();
+//
+//		if ($this->yiiCss)
+//			$this->registerYiiCss();
+//
+//		if ($this->enableJS)
+//			$this->registerCoreScripts();
 	}
 
 	/**
@@ -98,7 +98,7 @@ class Bootstrap extends CApplicationComponent
 	 */
 	public function registerCss()
 	{
-		Yii::app()->clientScript->registerCssFile($this->getAssetsUrl().'/css/bootstrap.min.css');
+		Yii::app()->clientScript->registerCssFile($this->getAssetsUrl().'/css/bootstrap-simple.min.css');
 	}
 
 	/**

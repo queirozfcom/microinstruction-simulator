@@ -6,18 +6,18 @@ class SiteController extends Controller {
      * Declares class-based actions.
      */
     public function actions() {
-        return array(
+        return [
             // captcha action renders the CAPTCHA image displayed on the contact page
-            'captcha' => array(
+            'captcha' => [
                 'class' => 'CCaptchaAction',
                 'backColor' => 0xFFFFFF,
-            ),
+            ],
             // page action renders "static" pages stored under 'protected/views/site/pages'
             // They can be accessed via: index.php?r=site/page&view=FileName
-            'page' => array(
+            'page' => [
                 'class' => 'CViewAction',
-            ),
-        );
+                ],
+        ];
     }
 
     /**
@@ -30,12 +30,10 @@ class SiteController extends Controller {
 
         $prog = $this->getProgramInstance();
 
-        //var_dump($prog);    
 
         $this->setProgramInstance($prog);
 
-
-        $this->redirect(array('write'));
+        $this->render('index', []);
     }
 
     /**
@@ -53,20 +51,26 @@ class SiteController extends Controller {
     public function actionExecute() {
 
         if (is_null(Yii::app()->user->getState('program'))) {
-            $this->redirect(array('write'));
+            $this->redirect(['write']);
         }
         $prog = $this->getProgramInstance();
-        
-        $dp = new CArrayDataProvider($prog->mainMemory->memoryArea, array(
-                    'keyField' => false,
-                    'pagination' => array(
-                        'pageSize' => 30,
-                    ),
-                ));
 
-        $this->render('execute', array(
+        $dp = new CArrayDataProvider($prog->mainMemory->memoryArea, [
+            'keyField' => false,
+            'pagination' => [
+                'pageSize' => 30,
+                ],
+                ]);
+
+        $this->render('execute', [
             'dataProvider' => $dp,
-        ));
+        ]);
+    }
+
+    public function actionErase_memory() {
+            $prog = new Program;
+            $this->setProgramInstance($prog);
+            $this->redirect('write');
     }
 
     public function actionRun_next_instruction() {
@@ -75,21 +79,22 @@ class SiteController extends Controller {
             $prog->runNextInstruction();
             $this->setProgramInstance($prog);
             $this->dumpInfoAsJson($prog);
-        }else
+        }
+        else
             throw new CHttpException(400, 'Invalid request. Please do not repeat this request again.');
     }
-    
-    public function actionRun_everything(){
-                if (Yii::app()->request->isPostRequest) {
+
+    public function actionRun_everything() {
+        if (Yii::app()->request->isPostRequest) {
             $prog = $this->getProgramInstance();
             $prog->run();
             $this->setProgramInstance($prog);
             $this->dumpInfoAsJson($prog);
-        }else
+        }
+        else
             throw new CHttpException(400, 'Invalid request. Please do not repeat this request again.');
-
     }
-    
+
 //        public function actionBootstrap(){
 //            
 //      }
@@ -171,16 +176,16 @@ class SiteController extends Controller {
         }
         $prog = $this->getProgramInstance();
 
-        $dp = new CArrayDataProvider($prog->mainMemory->memoryArea, array(
-                    'keyField' => false,
-                    'pagination' => array(
-                        'pageSize' => 30,
-                    ),
-                ));
-        $this->render('write', array(
+        $dp = new CArrayDataProvider($prog->mainMemory->memoryArea, [
+            'keyField' => false,
+            'pagination' => [
+                'pageSize' => 30,
+                ],
+                ]);
+        $this->render('write', [
             'dataProvider' => $dp,
             'model' => $model
-        ));
+        ]);
     }
 
     private function getProgramInstance() {

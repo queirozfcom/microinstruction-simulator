@@ -378,7 +378,7 @@ class Instruction extends BinaryString {
                 $this->setIntValueStartingAt(20, 6, 26);
                 break;
             default:
-                throw new InstructionException("Invalid Mnemonic for this machine.");
+                throw new InstructionException('Invalid Mnemonic for this machine : "'.  strtoupper($mnemonic).'".');
         }
     }
 
