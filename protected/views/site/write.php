@@ -1,168 +1,190 @@
-<?php    
-
-$this->breadcrumbs=[
+<?php
+$this->breadcrumbs = [
     'Program Writing'
 ];
 
 
-Yii::app()->getClientScript()->registerCssFile(Yii::app()->baseUrl.'/css/app/write.css');
+Yii::app()->getClientScript()->registerCssFile(Yii::app()->baseUrl . '/css/app/write.css');
 
-Yii::app()->getClientScript()->registerCssFile(Yii::app()->baseUrl.'/css/common/common.css');
+Yii::app()->getClientScript()->registerCssFile(Yii::app()->baseUrl . '/css/common/common.css');
 
-Yii::app()->getClientScript()->registerScriptFile(Yii::app()->baseUrl.'/js/site/app/write.js');
-
+Yii::app()->getClientScript()->registerScriptFile(Yii::app()->baseUrl . '/js/site/app/write.js');
 ?>
 
-<div>
-    <div class="panel-div ui-corner-all " id="main-div">
-        
-        <div class="step-div">Step 1 of 2: Writing the Program</div>
-        
-        <div class="well app-half-div " id="left-div">
-            <div class="subtitle">New Instruction</div>
-           
-        <?php $form=$this->beginWidget('CActiveForm', array(
-            'id'=>'add-instruction-form',
-            //'enableClientValidation'=>true,
-            'enableAjaxValidation'=>true,
-            'focus'=>array($model,'mnemonic'),
-            'clientOptions'=>array(
-                    'validateOnSubmit'=>true
-            ),
-        )); 
-        ?>           
-            
-            <div id="controls-div">
-                <div id="error-div">
-                    <?php echo $form->error($model,'mnemonic',array('style'=>'color:red !important;')); ?>
-                    <?php echo $form->error($model,'target_param',array('style'=>'color:red !important;')); ?>
-                    <?php echo $form->error($model,'target_constant',array('style'=>'color:red !important;')); ?>
-                    <?php echo $form->error($model,'source_constant',array('style'=>'color:red !important;')); ?>
-                    
-                    <?php //echo $form->errorSummary($model); ?>
-                    <?php echo $form->error($model,'source_param',array('style'=>'color:red !important;')); ?>
-                </div>
-                <div class="row">
-                        <?php echo $form->labelEx($model,'mnemonic'); ?>
-                        <?php echo $form->dropDownList($model,'mnemonic',Instruction::getValidInstructions(),array(
-                            'empty'=>'Please Select',
-                            'class'=>'select-input'
-                        )); ?>
-                        
-                </div>
-
-                <div class="row">
-                    <?php echo $form->labelEx($model,'target_param'); ?>
-                    
-                    <a href="#" rel="tooltip" title="check this box to use this register/constant indirectly">
-                    <?php echo $form->checkBox($model,'target_param_indirection',array('class'=>'param-indirection')); ?>
-                    </a>    
-                    <?php echo $form->dropDownList($model,'target_param', Program::getValidTargetableRegisters(),array(
-                            'empty'=>'Please Select',
-                        )); ?>
-                    <?php echo $form->textField($model,'target_constant',
-                                array(
-                                    'style'=>'float:right;position:relative;right:-25px;bottom:37px;display:none;',
-                                    'class'=>'input-mini'
-                                    )); ?>
-                </div>  
-                
-                <div class="row">
-                    <?php echo $form->labelEx($model,'source_param'); ?>
-                    
-                    <a href="#" rel="tooltip" title="check this box to use this register/constant indirectly">
-                        <?php echo $form->checkBox($model,'source_param_indirection',array('class'=>'param-indirection')); ?>
-                    </a> 
-                    <?php echo $form->dropDownList($model,'source_param', Program::getValidTargetableRegisters(),array(
-                            'empty'=>'Please Select',
-                        )); ?>
-                    <?php echo $form->textField($model,'source_constant',
-                                array(
-                                    'style'=>'float:right;position:relative;right:-25px;bottom:37px;display:none;',
-                                    'class'=>'input-mini'
-                        )); ?>                    
-                        
-                </div>
-                <br />
-                <div class="row">
-                    <?php  $this->widget('bootstrap.widgets.BootButton', array(
-                        'label'=>'add instruction',
-                        'htmlOptions'=>array(
-                            'id'=>'add-instruction-button',
-                            
-                        ),                        
-                        'type'=>'primary', // '', 'primary', 'info', 'success', 'warning', 'danger' or 'inverse'
-                        'size'=>'normal', // '', 'large', 'small' or 'mini'
-                    )); 
-                    
-                    
-                    ?>
-                </div>
-                
-     
-             </div>  
-            <?php $this->endWidget(); ?>
-            
-        </div>
-        <div class="well app-half-div ui-corner-all" id="right-div">
-            <div class="subtitle">Memory Contents</div>
-            <?php $this->widget('bootstrap.widgets.BootGridView', array(
-                    'type'=>'striped bordered',
-                    'dataProvider'=>$dataProvider,
-                    'template'=>"{items}",
-                    'htmlOptions'=>array(
-                        'style'=>'margin:8px;'
-                    ),
-                    'columns'=>array(
-                        array(
-                            'name'=>'Address', 
-                            'header'=>'Address',
-                            'value'=>'$row',
-                            'htmlOptions'=>array(
-                                'style'=>'width:50px;'
-                                )
-                            ),
-                        array(
-                            'name'=>'Content', 
-                            'header'=>'Content',
-                            'value'=>'$data->humanReadableForm()'
-                            ),
-                    ),
-                )); 
-            ?>
-            <?php 
-        
-//        $this->widget('zii.widgets.jui.CJuiButton', array(
-//                    'name'=>'start_execution',
-//                    'buttonType'=>'link',
-//           //         'themeUrl'=>'/ext/css',
-//           //         'theme'=>'lighty',
-//                    'caption'=>'Proceed on to execution',
-//                    'url'=>array('site/execute'),   
-//                    'htmlOptions'=>array(
-//                        'style'=>'float:right;right:180px;margin-bottom:20px;'
-//                    )
-
-//        ));
-        
-                   $this->widget('bootstrap.widgets.BootButton', array(
-                        'label'=>'proceed on to execution',
-                        'htmlOptions'=>array(
-                            'onclick'=>'window.location.href="'.Yii::app()->createUrl('site/execute').'";',
-                            'foo'=>'bar',
-                            'href'=>'foo',
-                        ),                        
-                        'type'=>'primary', // '', 'primary', 'info', 'success', 'warning', 'danger' or 'inverse'
-                        'size'=>'normal', // '', 'large', 'small' or 'mini'
-                    )); 
-        
-        
-        ?>
-            
-        </div>
-
-        <br style="clear:both;"/>
+<div class="container">
+    <div class="row-fluid" style="text-align:center;">
+        <h2>Step 1 of 2: Writing the Program</h2>
     </div>
 
-</div>
+    <div class="row-fluid">
+
+        <div class="span5 well" style="padding-bottom:0;">
+            <div class="row-fluid" style="text-align: center;">
+                <p>New Instruction</p>
+            </div>
+            <div class="row-fluid form">
+                
+                <?php
+                $form = $this->beginWidget('CActiveForm', [
+                    'id' => 'add-instruction-form',
+                    'htmlOptions'=>[
+                      'style'=>'padding-bottom:0;',  
+                    ],
+                    //'enableClientValidation'=>true,
+                    'enableAjaxValidation' => true,
+                    'focus' => [$model, 'mnemonic'],
+                    'clientOptions' => [
+                        'validateOnSubmit' => true
+                        ],
+                        ]);
+                ?>
+                
+                <div class="controls controls-row">
+                <?php echo $form->errorSummary($model, null, null, ['class' => 'alert alert-error']); ?>    
+
+                </div>
+                
+
+                <div class="controls control-group">
+
+                    <div class="row-fluid">
+
+                        <?php echo $form->labelEx($model, 'mnemonic'); ?>
+                        <?php
+                        echo $form->dropDownList($model, 'mnemonic', Instruction::getValidInstructions(), [
+                            'empty' => 'Please Select',
+                            'class'=>"span12",
+                        ]);
+                        ?>
+                        <?php echo $form->error($model, 'mnemonic'); ?>
+                    </div>
+
+
+                </div>
+
+                <div class="controls control-group">
+                    <div class="controls">
+                        <?php echo $form->labelEx($model, 'target_param'); ?>
+                    </div>
+                    <div class="controls controls-row">
+                        <div class="span1">
+                            <?php
+                            echo $form->checkBox($model, 'target_param_indirection', [
+                                'class' => 'param-indirection',
+                                'rel' => 'tooltip',
+                                'title' => 'check this box to use this register/constant indirectly']);
+                            ?>
+
+                        </div>
+
+                        <div class="span8">
+                            <?php
+                            echo $form->dropDownList($model, 'target_param', Program::getValidTargetableRegisters(), [
+                                'empty' => 'Please Select',
+                                'style'=>"width:100%;"
+                            ]);
+                            ?>
+                        </div>
+                        <div class="span3">
+                            <?php
+                            echo $form->textField($model, 'target_constant', [
+                                'style' => 'display:none;',
+                                'class' => 'input-mini'
+                            ]);
+                            ?>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="controls control-group">
+                        <div class="controls">
+                            <?php echo $form->labelEx($model, 'source_param'); ?>
+                        </div>
+                    <div class="controls controls-row">
+
+                        <div class="span1">
+                            <?php
+                            echo $form->checkBox($model, 'source_param_indirection', [
+                                'class' => 'param-indirection',
+                                'rel' => 'tooltip',
+                                'title' => 'check this box to use this register/constant indirectly']);
+                            ?>
+                        </div>
+                        <div class="span8">
+                            <?php
+                            echo $form->dropDownList($model, 'source_param', Program::getValidTargetableRegisters(), [
+                                'empty' => 'Please Select',
+                                    'style'=>"width:100%;"
+                            ]);
+                            ?>
+                        </div>
+                        <div class="span3">
+                            <?php
+                            echo $form->textField($model, 'source_constant', [
+                                'style' => 'display:none;',
+                                'class' => 'input-mini'
+                            ]);
+                            ?>
+
+                        </div>
+                    </div>
+
+                </div>  
+                <div class="controls controls-row">
+                    <?php
+                    echo CHtml::submitButton('add instruction', [
+                        'class' => 'btn btn-primary span6 offset3',
+                        'id' => 'add-instruction-button'
+                    ]);
+                    ?>
+                </div>
+                <?php $this->endWidget(); ?>
+            </div>
+        </div>
+        <div class="well span7">
+            <div class="subtitle">Memory Contents</div>
+
+            <?php
+            $this->widget('bootstrap.widgets.BootGridView', [
+                'type' => 'striped bordered',
+                'id' => 'instructions-grid',
+                'selectableRows'=>null,
+                'dataProvider' => $dataProvider,
+                'filter' => null,
+                'template' => "{items}",
+                'htmlOptions' => [
+                    'style' => 'margin:8px;'
+                ],
+                'columns' => [
+                    [
+                        'header' => 'Address',
+                        'value' => '$row',
+                        'htmlOptions' => [
+                            'style' => 'width:50px;'
+                        ]
+                    ],
+                    [
+                        'header' => 'Content',
+                        'value' => '$data->humanReadableForm()'
+                ]]]);
+            ?>
+            <br />
+            <div class="controls">
+                <?php
+                echo Chtml::htmlButton('Proceed on to Execution', [
+                    'class' => 'btn btn-primary span6 offset3',
+                    'onclick' => 'window.location.href="' . Yii::app()->createUrl('site/execute') . '";'
+                ])
+                ?>
+            </div>
+
+
+
+        </div>
+
+    </div>
+
+
+
+
 

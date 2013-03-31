@@ -1,47 +1,12 @@
-.ui-custom-icon-plus{
-    background-image: url('/images/plus.png') !important;
-}
-.ui-custom-icon-tick-32{
-    background-image: url('/images/tick-32.png') !important;
-    left: 16px !important;
-    top:16px !important;
-    width:32px !important;
-    height:32px !important;    
-}
-
-.param-indirection{
-    margin-bottom:9px!important;
-    position:relative;
-    right:2px;
-    
-}
-
-#NewInstructionForm_source_reg_indirection{
-    position:relative;
-    
-}
 
 
-    
-#NewInstructionForm_source_reg{
-  
-}
-
-#NewInstructionForm_mnemonic{
-    margin-left:18px;
-}
 #memory-grid{
     min-height:60px;
     max-height:600px;
     overflow:auto;
     padding:0px;
 }
-.ui-custom-icon-up{
-    background-image: url('/images/arrow-090-medium.png') !important;
-}
-.ui-custom-icon-down{
-    background-image: url('/images/arrow-270-medium.png') !important;
-}
+
 
 .panel-div{
     min-height:600px;
@@ -63,51 +28,4 @@
     -webkit-box-shadow: inset 0 1px 0 #fff;
     -moz-box-shadow: inset 0 1px 0 #fff;
     box-shadow: inset 0 1px 0 #fff;
-}
-
-.step-div{
-    margin: 10px;
-    font-size: 20px;
-    font-weight: bold;
-}
-
-.app-half-div{
-    text-align: left;
-    margin: 15px;
-}
-
-#left-div{
-    float:left;
-    width:30%;
-    margin-right:2px;
-}
-
-#right-div{
-    width:54%;
-    min-height:60px;
-    max-height:700px;
-    overflow: auto;
-    float:right;
-    text-align: center;
-    margin-left:2px;
-}
-
-#add-instruction-button{
-    margin: 8px;
-    position:relative;
-    top:50px;
-    left:85px;
-}
-
-#controls-div{
-    margin: 8px;
-}
-
-div.row{
-    min-height: 78px;
-    max-height:78px;
-}
-
-#error-div{
-    
 }

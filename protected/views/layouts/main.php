@@ -3,14 +3,19 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <meta name="language" content="en" />
+        
+        <?php Yii::app()->getClientScript()->registerScript('trigger-tooltips','
+$(document).ready(function(){
+    $(\'[rel="tooltip"]\').tooltip();
+});
+',  CClientScript::POS_END); ?>
+        
         <title><?php echo CHtml::encode($this->pageTitle); ?></title>
     </head>
 
     <body>
 
         <div class="container" id="page">
-
-
 
             <div id="mainmenu">
                 <?php
@@ -48,16 +53,16 @@
                     'links' => $this->breadcrumbs,
                 ));
                 ?>
-<?php endif ?>
+            <?php endif ?>
 
-<?php echo $content; ?>
+            <?php echo $content; ?>
 
             <div class="clear"></div>
 
             <div id="footer">
                 Copyright &copy; <?php echo date('Y'); ?> by My Company.
                 <br/>
-<?php echo Yii::powered(); ?>
+                <?php echo Yii::powered(); ?>
             </div><!-- footer -->
 
         </div><!-- page -->

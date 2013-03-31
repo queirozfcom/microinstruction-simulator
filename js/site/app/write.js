@@ -1,9 +1,4 @@
 $(document).ready(function(){
-//   $(".select-input").selectmenu({
-//                    style:'dropdown',
-//                    menuWidth:'200',
-//                    width:'200'                
-//                }); 
                 
    $('#add-instruction-button').click(function(){
       $('#add-instruction-form').submit(); 
