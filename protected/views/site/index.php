@@ -1,6 +1,6 @@
 <div class="container">
     <div class="well" style="text-align:center;">
-
+        
         <div class="row-fluid">
 
             <h2>Microinstruction Simulator</h2>
@@ -17,7 +17,7 @@
                         'onclick'=>'window.location.href="' . Yii::app()->createUrl('site/write') . '";'
                         ]); ?>
                     <br /><br />
-
+                    
 
             </div>
             <br />

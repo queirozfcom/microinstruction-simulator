@@ -11,3 +11,7 @@ DirectoryIndex index.php
 
 # otherwise forward it to index.dev.php
 RewriteRule . index.php
+
+php_value max_execution_time 13
+php_value max_input_time 10
+php_value memory_limit 64M
