@@ -52,26 +52,23 @@ class Microinstruction extends BinaryString {
     }
 
     public function getTargetRegIndex() {
-        $targetRegisterIndexes = array(27, 28, 8, 9, 10, 11, 15, 16, 17, 18);
+        $targetRegisterIndexes = [27, 28, 8, 9, 10, 11, 15, 16, 17, 18];
 
         foreach ($targetRegisterIndexes as $index) {
-            if ($this[$index] == 1) {
+            if ($this[$index] === '1')
                 return $index;
-            }
         }
 
-        if ($this[24] == 1) {
-            if ($this[23] == 1 and $this[22] == 0) {
+        if ($this[24] === '1') {
+            
+            if (($this[23] === '1') && ($this[22] === '0'))
                 return 24;
-            } else {
+            else
                 throw new MicroinstructionException('You\'re trying to send a value to MDR but you haven\'t set MUX C value accordingly. If this is an operation of type LOAD DATA TO MDR, you should handle that first in  Program::runMicroinstruction() function ');
-            }
         }
     }
 
     public function setWrite() {
-        //syslog(LOG_ALERT,'setwrite');
-
         $this[26] = 1;
         $this[25] = 0;
     }
@@ -98,24 +95,96 @@ class Microinstruction extends BinaryString {
             $this[12] = $muxVal{2};
 
             $intALUOpCode = ALU::returnOpCodeForOperation('S=A');
-        } else {
-            throw new DecoderException('Unsupported side. Must be either A or B.');
         }
+        else
+            throw new DecoderException('Unsupported side. Must be either A or B.');
+
         $this->setIntValueStartingAt($intALUOpCode, 8, 0);
     }
 
+    public function setMuxAndALUValue($mnemonic, $sourceRegister, $targetRegister) {
+
+        $sourceSide = Decoder::getSideFromSourceName($sourceRegister);
+        $targetSide = Decoder::getSideFromSourceName($targetRegister);
+
+        if ($sourceSide === $targetSide)
+            throw new MicroinstructionException('Can\'t add two registers that are on the same side. Please move one of them to an Auxiliary Register (AR1 or AR2)');
+
+        $sourceMuxVal = Decoder::getMUXValueFromRegister($sourceRegister);
+        $targetMuxVal = Decoder::getMUXValueFromRegister($targetRegister);
+
+//        print $sourceMuxVal. "\n";
+//        print $targetMuxVal . "\n";
+
+        if ($targetSide == 'B') {
+            $this[21] = $targetMuxVal{0};
+            $this[20] = $targetMuxVal{1};
+            $this[19] = $targetMuxVal{2};
+
+            $this[14] = $sourceMuxVal{0};
+            $this[13] = $sourceMuxVal{1};
+            $this[12] = $sourceMuxVal{2};
+        } else {
+            $this[14] = $targetMuxVal{0};
+            $this[13] = $targetMuxVal{1};
+            $this[12] = $targetMuxVal{2};
+
+            $this[21] = $sourceMuxVal{0};
+            $this[20] = $sourceMuxVal{1};
+            $this[19] = $sourceMuxVal{2};
+        }
+
+        if (strtoupper($mnemonic) == 'ADD')
+            $intALUOpCode = ALU::returnOpCodeForOperation('S=A+B');
+        elseif (strtoupper($mnemonic) == "SUB") {
+            if ($targetSide == 'B')
+                $intALUOpCode = ALU::returnOpCodeForOperation('S=B-A');
+            else
+                $intALUOpCode = ALU::returnOpCodeForOperation('S=A-B');
+        } elseif (strtoupper($mnemonic) == 'MUL')
+            $intALUOpCode = ALU::returnOpCodeForOperation('S=A*B');
+        elseif (strtoupper($mnemonic) == 'AND')
+            $intALUOpCode = ALU::returnOpCodeForOperation('S=AandB');
+        elseif (strtoupper($mnemonic) == 'OR')
+            $intALUOpCode = ALU::returnOpCodeForOperation('S=AorB');
+        elseif (strtoupper($mnemonic) == 'NAND')
+            $intALUOpCode = ALU::returnOpCodeForOperation('S=AnandB');
+        elseif (strtoupper($mnemonic) == 'NOR')
+            $intALUOpCode = ALU::returnOpCodeForOperation('S=AnorB');
+        elseif (strtoupper($mnemonic) == 'XOR')
+            $intALUOpCode = ALU::returnOpCodeForOperation('S=AxorB');
+        elseif (strtoupper($mnemonic) == 'CMP') {
+            if ($targetSide == 'B')
+                $intALUOpCode = ALU::returnOpCodeForOperation('S=BcmpA');
+            else
+                $intALUOpCode = ALU::returnOpCodeForOperation('S=AcmpB');
+        }
+        else
+            throw new MicroinstructionException('Invalid operation: ' . $mnemonic);
+
+
+        $this->setIntValueStartingAt($intALUOpCode, 8, 0);
+    }
+
+    /**
+     * 
+     * @throws MicroinstructionException
+     */
     public function setMuxAndALUValueFromSourceRegisterAndMnemonic() {
         if (func_num_args() === 3) {
-            $targetReg = func_get_arg(0);
+
+            throw new Exception('Use Microinstruction::setMuxAndALUValue method instead');
+
+            $mnemonic = func_get_arg(0);
             $sourceReg = func_get_arg(1);
-            $mnemonic = func_get_arg(2);
+            $targetReg = func_get_arg(2);
 
             $targetSide = Decoder::getSideFromSourceName($targetReg);
             $sourceSide = Decoder::getSideFromSourceName($sourceReg);
 
-            if ($sourceSide === $targetSide) {
+            if ($sourceSide === $targetSide)
                 throw new MicroinstructionException('Can\'t add two registers that are on the same side. Please move one of them to an Auxiliary Register (AR1 or AR2)');
-            }
+
 
             $targetMuxVal = Decoder::getMUXValueFromRegister($targetReg);
             $sourceMuxVal = Decoder::getMUXValueFromRegister($sourceReg);
@@ -196,24 +265,24 @@ class Microinstruction extends BinaryString {
                 $this[19] = 0;
             }
 
-            if (strtoupper($mnemonic) == 'SHR') {
+            if (strtoupper($mnemonic) == 'SHR')
                 $intALUOpCode = ALU::returnOpCodeForOperation('S=shr');
-            } elseif (strtoupper($mnemonic) == 'SHL') {
+            elseif (strtoupper($mnemonic) == 'SHL')
                 $intALUOpCode = ALU::returnOpCodeForOperation('S=shl');
-            } elseif (strtoupper($mnemonic) == 'NOT') {
+            elseif (strtoupper($mnemonic) == 'NOT')
                 $intALUOpCode = ALU::returnOpCodeForOperation('S=not');
-            } else {
+            else
                 throw new MicroinstructionException('Invalid operation: ' . $mnemonic);
-            }
+
 
             $this->setIntValueStartingAt($intALUOpCode, 8, 0);
         }
     }
 
     public function setTargetIndexFromTargetRegister($regname) {
-        if (!is_string($regname)) {
+        if (!is_string($regname))
             throw new MicroinstructionException('Register names must be strings.');
-        }
+
         switch (strtoupper($regname)) {
             case 'R0':
                 $this[8] = 1;
@@ -246,8 +315,8 @@ class Microinstruction extends BinaryString {
                 $this[28] = 1;
                 break;
             case 'MDR':
-                $this[23] = 1;
-                $this[24] = 1;
+                $this->setOne(23, 24);
+                $this->setZero(22);
                 break;
             default:
                 throw new DecoderException('Unsupported register name: ' . $regname);
@@ -255,19 +324,17 @@ class Microinstruction extends BinaryString {
     }
 
     public function isMemoryRead() {
-        if ($this[26] == 0 and $this[25] == 1) {
+        if ($this[26] == 0 and $this[25] == 1)
             return true;
-        } else {
+        else
             return false;
-        }
     }
 
     public function isMemoryWrite() {
-        if ($this[26] == 1 and $this[25] == 0) {
+        if ($this[26] == 1 and $this[25] == 0)
             return true;
-        } else {
+        else
             return false;
-        }
     }
 
     public function isLoadReadDataIntoMDR() {
@@ -351,17 +418,16 @@ class Microinstruction extends BinaryString {
     public function getBranchOffset() {
         $negativeOffset = $this->getIntValueStartingAt(7, 15);
         $positiveOffset = $this->getIntValueStartingAt(7, 8);
-        
-        if( $negativeOffset!==0  && $positiveOffset!==0)
-                throw new MicroinstructionException('A Branch microinstruction should have either a positive offset or a negative offset. We found a Microinstruction that has both. Negative offset='.$negativeOffset.' and positive offset='.$positiveOffset.'.');
-        
-        if($negativeOffset===0)
+
+        if ($negativeOffset !== 0 && $positiveOffset !== 0)
+            throw new MicroinstructionException('A Branch microinstruction should have either a positive offset or a negative offset. We found a Microinstruction that has both. Negative offset=' . $negativeOffset . ' and positive offset=' . $positiveOffset . '.');
+
+        if ($negativeOffset === 0)
             return $positiveOffset;
-        elseif($positiveOffset===0)
-            return $negativeOffset*(-1);
+        elseif ($positiveOffset === 0)
+            return $negativeOffset * (-1);
         else
             throw new MicroinstructionException('One branch offset should be a nonzero integer and the other should be zero');
-        
     }
 
     public function setBranchOffset($offset) {
@@ -370,11 +436,10 @@ class Microinstruction extends BinaryString {
 
         if ($offset > 0)
             $this->setIntValueStartingAt($offset, 7, 8);
-        elseif($offset <0)
-            $this->setIntValueStartingAt($offset*(-1), 7, 15);
-        else    
+        elseif ($offset < 0)
+            $this->setIntValueStartingAt($offset * (-1), 7, 15);
+        else
             throw new MicroinstructionException('Zero offset? What be this madness?');
-        
     }
 
 //    public function isMUXAActive() {

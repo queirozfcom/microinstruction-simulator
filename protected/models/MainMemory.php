@@ -78,7 +78,7 @@ class MainMemory implements ArrayAccess, Countable {
      */
     public function getReturnedValue() {
         if (!$this->returnedValue instanceof BinaryString)
-            throw new MainMemoryException("returned value not valid binary string");
+            throw new MainMemoryException("Returned value not valid binary string. Maybe you've reached the end.");
         return $this->returnedValue;
     }
 

@@ -46,8 +46,12 @@ class Program {
         while (true) {
             try {
                 $this->runNextInstruction();
-            } catch (Exception $exc) {//program has ended
-                return;
+            } catch (ProgramException $exc) {
+                if($exc->getMessage()==='End of program reached.')
+                    return;
+                else
+                    throw $exc;
+                
             }
         }
     }
@@ -126,7 +130,7 @@ class Program {
         $nextInstruction = $this->IR->getContent();
         
         if (get_class($nextInstruction) === 'BinaryString') 
-            throw new ProgramException('End of program reached');
+            throw new ProgramException('End of program reached.');
         
         $this->runInstruction($nextInstruction);
         $this->incrementPC();
@@ -149,11 +153,19 @@ class Program {
      */
     public function fetch() {
         $this->setCurrentInstruction("fetch");
-
+        
         $fetchMicroprogram = $this->controlUnit->decode("fetch");
         
         foreach ($fetchMicroprogram as $microinstruction) {
+            
+            try{
             $this->runMicroinstruction($microinstruction);
+            }catch(MainMemoryException $e){
+                if($e->getMessage()==="Returned value not valid binary string. Maybe you've reached the end.")
+                    throw new ProgramException('End of program reached.');
+                else
+                    throw $e;
+            }
         }
     }
 
@@ -183,7 +195,7 @@ class Program {
         $this->addToLog($microinstruction);
 
         if ($microinstruction->isBranch()) {
-            $this->evaluateBranch($microinstruction); //if flag is set, perform branch
+            $this->evaluateBranch($microinstruction); //if flag is set, branch will be performed in there
         } else {
             if ($microinstruction == new Microinstruction('pc_to_mar_read')) {
                 $this->MAR->setContent($this->PC->getContent());
@@ -193,18 +205,17 @@ class Program {
             elseif ($microinstruction == new Microinstruction('mdr_to_mar_read')) {
                 $this->MAR->setContent($this->MDR->getContent());
                 $this->performMemoryRead();
-            } elseif ($microinstruction == new Microinstruction('data_to_mdr'))
-                $this->MDR->setContent($this->mainMemory->getReturnedValue());
+            } elseif ($microinstruction == new Microinstruction('data_to_mdr')){
+                $this->MDR->setContent($this->mainMemory->getReturnedValue());}
             elseif ($microinstruction == new Microinstruction('mdr_to_ir'))
                 $this->IR->setContent($this->MDR->getContent());
             elseif ($microinstruction == new Microinstruction('increment_pc'))
                 $this->PC->setContent(new BinaryString(32, $this->PC->getContent()->asInt() + 1));
             else {
-
                 $targetRegName = self::getRegisterNameFromTargetIndex($microinstruction->getTargetRegIndex());
                 $leftRegName = self::getRegisterNameFromMUXAValue($microinstruction->getMUXAValue());
                 $rightRegName = self::getRegisterNameFromMUXBValue($microinstruction->getMUXBValue());
-
+                
                 $ALUOpCode = $microinstruction->getALUOperationCode();
 
                 if (is_null($leftRegName)) {

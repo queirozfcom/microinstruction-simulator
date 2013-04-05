@@ -185,22 +185,24 @@ class DecoderTest extends CDbTestCase{
     
         $this->assertEquals(1,$mp3[2][26]);
     }
-    public function test_exception_gets_thrown_if_a_direct_constant_is_used_as_param1(){
+    public function test_exception_gets_thrown_if_a_direct_constant_is_used_as_target(){
         $obj = new Decoder;
         
         $method = self::getMethod('decodeMovInstruction');
         
         $this->setExpectedException('InstructionException');
         
-        $inst = new Instruction('mov','constant',false,'r0',true);
+        $inst = new Instruction('mov','r0',false,'constant',false);
         $mp = $method->invoke($obj,$inst);
     }
     public function test_constant_no_indirection(){
+        //mov(const,r0)
+        
         $obj = new Decoder;
         
         $method = self::getMethod('decodeMovInstruction');
         
-        $inst = new Instruction('mov','r0',false,'constant',false);
+        $inst = new Instruction('mov','constant',false,'r0',false);
         
         $mp = $method->invoke($obj,$inst);
         

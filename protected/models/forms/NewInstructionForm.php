@@ -25,7 +25,7 @@ class NewInstructionForm extends CFormModel{
     {
             return array(
                     // username and password are required
-                    array('mnemonic, target_param', 'required'),
+                    array('mnemonic, source_param', 'required'),
                     array('target_constant,source_constant','numerical'),
                     // rememberMe needs to be a boolean
                     array('target_param_indirection, source_param_indirection', 'boolean'),

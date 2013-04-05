@@ -70,7 +70,7 @@ class Instruction extends BinaryString {
             if (is_null($this->param2) && $this->requiresTwoArguments())
                 throw new InstructionException('Missing argument 2 for instruction that needs 2 arguments');
 
-            if ($this->param1 === "CONSTANT" && !$this->indirection1 && !$this->isBranch())
+            if ($this->param2 === "CONSTANT" && !$this->indirection2 && !$this->isBranch())
                 throw new InstructionException('Cannot use a direct CONSTANT as target for an Instruction.');
         }elseif (func_num_args() === 2) {
             //branch-type instructions
@@ -140,11 +140,11 @@ class Instruction extends BinaryString {
     }
 
     public function hasConstant() {
-        if (($this->param1 === 'CONSTANT') or ($this->param2 === 'CONSTANT')) {
+        if (($this->param1 === 'CONSTANT') || ($this->param2 === 'CONSTANT')) 
             return true;
-        } else {
+         else 
             return false;
-        }
+        
     }
 
     private function requiresTwoArguments() {
@@ -203,9 +203,9 @@ class Instruction extends BinaryString {
         if($offset===0)
             throw new InstructionException('Nonzero Integer needed. '.$offset.' found.');
         
-        if ($offset<0){
+        
+        if ($offset<0)
             $this->setIntValueStartingAt($offset*(-1), 7, 14);
-        }
         elseif($offset>0)
             $this->setIntValueStartingAt($offset, 7, 0);
         
@@ -305,6 +305,9 @@ class Instruction extends BinaryString {
                 break;
             case "MDR":
                 $this->setIntValueStartingAt(9, 5, 13);
+                break;
+            case "MAR":
+                $this->setIntValueStartingAt(10, 5, 13);
                 break;
             case null:
                 $this->param2 = null;

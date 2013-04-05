@@ -64,40 +64,6 @@ Yii::app()->getClientScript()->registerScriptFile(Yii::app()->baseUrl . '/js/sit
 
                     <div class="controls control-group">
                         <div class="controls">
-                            <?php echo $form->labelEx($model, 'target_param'); ?>
-                        </div>
-                        <div class="controls controls-row">
-                            <div class="span1">
-                                <?php
-                                echo $form->checkBox($model, 'target_param_indirection', [
-                                    'class' => 'param-indirection',
-                                    'rel' => 'tooltip',
-                                    'title' => 'check this box to use this register/constant indirectly']);
-                                ?>
-
-                            </div>
-
-                            <div class="span8">
-                                <?php
-                                echo $form->dropDownList($model, 'target_param', Program::getValidTargetableRegisters(), [
-                                    'empty' => 'Please Select',
-                                    'style' => "width:100%;"
-                                ]);
-                                ?>
-                            </div>
-                            <div class="span3">
-                                <?php
-                                echo $form->textField($model, 'target_constant', [
-                                    'style' => 'display:none;',
-                                    'class' => 'input-mini'
-                                ]);
-                                ?>
-
-                            </div>
-                        </div>
-                    </div>
-                    <div class="controls control-group">
-                        <div class="controls">
                             <?php echo $form->labelEx($model, 'source_param'); ?>
                         </div>
                         <div class="controls controls-row">
@@ -130,6 +96,40 @@ Yii::app()->getClientScript()->registerScriptFile(Yii::app()->baseUrl . '/js/sit
                         </div>
 
                     </div>  
+                    <div class="controls control-group">
+                        <div class="controls">
+                            <?php echo $form->labelEx($model, 'target_param'); ?>
+                        </div>
+                        <div class="controls controls-row">
+                            <div class="span1">
+                                <?php
+                                echo $form->checkBox($model, 'target_param_indirection', [
+                                    'class' => 'param-indirection',
+                                    'rel' => 'tooltip',
+                                    'title' => 'check this box to use this register/constant indirectly']);
+                                ?>
+
+                            </div>
+
+                            <div class="span8">
+                                <?php
+                                echo $form->dropDownList($model, 'target_param', Program::getValidTargetableRegisters(), [
+                                    'empty' => 'Please Select',
+                                    'style' => "width:100%;"
+                                ]);
+                                ?>
+                            </div>
+                            <div class="span3">
+                                <?php
+                                echo $form->textField($model, 'target_constant', [
+                                    'style' => 'display:none;',
+                                    'class' => 'input-mini'
+                                ]);
+                                ?>
+
+                            </div>
+                        </div>
+                    </div>
                     <br />
                     <br />
                     <div class="controls controls-row">

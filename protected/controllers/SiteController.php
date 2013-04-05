@@ -95,21 +95,6 @@ class SiteController extends Controller {
             throw new CHttpException(400, 'Invalid request. Please do not repeat this request again.');
     }
 
-//        public function actionBootstrap(){
-//            
-//      }
-//        public function actionFetchfirst(){
-//            if(Yii::app()->request->isPostRequest)
-//            {
-//                $prog = $this->getProgramInstance();
-//                $prog->fetchFirst();
-//                $this->setProgramInstance($prog);
-//                $this->dumpInfoAsJson($prog);
-//            }
-//            else
-//                throw new CHttpException(400,'Invalid request. Please do not repeat this request again.');
-//
-//        }
     public function actionReset() {
         if (Yii::app()->request->isPostRequest) {
             $prog = $this->getProgramInstance();
@@ -148,17 +133,17 @@ class SiteController extends Controller {
 
             $mnemonic = $params['mnemonic'];
 
-            $param1 = $params['target_param'] === "" ? null : $params['target_param'];
+            $param1 = $params['source_param'] === "" ? null : $params['source_param'];
 
-            $indirection1 = $params['target_param_indirection'] === "0" ? false : true;
+            $indirection1 = $params['source_param_indirection'] === "0" ? false : true;
 
-            $constant1 = $params['target_constant'] === "" ? null : $params['target_constant'];
+            $constant1 = $params['source_constant'] === "" ? null : $params['source_constant'];
 
-            $param2 = $params['source_param'] === "" ? null : $params['source_param'];
+            $param2 = $params['target_param'] === "" ? null : $params['target_param'];
 
-            $indirection2 = $params['source_param_indirection'] === "0" ? false : true;
+            $indirection2 = $params['target_param_indirection'] === "0" ? false : true;
 
-            $constant2 = $params['source_constant'] === "" ? null : $params['source_constant'];
+            $constant2 = $params['target_constant'] === "" ? null : $params['target_constant'];
 
             $vo = new VOInstruction($mnemonic, $param1, $indirection1, $constant1, $param2, $indirection2, $constant2);
 
@@ -170,9 +155,6 @@ class SiteController extends Controller {
             }
             $this->setProgramInstance($prog);
 
-//                echo '<pre>';
-//                var_dump($vo);
-//                echo '</pre>';
         }
         $prog = $this->getProgramInstance();
 
@@ -180,8 +162,7 @@ class SiteController extends Controller {
             'keyField' => false,
             'pagination' => [
                 'pageSize' => 30,
-                ],
-                ]);
+                ]]);
         $this->render('write', [
             'dataProvider' => $dp,
             'model' => $model
@@ -190,11 +171,11 @@ class SiteController extends Controller {
 
     private function getProgramInstance() {
 
-        if (is_null(Yii::app()->user->getState('program'))) {
+        if (is_null(Yii::app()->user->getState('program'))) 
             $prog = new Program();
-        } else {
+        else 
             $prog = Yii::app()->user->getState('program');
-        }
+        
         return $prog;
     }
 

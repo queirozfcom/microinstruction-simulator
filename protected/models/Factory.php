@@ -22,8 +22,12 @@ class Factory {
             $output[] = new Instruction($vo->getMnemonic(), $vo->getConstant1());
         } else {
             $mnem = $vo->getMnemonic();
+            
+            //source
             $param1 = $vo->getArg1();
             $ind1 = $vo->getIndirection1();
+            
+            //target
             $param2 = $vo->getArg2();
             $ind2 = $vo->getIndirection2();
 
