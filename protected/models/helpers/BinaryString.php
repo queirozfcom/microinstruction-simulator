@@ -190,10 +190,35 @@ class BinaryString implements ArrayAccess, Countable {
         $newBs = new BinaryString($this->length);
 
         for ($i = 0; $i < $this->length; $i++) {
-            if ($this[$i] === "1") {
+            if ($this[$i] === "1")
                 $newBs[$i] = "0";
-            } elseif ($this[$i] === "0") {
+            elseif ($this[$i] === "0")
                 $newBs[$i] = "1";
+        }
+
+        return $newBs;
+    }
+
+    public function neg() {
+        $newBs = new BinaryString($this->length);
+
+        $phase = 1;
+
+        //2's complement
+        //http://en.wikipedia.org/wiki/Two's_complement#Working_from_LSB_towards_MSB
+        for ($i = 0; $i < $this->length; $i++) {
+            if ($phase === 1) {
+                if ($this[$i] === "0")
+                    $newBs->setZero($i);
+                elseif ($this[$i] === "1") {
+                    $newBs->setOne($i);
+                    $phase = 2;
+                }
+            } elseif ($phase === 2) {
+                if ($this[$i] === "0")
+                    $newBs->setOne($i);
+                elseif ($this[$i] === "1")
+                    $newBs->setZero($i);
             }
         }
 
@@ -280,13 +305,13 @@ class BinaryString implements ArrayAccess, Countable {
     }
 
     public function getIntValueStartingAt($length, $startingIndex) {
-        if ($startingIndex + $length > $this->length) 
+        if ($startingIndex + $length > $this->length)
             throw new BinaryStringException('$startingIndex + $length cannot exceed this BinaryString\' length');
-        
-        
-        
+
+
+
         $string = "";
-        for ($i = $startingIndex; $i < ($length + $startingIndex) ; $i++) {
+        for ($i = $startingIndex; $i < ($length + $startingIndex); $i++) {
             $string.= $this[$i];
         }
 

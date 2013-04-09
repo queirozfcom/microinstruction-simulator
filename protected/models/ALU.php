@@ -52,6 +52,8 @@ class ALU {
                 return 18;
             case 'S=not':
                 return 19;
+            case 'S=neg':
+                return 20;
             default:
                 throw new ALUException('Unsupported operation: ' . $operation);
         }
@@ -105,6 +107,8 @@ class ALU {
                 return 'S=shl';
             case 19:
                 return 'S=not';
+            case 20:
+                return 'S=neg';
             default:
                 throw new ALUException("$opcode is not a valid operation code for this ALU");
         }
@@ -187,6 +191,8 @@ class ALU {
                 return $this->shiftLeft($arg1, $arg2);
             case 'S=not':
                 return $this->doNot($arg1, $arg2);
+            case 'S=neg':
+                return $this->doNeg($arg1,$arg2);
             default:
                 throw new ALUException("The function compute has not been defined for {$opName}.");
         }
@@ -216,7 +222,26 @@ class ALU {
             return $opt2->not();
         
     }
+    
+    /**
+     * There are two arguments because we don't know, a priori, which of them will be the side that will get Not'd .
+     * @param null | BinaryString $opt1
+     * @param null | BinaryString $opt2
+     */
+    private function doNeg($opt1, $opt2) {
+        if (!($opt1 instanceof BinaryString) && !($opt2 instanceof BinaryString))
+            throw new ALUException('Either $opt1 OR $opt2 need be a BinaryString, but $opt1\'s class is ' . get_class($opt1) . ' and $opt2\'s class is ' . get_class($opt2) . '.');
 
+        if ($opt1 instanceof BinaryString) 
+            return $opt1->neg();
+        
+        if ($opt2 instanceof BinaryString) 
+            return $opt2->neg();
+        
+    }
+    
+    
+    
     /**
      * There are two arguments because we don't know, a priori, which of them will be the side that will get to be shifted.
      * 

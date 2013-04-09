@@ -26,8 +26,7 @@ class Instruction extends BinaryString {
         'BRN',
         'BRE',
         'BRL',
-        'BRG',
-        'BRC');
+        'BRG');
     protected $length = 32;
     protected $string;
     //switch to private upon end of testing
@@ -182,6 +181,7 @@ class Instruction extends BinaryString {
     private function requiresOnlyOneArgument() {
         $arr = array('CLR',
             'NOT',
+            'NEG',
             'SHL',
             'SHR',
             'BRZ',
@@ -379,6 +379,9 @@ class Instruction extends BinaryString {
                 break;
             case "BRG":
                 $this->setIntValueStartingAt(20, 6, 26);
+                break;
+            case "NEG":
+                $this->setIntValueStartingAt(21, 6, 26);
                 break;
             default:
                 throw new InstructionException('Invalid Mnemonic for this machine : "'.  strtoupper($mnemonic).'".');

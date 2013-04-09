@@ -46,9 +46,7 @@ Yii::app()->getClientScript()->registerScriptFile(Yii::app()->baseUrl . '/js/sit
 
 
                     <div class="controls control-group">
-
                         <div class="row-fluid">
-
                             <?php echo $form->labelEx($model, 'mnemonic'); ?>
                             <?php
                             echo $form->dropDownList($model, 'mnemonic', Instruction::getValidInstructions(), [
@@ -58,8 +56,6 @@ Yii::app()->getClientScript()->registerScriptFile(Yii::app()->baseUrl . '/js/sit
                             ?>
                             <?php echo $form->error($model, 'mnemonic'); ?>
                         </div>
-
-
                     </div>
 
                     <div class="controls control-group">

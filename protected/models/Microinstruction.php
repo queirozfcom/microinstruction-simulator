@@ -265,12 +265,14 @@ class Microinstruction extends BinaryString {
                 $this[19] = 0;
             }
 
-            if (strtoupper($mnemonic) == 'SHR')
+            if (strtoupper($mnemonic) === 'SHR')
                 $intALUOpCode = ALU::returnOpCodeForOperation('S=shr');
-            elseif (strtoupper($mnemonic) == 'SHL')
+            elseif (strtoupper($mnemonic) === 'SHL')
                 $intALUOpCode = ALU::returnOpCodeForOperation('S=shl');
-            elseif (strtoupper($mnemonic) == 'NOT')
+            elseif (strtoupper($mnemonic) === 'NOT')
                 $intALUOpCode = ALU::returnOpCodeForOperation('S=not');
+            elseif (strtoupper($mnemonic) === 'NEG')
+                $intALUOpCode = ALU::returnOpCodeForOperation('S=neg');
             else
                 throw new MicroinstructionException('Invalid operation: ' . $mnemonic);
 

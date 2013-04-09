@@ -81,7 +81,7 @@ class Decoder {
                 $inst->getMnemonic() === "NOR" || $inst->getMnemonic() === "XOR" ||
                 $inst->getMnemonic() === "CMP") {
             return $this->decodeArithmeticInstruction($inst);
-        } elseif ($inst->getMnemonic() === 'SHL' || $inst->getMnemonic() === 'SHR' || $inst->getMnemonic() === 'NOT' ) {
+        } elseif ($inst->getMnemonic() === 'SHL' || $inst->getMnemonic() === 'SHR' || $inst->getMnemonic() === 'NOT' || $inst->getMnemonic() === 'NEG' ) {
             return $this->decodeOneOperandInstruction($inst);
         } elseif($inst->getMnemonic()==='BRZ' || $inst->getMnemonic()==='BRN' || 
                 $inst->getMnemonic()==='BRE' || $inst->getMnemonic()==='BRL' || 
@@ -118,6 +118,8 @@ class Decoder {
 
         if ($inst->hasIndirection()) {
             if ($inst->hasConstant()) {
+                //MNEM([CONST])
+                //check
                 $returnMicroprogram[] = new Microinstruction('increment_pc');
                 $returnMicroprogram[] = new Microinstruction('pc_to_mar_read');
                 $returnMicroprogram[] = new Microinstruction('data_to_mdr');
@@ -147,6 +149,8 @@ class Decoder {
 
                 return $returnMicroprogram;
             } else {
+                //MNEM([REG])
+                //check
                 $mi = new Microinstruction();
                 $mi->setMuxAndALUValueForMOVFromSourceRegister($inst->getParam1());
                 $mi->setTargetIndexFromTargetRegister('MAR');
@@ -155,7 +159,6 @@ class Decoder {
                 $returnMicroprogram[] = $mi;
 
                 $returnMicroprogram[] = new Microinstruction('data_to_mdr');
-
 
                 $mi = new Microinstruction;
                 $mi->setMuxAndALUValueForMOVFromSourceRegister('MDR');
@@ -181,9 +184,12 @@ class Decoder {
                 return $returnMicroprogram;
             }
         } else {
+            //no indirection
             if ($inst->hasConstant()) {
-                throw new DecoderException('not able to shift a pure number. It should be either an indirected constant or a register');
+                throw new DecoderException('Unable to shift a pure number. It should be either an indirected constant or a register or an indirected register.');
             } else {
+               //MNEM(REG)
+                //check
                 $mi = new Microinstruction;
 
                 $mi->setMuxAndALUValueFromSourceRegisterAndMnemonic($inst->getParam1(), $inst->getMnemonic());
