@@ -39,18 +39,18 @@ $(document).ready(function(){
                             array(
                                 'class' => 'bootstrap.widgets.BootMenu',
                             ),
-                            array(
-                                'class' => 'bootstrap.widgets.BootMenu',
-                                'htmlOptions' => array('class' => 'pull-right'),
-                                'items' => array(
-                                    array('label' => 'About', 'url' => '#', 'items' => array(
-                                            array('label' => 'Author', 'url' => '#'),
-                                            array('label' => 'Credits', 'url' => '#'),
-                                            '---',
-                                            array('label' => 'Contact', 'url' => '#'),
-                                    )),
-                                ),
-                            ),
+//                            array(
+//                                'class' => 'bootstrap.widgets.BootMenu',
+//                                'htmlOptions' => array('class' => 'pull-right'),
+//                                'items' => array(
+//                                    array('label' => 'About', 'url' => '#', 'items' => array(
+//                                            array('label' => 'Author', 'url' => '#'),
+//                                            array('label' => 'Credits', 'url' => '#'),
+//                                            '---',
+//                                            array('label' => 'Contact', 'url' => '#'),
+//                                    )),
+//                                ),
+//                            ),
                         ),
                     ));
                     ?>
