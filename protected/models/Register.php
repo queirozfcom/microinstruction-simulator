@@ -11,7 +11,6 @@
 		private $content;
 		private $DATAWORDLENGTHINBITS=32;
                 
-                
                 public function __construct($contents) {
                     if(!is_a($contents,'BinaryString')){
                         throw new RegisterException('Cannot set contents to a Register with anything other than a BinaryString');

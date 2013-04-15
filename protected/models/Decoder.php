@@ -59,6 +59,9 @@ class Decoder {
             $tempMicro->setOne(0);
             $tempMicro->setOne(28);
             $returnMicroprogram[] = $tempMicro; //IR<-MDR
+        }elseif($alias === 'increment_pc'){
+            //just one microinstruction: pc <-pc + 1
+            $returnMicroprogram[] = new Microinstruction('increment_pc');
         }
         return $returnMicroprogram;
     }

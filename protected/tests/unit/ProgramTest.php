@@ -1685,6 +1685,28 @@ class ProgramTest extends CDbTestCase {
         $p->run();
         $this->assertEquals(59, $p->R3->asInt());
     }
+    
+    public function testSimpleMicroByMicro(){
+        //mov(50,r0)
+        $p = new Program;
+
+        foreach (Factory::returnInstructionAndPossibleConstants(new VOInstruction('mov', 'constant', false, 50, 'r0', false, null)) as $line) {
+            $p->appendToMemory($line);
+        }
+        
+        $p->runNextMicroinstruction();//pc_to_mar_read
+        $this->assertEquals(0, $p->MAR->asInt());
+        $p->runNextMicroinstruction();//data_to_mdr
+        $p->runNextMicroinstruction();//mdr_to_ir
+        $this->assertEquals((new Instruction('mov','constant',false,'r0',false))->asInt(), $p->IR->asInt());
+        $p->runNextMicroinstruction();//increment_pc
+        $this->assertEquals(1, $p->PC->asInt());
+        $p->runNextMicroinstruction();//pc_to_mar_read
+        $p->runNextMicroinstruction();//data_to_mdr
+        $p->runNextMicroinstruction();//mdr_to_r0
+        $this->assertEquals(50, $p->R0->asInt());
+        
+    }
 }
 
 ?>

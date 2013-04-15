@@ -47,64 +47,86 @@ Yii::app()->getClientScript()->registerCssFile(Yii::app()->baseUrl . '/css/app/e
 
                 <div class="controls controls-row">
 
-                    <?php
-                    $this->widget('bootstrap.widgets.BootButton', array(
-                        'label' => 'reset PC',
-                        'htmlOptions' => array(
-                            'id' => 'reset-button',
-                            'class' => 'span4',
-                            'targeturl' => $this->createUrl('site/reset'),
-                            'rel' => 'tooltip',
-                            'data-title' => 'Reset PC (Program Counter) but keep Memory and Register Contents intact.'
-                        ),
-                        'type' => 'danger', // '', 'primary', 'info', 'success', 'warning', 'danger' or 'inverse'
-                        'size' => 'normal', // '', 'large', 'small' or 'mini'
-                    ));
-                    ?>
-                    <?php
-                    $this->widget('bootstrap.widgets.BootButton', array(
-                        'label' => 'run next instruction',
-                        'htmlOptions' => array(
-                            'class' => 'span4',
-                            'id' => 'run-next-instruction-button',
-                            'targeturl' => $this->createUrl('site/run_next_instruction'),
-                            'rel' => 'tooltip',
-                            'data-title' => 'Fetch the next Instruction from Memory and run it.'
-                        ),
-                        'type' => 'inverse', // '', 'primary', 'info', 'success', 'warning', 'danger' or 'inverse'
-                        'size' => 'normal', // '', 'large', 'small' or 'mini'
-                    ));
-                    ?>
+                    <div class="controls controls-row">
 
-                    <?php
-                    $this->widget('bootstrap.widgets.BootButton', array(
-                        'label' => 'run program',
-                        'htmlOptions' => array(
-                            'class' => 'span4',
-                            'id' => 'run-everything-button',
-                            'targeturl' => $this->createUrl('site/run_everything'),
-                            'rel' => 'tooltip',
-                            'data-title' => 'Run the whole thing. Program stops automatically when the PC reaches the last valid Memory line.'
-                        ),
-                        'type' => 'success', // '', 'primary', 'info', 'success', 'warning', 'danger' or 'inverse'
-                        'size' => 'medium', // '', 'large', 'small' or 'mini'
-                    ));
-                    ?>
+                        <?php
+                        $this->widget('bootstrap.widgets.BootButton', array(
+                            'label' => 'reset PC',
+                            'htmlOptions' => array(
+                                'id' => 'reset-button',
+                                'class' => 'span12',
+                                'targeturl' => $this->createUrl('site/reset'),
+                                'rel' => 'tooltip',
+                                'data-title' => 'Reset PC (Program Counter) but keep Memory and Register Contents intact.'
+                            ),
+                            'type' => 'danger', // '', 'primary', 'info', 'success', 'warning', 'danger' or 'inverse'
+                            'size' => 'normal', // '', 'large', 'small' or 'mini'
+                        ));
+                        ?>
+                    </div>
+                    <br />
+                    <div class="controls controls-row">
+                        <?php
+                        $this->widget('bootstrap.widgets.BootButton', array(
+                            'label' => 'run next microinstruction',
+                            'htmlOptions' => array(
+                                'class' => 'span4',
+                                'id' => 'run-next-microinstruction-button',
+                                'targeturl' => $this->createUrl('site/run_next_microinstruction'),
+                                'rel' => 'tooltip',
+                                'data-title' => 'Run the next microinstruction.'
+                            ),
+                            'type' => 'warning', // '', 'primary', 'info', 'success', 'warning', 'danger' or 'inverse'
+                            'size' => 'normal', // '', 'large', 'small' or 'mini'
+                        ));
+                        ?>
+                        <?php
+                        $this->widget('bootstrap.widgets.BootButton', array(
+                            'label' => 'run next instruction',
+                            'htmlOptions' => array(
+                                'class' => 'span4',
+                                'id' => 'run-next-instruction-button',
+                                'targeturl' => $this->createUrl('site/run_next_instruction'),
+                                'rel' => 'tooltip',
+                                'data-title' => 'Fetch the next Instruction from Memory and run it.'
+                            ),
+                            'type' => 'inverse', // '', 'primary', 'info', 'success', 'warning', 'danger' or 'inverse'
+                            'size' => 'normal', // '', 'large', 'small' or 'mini'
+                        ));
+                        ?>
+
+                        <?php
+                        $this->widget('bootstrap.widgets.BootButton', array(
+                            'label' => 'run program',
+                            'htmlOptions' => array(
+                                'class' => 'span4',
+                                'id' => 'run-everything-button',
+                                'targeturl' => $this->createUrl('site/run_everything'),
+                                'rel' => 'tooltip',
+                                'data-title' => 'Run the whole thing. Program stops automatically when the PC reaches the last valid Memory line.'
+                            ),
+                            'type' => 'success', // '', 'primary', 'info', 'success', 'warning', 'danger' or 'inverse'
+                            'size' => 'medium', // '', 'large', 'small' or 'mini'
+                        ));
+                        ?>
+
+                    </div>
+
 
 
                 </div>
 
             </div>
-                    <div class="well span6" style="min-height: 337px;">
-            <!--<div class="subtitle">Current Instruction: <br /><span id="current-instruction-span">&nbsp;</span></div>-->
-            <!--<div class="subtitle">Associated Microprogram: <span id="current-microinstruction-span"><br /><br /><br /><br /></span></div>-->
-            <div class="subtitle" id="log">
-                LOG:<br />
-                <div id="log-contents">
+            <div class="well span6" style="min-height: 337px;">
+    <!--<div class="subtitle">Current Instruction: <br /><span id="current-instruction-span">&nbsp;</span></div>-->
+    <!--<div class="subtitle">Associated Microprogram: <span id="current-microinstruction-span"><br /><br /><br /><br /></span></div>-->
+                <div class="subtitle" id="log">
+                    LOG:<br />
+                    <div id="log-contents">
 
+                    </div>
                 </div>
             </div>
-        </div>
         </div>    
 
 

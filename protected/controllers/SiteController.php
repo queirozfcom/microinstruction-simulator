@@ -16,7 +16,7 @@ class SiteController extends Controller {
             // They can be accessed via: index.php?r=site/page&view=FileName
             'page' => [
                 'class' => 'CViewAction',
-                ],
+            ],
         ];
     }
 
@@ -59,8 +59,8 @@ class SiteController extends Controller {
             'keyField' => false,
             'pagination' => [
                 'pageSize' => 30,
-                ],
-                ]);
+            ],
+        ]);
 
         $this->render('execute', [
             'dataProvider' => $dp,
@@ -68,15 +68,26 @@ class SiteController extends Controller {
     }
 
     public function actionErase_memory() {
-            $prog = new Program;
-            $this->setProgramInstance($prog);
-            $this->redirect('write');
+        $prog = new Program;
+        $this->setProgramInstance($prog);
+        $this->redirect('write');
     }
 
     public function actionRun_next_instruction() {
         if (Yii::app()->request->isPostRequest) {
             $prog = $this->getProgramInstance();
             $prog->runNextInstruction();
+            $this->setProgramInstance($prog);
+            $this->dumpInfoAsJson($prog);
+        }
+        else
+            throw new CHttpException(400, 'Invalid request. Please do not repeat this request again.');
+    }
+
+    public function actionRun_next_microinstruction() {
+        if (Yii::app()->request->isPostRequest) {
+            $prog = $this->getProgramInstance();
+            $prog->runNextMicroinstruction();
             $this->setProgramInstance($prog);
             $this->dumpInfoAsJson($prog);
         }
@@ -154,7 +165,6 @@ class SiteController extends Controller {
                 $prog->appendToMemory($line);
             }
             $this->setProgramInstance($prog);
-
         }
         $prog = $this->getProgramInstance();
 
@@ -162,7 +172,7 @@ class SiteController extends Controller {
             'keyField' => false,
             'pagination' => [
                 'pageSize' => 30,
-                ]]);
+        ]]);
         $this->render('write', [
             'dataProvider' => $dp,
             'model' => $model
@@ -171,11 +181,11 @@ class SiteController extends Controller {
 
     private function getProgramInstance() {
 
-        if (is_null(Yii::app()->user->getState('program'))) 
+        if (is_null(Yii::app()->user->getState('program')))
             $prog = new Program();
-        else 
+        else
             $prog = Yii::app()->user->getState('program');
-        
+
         return $prog;
     }
 

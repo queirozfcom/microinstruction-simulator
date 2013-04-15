@@ -32,28 +32,130 @@ class Program {
     private $PC;
     //registers end
     private $ALU;
+
+    /**
+     *
+     * @var MainMemory
+     */
     private $mainMemory;
+
+    /**
+     *
+     * @var ControlUnit
+     */
     private $controlUnit;
     //other
     private $currentMicroinstruction;
-    private $currentInstruction;
     private $nextInstruction;
     public $executionPhase = false;
     private $log = array();
-    private $fetchFirst = false;
+    //private $fetchFirst = false;
+
+    private $_currentMicroprogram = null;
+    private $_currentMicroprogramIndex = 0;
+    
+    /**
+     * Increment starts true because we want fetch to be the first thing to happen.
+     * As this is thought out, this happens when the last microprogram was an 'increment'. 
+     * That's why 'increment' is set to true at the start.
+     * 
+     * @var array 
+     */
+    private $_currentMicroProgramType = [
+        'fetch' => false,
+        'regular' => false,
+        'increment' => true
+    ];
 
     public function run() {
         while (true) {
             try {
                 $this->runNextInstruction();
             } catch (ProgramException $exc) {
-                if($exc->getMessage()==='End of program reached.')
+                if ($exc->getMessage() === 'End of program reached.')
                     return;
                 else
                     throw $exc;
-                
             }
         }
+    }
+
+    private function incrementMicroprogramIndex() {
+        $this->_currentMicroprogramIndex +=1;
+    }
+    
+
+    /**
+     * This gets called by the controller.
+     * 
+     * This will check what the current microinstruction is and it will run the next one.
+     * If the end of the current microprogram was reached, we will start the next one.
+     * 
+     */    
+    public function runNextMicroinstruction() {
+        if (count($this->_currentMicroprogram) === $this->_currentMicroprogramIndex) {
+            //we've executed the last microinstruction in this microprogram so we need to go to the next microprogram.
+            if ($this->isFetch()) {
+                $this->_currentMicroprogram = $this->controlUnit->decode($this->IR->getContent());
+                $this->resetMicroprogramIndex();
+                $this->runMicroinstruction($this->_currentMicroprogram[$this->_currentMicroprogramIndex]);
+                $this->incrementMicroprogramIndex();
+                $this->setIsRegular();
+            } elseif ($this->isIncrement()) {
+                $this->_currentMicroprogram = $this->controlUnit->decode("fetch");
+                $this->resetMicroprogramIndex();
+                $this->runMicroinstruction($this->_currentMicroprogram[$this->_currentMicroprogramIndex]);
+                $this->incrementMicroprogramIndex();
+                $this->setIsFetch();
+            } elseif ($this->isRegular()) {
+                $this->_currentMicroprogram = $this->controlUnit->decode("increment_pc");
+                $this->resetMicroprogramIndex();
+                $this->runMicroinstruction(($this->_currentMicroprogram[$this->_currentMicroprogramIndex]));
+                $this->incrementMicroprogramIndex();
+                $this->setIsIncrement();
+            }
+        } else {
+            $this->runMicroinstruction($this->_currentMicroprogram[$this->_currentMicroprogramIndex]);
+            $this->incrementMicroprogramIndex();
+        }
+    }
+
+    private function resetMicroprogramIndex() {
+        $this->_currentMicroprogramIndex = 0;
+    }
+
+    private function isFetch() {
+        return $this->_currentMicroProgramType['fetch'];
+    }
+
+    private function isRegular() {
+        return $this->_currentMicroProgramType['regular'];
+    }
+
+    private function isIncrement() {
+        return $this->_currentMicroProgramType['increment'];
+    }
+
+    private function setIsFetch() {
+        $this->_currentMicroProgramType['fetch'] = true;
+        $this->_currentMicroProgramType['regular'] = false;
+        $this->_currentMicroProgramType['increment'] = false;
+    }
+
+    private function setIsRegular() {
+        $this->_currentMicroProgramType['fetch'] = false;
+        $this->_currentMicroProgramType['regular'] = true;
+        $this->_currentMicroProgramType['increment'] = false;
+    }
+
+    private function setIsIncrement() {
+        $this->_currentMicroProgramType['fetch'] = false;
+        $this->_currentMicroProgramType['regular'] = false;
+        $this->_currentMicroProgramType['increment'] = true;
+    }
+
+    private function setNextMicroInstruction() {
+        
     }
 
     public function appendToMemory(BinaryString $bs) {
@@ -74,9 +176,8 @@ class Program {
     }
 
     public function getLog() {
-        if (isset($this->log)) {
+        if (isset($this->log))
             return $this->log;
-        }
     }
 
     public function __construct() {
@@ -128,10 +229,10 @@ class Program {
         $this->fetch();
 
         $nextInstruction = $this->IR->getContent();
-        
-        if (get_class($nextInstruction) === 'BinaryString') 
+
+        if (get_class($nextInstruction) === 'BinaryString')
             throw new ProgramException('End of program reached.');
-        
+
         $this->runInstruction($nextInstruction);
         $this->incrementPC();
     }
@@ -152,16 +253,15 @@ class Program {
      * and bring it over to the IR Register.
      */
     public function fetch() {
-        $this->setCurrentInstruction("fetch");
-        
+
         $fetchMicroprogram = $this->controlUnit->decode("fetch");
-        
+
         foreach ($fetchMicroprogram as $microinstruction) {
-            
-            try{
-            $this->runMicroinstruction($microinstruction);
-            }catch(MainMemoryException $e){
-                if($e->getMessage()==="Returned value not valid binary string. Maybe you've reached the end.")
+
+            try {
+                $this->runMicroinstruction($microinstruction);
+            } catch (MainMemoryException $e) {
+                if ($e->getMessage() === "Returned value not valid binary string. Maybe you've reached the end.")
                     throw new ProgramException('End of program reached.');
                 else
                     throw $e;
@@ -170,7 +270,6 @@ class Program {
     }
 
     private function runInstruction(Instruction $inst) {
-        $this->setCurrentInstruction($inst);
         $microProgram = $this->controlUnit->decode($inst);
         foreach ($microProgram as $microinstruction) {
             $this->runMicroinstruction($microinstruction);
@@ -205,9 +304,9 @@ class Program {
             elseif ($microinstruction == new Microinstruction('mdr_to_mar_read')) {
                 $this->MAR->setContent($this->MDR->getContent());
                 $this->performMemoryRead();
-            } elseif ($microinstruction == new Microinstruction('data_to_mdr')){
-                $this->MDR->setContent($this->mainMemory->getReturnedValue());}
-            elseif ($microinstruction == new Microinstruction('mdr_to_ir'))
+            } elseif ($microinstruction == new Microinstruction('data_to_mdr')) {
+                $this->MDR->setContent($this->mainMemory->getReturnedValue());
+            } elseif ($microinstruction == new Microinstruction('mdr_to_ir'))
                 $this->IR->setContent($this->MDR->getContent());
             elseif ($microinstruction == new Microinstruction('increment_pc'))
                 $this->PC->setContent(new BinaryString(32, $this->PC->getContent()->asInt() + 1));
@@ -215,7 +314,7 @@ class Program {
                 $targetRegName = self::getRegisterNameFromTargetIndex($microinstruction->getTargetRegIndex());
                 $leftRegName = self::getRegisterNameFromMUXAValue($microinstruction->getMUXAValue());
                 $rightRegName = self::getRegisterNameFromMUXBValue($microinstruction->getMUXBValue());
-                
+
                 $ALUOpCode = $microinstruction->getALUOperationCode();
 
                 if (is_null($leftRegName)) {
@@ -237,10 +336,10 @@ class Program {
                 $this->resetFlags();
                 //result is a BinaryString
                 $result = $this->ALU->operateOn($leftRegContents, $rightRegContents, $ALUOpCode);
-                
+
                 $this->setFlags($result);
-                
-                
+
+
                 if (!ALU::isCMPOperation($ALUOpCode)) {
                     //CMP is the same as SUB but no results are stored in the target register
 
@@ -272,7 +371,6 @@ class Program {
             $newPCContents->setIntegerValue($newPCContentsAsInt);
 
             $this->PC->setContent($newPCContents);
-
         }
     }
 
@@ -359,7 +457,7 @@ class Program {
      * @param String|Instruction $param
      */
     private function setCurrentInstruction($param) {
-        $this->currentInstruction = $param;
+        $this->_currentInstruction = $param;
     }
 
     /**
