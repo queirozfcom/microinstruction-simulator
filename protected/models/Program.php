@@ -17,6 +17,7 @@ class Program {
         'L' => false,
         'G' => false
     ];
+    
     private static $targetableRegisters = ['R0', 'R1', 'R2', 'R3', 'R4', 'CONSTANT'];
     //registers begin
     private $R0;

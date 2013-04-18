@@ -11,7 +11,6 @@ class Instruction extends BinaryString {
         'ADD',
         'SUB',
         'MUL',
-        'DIV',
         'AND',
         'OR',
         'NAND',

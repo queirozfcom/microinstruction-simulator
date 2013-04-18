@@ -18,15 +18,15 @@ class Factory {
         $output = [];
 
         if ($vo->representsABranch()) {
-            
+
             $output[] = new Instruction($vo->getMnemonic(), $vo->getConstant1());
         } else {
             $mnem = $vo->getMnemonic();
-            
+
             //source
             $param1 = $vo->getArg1();
             $ind1 = $vo->getIndirection1();
-            
+
             //target
             $param2 = $vo->getArg2();
             $ind2 = $vo->getIndirection2();
@@ -35,7 +35,30 @@ class Factory {
             $output[] = $inst;
 
             if ($vo->arg1IsConstant()) {
-                $bs = new BinaryString(32, $vo->getConstant1());
+                
+                echo '<pre>';
+                var_dump($vo->getConstant1());
+                echo '</pre>';
+                exit;
+                
+                if ($vo->getConstant1()[0] === '0' && $vo->getConstant1()[1] === 'x') {
+                    //need to account for hex numbers
+                    $numberAsInt = hexdec($vo->getConstant1());
+                    $bs = new BinaryString(32, $numberAsInt);
+                } elseif ($vo->getConstant1()[0]==='-' && $vo->getConstant1()[1] === '0' && $vo->getConstant1()[2] === 'x') {
+                    //and negative hex numbers
+                    $positiveNumber = hexdec(ltrim($vo->getConstant1(),'-'));
+                    
+                    echo '<pre>';
+                    var_dump($positiveNumber);
+                    echo '</pre>';
+                    exit;
+                    
+                } else {
+
+                    $bs = new BinaryString(32, $vo->getConstant1());
+                }
+
                 $output[] = $bs;
             }
             if ($vo->arg2IsConstant()) {
