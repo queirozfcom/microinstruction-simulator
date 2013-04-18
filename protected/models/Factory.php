@@ -36,11 +36,6 @@ class Factory {
 
             if ($vo->arg1IsConstant()) {
                 
-                echo '<pre>';
-                var_dump($vo->getConstant1());
-                echo '</pre>';
-                exit;
-                
                 if ($vo->getConstant1()[0] === '0' && $vo->getConstant1()[1] === 'x') {
                     //need to account for hex numbers
                     $numberAsInt = hexdec($vo->getConstant1());
@@ -48,11 +43,6 @@ class Factory {
                 } elseif ($vo->getConstant1()[0]==='-' && $vo->getConstant1()[1] === '0' && $vo->getConstant1()[2] === 'x') {
                     //and negative hex numbers
                     $positiveNumber = hexdec(ltrim($vo->getConstant1(),'-'));
-                    
-                    echo '<pre>';
-                    var_dump($positiveNumber);
-                    echo '</pre>';
-                    exit;
                     
                 } else {
 
