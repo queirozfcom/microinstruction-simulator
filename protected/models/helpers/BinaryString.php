@@ -199,6 +199,16 @@ class BinaryString implements ArrayAccess, Countable {
         return $newBs;
     }
 
+    public function clr() {
+        $newBs = new BinaryString($this->length);
+
+        for ($i = 0; $i < $this->length; $i++) {
+            $newBs[$i] = "0";
+        }
+
+        return $newBs;
+    }
+
     public function neg() {
         $newBs = new BinaryString($this->length);
 

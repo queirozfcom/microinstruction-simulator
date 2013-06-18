@@ -26,20 +26,17 @@
                  * @throws InstructionException 
                  */
 		public function __construct($mnemonic,$arg1,$indirection1,$constant1,$arg2,$indirection2,$constant2){
-			if(!is_string($mnemonic)){            
+			if(!is_string($mnemonic))            
 				throw new InvalidArgumentException('$mnemonic must be a string');
-			}
-                        if(strtolower($arg1)==='constant'){
-                            if(!is_numeric($constant1)){ 
-                                    throw new InstructionException("constants must be numeric");
-                            }
-			}
-			if(strtolower($arg2)==='constant'){
-				if(!is_numeric($constant2)){	
-					throw new InstructionException("constants must be numeric");
-				}
-			}
 			
+                        if(strtolower($arg1)==='constant')
+                            if(!is_numeric($constant1))
+                                    throw new InstructionException("constants must be numeric");
+			
+			if(strtolower($arg2)==='constant')
+				if(!is_numeric($constant2))	
+					throw new InstructionException("constants must be numeric");
+				
 			$this->mnemonic     = $mnemonic;
 			$this->arg1         = $arg1;
 			$this->indirection1 = $indirection1;
@@ -52,7 +49,7 @@
                 public function representsABranch(){
                     if(strtoupper($this->mnemonic)==='BRZ' || strtoupper($this->mnemonic)==='BRN' ||
                             strtoupper($this->mnemonic)==='BRE' || strtoupper($this->mnemonic)==='BRL' ||
-                            strtoupper($this->mnemonic)==='BRG')
+                            strtoupper($this->mnemonic)==='BRG' || strtoupper($this->mnemonic)==='RJMP' )
                         return true;
                     else 
                         return false;

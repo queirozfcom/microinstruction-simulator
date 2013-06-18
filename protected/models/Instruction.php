@@ -10,7 +10,6 @@ class Instruction extends BinaryString {
         'MOV',
         'ADD',
         'SUB',
-        'MUL',
         'AND',
         'OR',
         'NAND',
@@ -25,7 +24,8 @@ class Instruction extends BinaryString {
         'BRN',
         'BRE',
         'BRL',
-        'BRG');
+        'BRG',
+        'RJMP');
     protected $length = 32;
     protected $string;
     //switch to private upon end of testing
@@ -58,7 +58,6 @@ class Instruction extends BinaryString {
         if (func_num_args() === 5) {
             //normal usage
             $this->setIntegerValue(0);
-
             $this->setMnemonic(func_get_arg(0));
             $this->setParam1(func_get_arg(1));
             $this->setIndirection1(func_get_arg(2));
@@ -74,11 +73,10 @@ class Instruction extends BinaryString {
             //branch-type instructions
             //normal usage
             $this->setIntegerValue(0);
-
+            
             $this->setMnemonic(func_get_arg(0));
             $this->setParam1('constant');
             $this->setBranchOffset(func_get_arg(1));
-            
         }
     }
 
@@ -108,15 +106,10 @@ class Instruction extends BinaryString {
 
     public function humanReadableForm() {
         $output = "";
-
         $output .= $this->mnemonic;
-
         $output .= "(";
-
         $output .= $this->indirection1 ? "[" : "";
-
         $output .= ($this->param1 === "CONSTANT") ? "#" . $this->param1 : $this->param1;
-
         $output .= $this->indirection1 ? "]" : "";
 
         if (is_null($this->param2)) {
@@ -125,24 +118,19 @@ class Instruction extends BinaryString {
         }
 
         $output .= ",";
-
         $output .= $this->indirection2 ? "[" : "";
-
         $output .= ($this->param2 === "CONSTANT") ? "#" . $this->param2 : $this->param2;
-
         $output .= $this->indirection2 ? "]" : "";
-
         $output .= ")";
 
         return $output;
     }
 
     public function hasConstant() {
-        if (($this->param1 === 'CONSTANT') || ($this->param2 === 'CONSTANT')) 
+        if (($this->param1 === 'CONSTANT') || ($this->param2 === 'CONSTANT'))
             return true;
-         else 
+        else
             return false;
-        
     }
 
     private function requiresTwoArguments() {
@@ -154,31 +142,30 @@ class Instruction extends BinaryString {
     }
 
     public function isBranch() {
-
-        if ($this->mnemonic === 'BRZ' || $this->mnemonic === 'BRN' || $this->mnemonic === 'BRE' || $this->mnemonic === 'BRL' || $this->mnemonic === 'BRG')
+        if ($this->mnemonic === 'BRZ' || $this->mnemonic === 'BRN' || $this->mnemonic === 'BRE' || $this->mnemonic === 'BRL' || $this->mnemonic === 'BRG' || $this->mnemonic ==='RJMP')
             return true;
         else
             return false;
     }
-    
-    public function getBranchOffset(){
-        $negativeOffset=$this->getIntValueStartingAt(7, 14);
-        $positiveOffset=$this->getIntValueStartingAt(7, 0);
-        
-        if( $negativeOffset!==0  && $positiveOffset!==0)
-                throw new InstructionException('A Branch Instruction should have either a positive offset or a negative offset. We found a Instruction that has both. Negative offset='.$negativeOffset.' and positive offset='.$positiveOffset.'.');
-        
-        if($negativeOffset===0)
+
+    public function getBranchOffset() {
+        $negativeOffset = $this->getIntValueStartingAt(7, 14);
+        $positiveOffset = $this->getIntValueStartingAt(7, 0);
+
+        if ($negativeOffset !== 0 && $positiveOffset !== 0)
+            throw new InstructionException('A Branch Instruction should have either a positive offset or a negative offset. We found a Instruction that has both. Negative offset=' . $negativeOffset . ' and positive offset=' . $positiveOffset . '.');
+
+        if ($negativeOffset === 0)
             return $positiveOffset;
-        elseif($positiveOffset===0)
-            return $negativeOffset*(-1);
+        elseif ($positiveOffset === 0)
+            return $negativeOffset * (-1);
         else
             throw new InstructionException('One branch offset should be a nonzero integer and the other should be zero');
-        
     }
-    
+
     private function requiresOnlyOneArgument() {
-        $arr = array('CLR',
+        $arr = [
+            'CLR',
             'NOT',
             'NEG',
             'SHL',
@@ -187,29 +174,28 @@ class Instruction extends BinaryString {
             'BRN',
             'BRE',
             'BRL',
-            'BRG');
-        if (in_array(strtoupper($this->mnemonic), $arr)) {
+            'BRG',
+            'RJMP'
+        ];
+        if (in_array(strtoupper($this->mnemonic), $arr))
             return true;
-        } else {
+        else
             return false;
-        }
     }
-    
-    private function setBranchOffset($offset){
-        if(!is_int($offset) && is_numeric($offset))
+
+    private function setBranchOffset($offset) {
+        if (!is_int($offset) && is_numeric($offset))
             $offset = intval($offset);
-        
-        if($offset===0)
-            throw new InstructionException('Nonzero Integer needed. '.$offset.' found.');
-        
-        
-        if ($offset<0)
-            $this->setIntValueStartingAt($offset*(-1), 7, 14);
-        elseif($offset>0)
+
+        if ($offset === 0)
+            throw new InstructionException('Nonzero Integer needed. ' . $offset . ' found.');
+
+        if ($offset < 0)
+            $this->setIntValueStartingAt($offset * (-1), 7, 14);
+        elseif ($offset > 0)
             $this->setIntValueStartingAt($offset, 7, 0);
-        
     }
-    
+
     private function setIndirection1($value) {
         if (!is_bool($value)) {
             throw new InstructionException('indirection1 value must be a boolean');
@@ -382,8 +368,11 @@ class Instruction extends BinaryString {
             case "NEG":
                 $this->setIntValueStartingAt(21, 6, 26);
                 break;
+            case "RJMP":
+                $this->setIntValueStartingAt(22, 6, 26);
+                break;
             default:
-                throw new InstructionException('Invalid Mnemonic for this machine : "'.  strtoupper($mnemonic).'".');
+                throw new InstructionException('Invalid Mnemonic for this machine : "' . strtoupper($mnemonic) . '".');
         }
     }
 

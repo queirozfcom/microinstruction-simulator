@@ -15,9 +15,9 @@ class Program {
         'N' => false,
         'E' => false,
         'L' => false,
-        'G' => false
+        'G' => false,
+        'R' => true//dummy flag, always set to true
     ];
-    
     private static $targetableRegisters = ['R0', 'R1', 'R2', 'R3', 'R4', 'CONSTANT'];
     //registers begin
     private $R0;
@@ -54,7 +54,7 @@ class Program {
 
     private $_currentMicroprogram = null;
     private $_currentMicroprogramIndex = 0;
-    
+
     /**
      * Increment starts true because we want fetch to be the first thing to happen.
      * As this is thought out, this happens when the last microprogram was an 'increment'. 
@@ -84,7 +84,6 @@ class Program {
     private function incrementMicroprogramIndex() {
         $this->_currentMicroprogramIndex +=1;
     }
-    
 
     /**
      * This gets called by the controller.
@@ -92,7 +91,7 @@ class Program {
      * This will check what the current microinstruction is and it will run the next one.
      * If the end of the current microprogram was reached, we will start the next one.
      * 
-     */    
+     */
     public function runNextMicroinstruction() {
         if (count($this->_currentMicroprogram) === $this->_currentMicroprogramIndex) {
             //we've executed the last microinstruction in this microprogram so we need to go to the next microprogram.
@@ -362,6 +361,7 @@ class Program {
 
         $offset = $microinstruction->getBranchOffset();
 
+        //rather than defining new logic for branches that DON'T depend upon flags (as is the case with unconditional jumps), i've set a dummy variable 'R' which is always true and therefore the branch always take place
         if ($this->flags[$branchFlag]) {
 
             $currentPCContentsAsInt = $this->PC->asInt();
@@ -523,6 +523,7 @@ class Program {
         $this->flags['E'] = false;
         $this->flags['L'] = false;
         $this->flags['G'] = false;
+        $this->flags['R'] = true;
     }
 
 }

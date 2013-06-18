@@ -273,6 +273,8 @@ class Microinstruction extends BinaryString {
                 $intALUOpCode = ALU::returnOpCodeForOperation('S=not');
             elseif (strtoupper($mnemonic) === 'NEG')
                 $intALUOpCode = ALU::returnOpCodeForOperation('S=neg');
+            elseif (strtoupper($mnemonic) === 'CLR')
+                $intALUOpCode = ALU::returnOpCodeForOperation ('S=clr');
             else
                 throw new MicroinstructionException('Invalid operation: ' . $mnemonic);
 
@@ -358,7 +360,7 @@ class Microinstruction extends BinaryString {
     public function setBranchType($type) {
         if (!is_string($type))
             throw new MicroinstructionException('"' . $type . '" is not a valid branch type for a microinstruction.');
-        if (!(mb_strlen($type) === 3 || mb_strlen($type) === 1 ))
+        if (!(mb_strlen($type) === 3 || mb_strlen($type) === 1 || mb_strlen($type) === 4 ))
             throw new MicroinstructionException('Only 1- or 3-letter branch types are allowed (the single letter or the 3-letter mnemonic). Given: "' . $type . '".');
 
         switch (mb_strtoupper($type, 'UTF-8')) {
@@ -382,6 +384,10 @@ class Microinstruction extends BinaryString {
             case 'BRG':
                 $this->setIntValueStartingAt(94, 8, 0);
                 break;
+            case 'R':
+            case 'RJMP':
+                $this->setIntValueStartingAt(95, 8, 0);
+                break;
             default:
                 throw new MicroinstructionException('Invalid branch type found: "' . $type . '".');
                 break;
@@ -391,8 +397,8 @@ class Microinstruction extends BinaryString {
     public function getBranchFlagType() {
         $branchIntValue = $this->getIntValueStartingAt(8, 0);
 
-        if ($branchIntValue < 90 || $branchIntValue > 94)
-            throw new MicroinstructionException('Invalid value for branch int value: ' . $branchIntValue . '. Allowed values are from 90 to 99 inclusive');
+        if ($branchIntValue < 90 || $branchIntValue > 95)
+            throw new MicroinstructionException('Invalid value for branch int value: ' . $branchIntValue . '. Allowed values are from 90 to 95 inclusive');
 
         switch ($branchIntValue) {
             case 90:
@@ -405,13 +411,15 @@ class Microinstruction extends BinaryString {
                 return 'L';
             case 94:
                 return 'G';
+            case 95:
+                return 'R';
             default:
-                throw new MicroinstructionException('Invalid value for branch int value: ' . $branchIntValue . '. Allowed values are from 90 to 99 inclusive');
+                throw new MicroinstructionException('Invalid value for branch int value: ' . $branchIntValue . '. Allowed values are from 90 to 95 inclusive');
         }
     }
 
     public function isBranch() {
-        if (($this->getIntValueStartingAt(8, 0) >= 90) && ($this->getIntValueStartingAt(8, 0) <= 94))
+        if (($this->getIntValueStartingAt(8, 0) >= 90) && ($this->getIntValueStartingAt(8, 0) <= 95))
             return true;
         else
             return false;

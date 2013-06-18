@@ -54,6 +54,8 @@ class ALU {
                 return 19;
             case 'S=neg':
                 return 20;
+            case 'S=clr':
+                return 21;
             default:
                 throw new ALUException('Unsupported operation: ' . $operation);
         }
@@ -109,6 +111,8 @@ class ALU {
                 return 'S=not';
             case 20:
                 return 'S=neg';
+            case 21:
+                return 'S=clr';
             default:
                 throw new ALUException("$opcode is not a valid operation code for this ALU");
         }
@@ -193,6 +197,8 @@ class ALU {
                 return $this->doNot($arg1, $arg2);
             case 'S=neg':
                 return $this->doNeg($arg1,$arg2);
+            case 'S=clr':
+                return $this->doClr($arg1,$arg2);
             default:
                 throw new ALUException("The function compute has not been defined for {$opName}.");
         }
@@ -240,6 +246,16 @@ class ALU {
         
     }
     
+    private function doClr($opt1,$opt2){
+        if (!($opt1 instanceof BinaryString) && !($opt2 instanceof BinaryString))
+            throw new ALUException('Either $opt1 OR $opt2 need be a BinaryString, but $opt1\'s class is ' . get_class($opt1) . ' and $opt2\'s class is ' . get_class($opt2) . '.');
+
+        if ($opt1 instanceof BinaryString) 
+            return $opt1->clr();
+        
+        if ($opt2 instanceof BinaryString) 
+            return $opt2->clr();        
+    }
     
     
     /**
