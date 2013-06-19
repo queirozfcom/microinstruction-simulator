@@ -17,10 +17,9 @@ class Factory {
     public static function returnInstructionAndPossibleConstants(VOInstruction $vo) {
         $output = [];
 
-        if ($vo->representsABranch()) {
-
+        if ($vo->representsABranch())
             $output[] = new Instruction($vo->getMnemonic(), $vo->getConstant1());
-        } else {
+        else {
             $mnem = $vo->getMnemonic();
 
             //source
@@ -35,19 +34,18 @@ class Factory {
             $output[] = $inst;
 
             if ($vo->arg1IsConstant()) {
-                
-                if ($vo->getConstant1()[0] === '0' && $vo->getConstant1()[1] === 'x') {
-                    //need to account for hex numbers
+                if (count($vo->getConstant1()) >= 2 && $vo->getConstant1()[0] === '0' && $vo->getConstant1()[1] === 'x') {
+                    //hexadecimal numbers are at least 2 characters long (0x)
                     $numberAsInt = hexdec($vo->getConstant1());
                     $bs = new BinaryString(32, $numberAsInt);
-                } elseif ($vo->getConstant1()[0]==='-' && $vo->getConstant1()[1] === '0' && $vo->getConstant1()[2] === 'x') {
-                    //and negative hex numbers
-                    $positiveNumber = hexdec(ltrim($vo->getConstant1(),'-'));
-                    
-                } else {
-
-                    $bs = new BinaryString(32, $vo->getConstant1());
+                } elseif (count($vo->getConstant1()) >= 3 && $vo->getConstant1()[0] === '-' && $vo->getConstant1()[1] === '0' && $vo->getConstant1()[2] === 'x') {
+                    //and negative hex numbers are at least 3 characters long
+                    $positiveNumber = hexdec(ltrim($vo->getConstant1(), '-'));
+                    $number = $positiveNumber - 2 * ($positiveNumber);
+                    $bs = new BinaryString(32, $number);
                 }
+                else
+                    $bs = new BinaryString(32, $vo->getConstant1());
 
                 $output[] = $bs;
             }
