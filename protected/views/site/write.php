@@ -58,7 +58,7 @@ Yii::app()->getClientScript()->registerScriptFile(Yii::app()->baseUrl . '/js/sit
                         </div>
                     </div>
 
-                    <div class="controls control-group">
+                    <div class="controls control-group source">
                         <div class="controls">
                             <?php echo $form->labelEx($model, 'source_param'); ?>
                         </div>
@@ -92,7 +92,7 @@ Yii::app()->getClientScript()->registerScriptFile(Yii::app()->baseUrl . '/js/sit
                         </div>
 
                     </div>  
-                    <div class="controls control-group">
+                    <div class="controls control-group target">
                         <div class="controls">
                             <?php echo $form->labelEx($model, 'target_param'); ?>
                         </div>

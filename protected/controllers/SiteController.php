@@ -119,9 +119,10 @@ class SiteController extends Controller {
         $array = $prog->dumpInfo();
 
         foreach ($array as &$v) {
-            if (is_array($v))
-                continue;
-            $v = "<span rel='tooltip' title='{$v->humanReadableForm()}'>{$v->__toString()}</span>";
+            //if (is_array($v))
+            //    continue;
+            if (is_object($v))
+                $v = "<span rel='tooltip' title='{$v->humanReadableForm()}'>{$v->__toString()}</span>";
         }
 
         $json = json_encode($array);

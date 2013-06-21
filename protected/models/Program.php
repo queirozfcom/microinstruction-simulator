@@ -217,7 +217,13 @@ class Program {
         $output["MDR"] = $this->MDR;
         $output["MAR"] = $this->MAR;
         $output["IR"] = $this->IR;
-
+        
+        $output["Z"] = ($this->flags['Z'])? '1' : '0';
+        $output["N"] = ($this->flags['N'])? '1' : '0';
+        $output["E"] = ($this->flags['E'])? '1' : '0';
+        $output["L"] = ($this->flags['L'])? '1' : '0';
+        $output["G"] = ($this->flags['G'])? '1' : '0';
+        
         $output['log'] = array_map(function($e) {
                     return ($e->__toString());
                 }, $this->log);

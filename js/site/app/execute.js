@@ -51,6 +51,12 @@ function update_fields(data){
     var IR_field = '#ir-contents';
     var MAR_field = '#mar-contents';
     var MDR_field = '#mdr-contents';
+    var flagZ_field = '#flagz'; 
+    var flagN_field = '#flagn';
+    var flagE_field = '#flage';
+    var flagL_field = '#flagl';
+    var flagG_field = '#flagg';
+    
     var current_macro_field = '#current-instruction-span';
     var log = '#log-contents';
     
@@ -68,11 +74,16 @@ function update_fields(data){
     $(AR2_field+" div.reg-contents-input").html(data.AR2);
     
     
-    
     $(MAR_field+" div.reg-contents-input").html(data.MAR);
     $(MDR_field+" div.reg-contents-input").html(data.MDR);
     
     $(IR_field+" div.reg-contents-input").html(data.IR);
+    
+    $(flagZ_field).html(data.Z);
+    $(flagN_field).html(data.N);
+    $(flagE_field).html(data.E);
+    $(flagL_field).html(data.L);
+    $(flagG_field).html(data.G);
     
     $(log).html("");
     for(var i=0;i<data.log.length;i++){

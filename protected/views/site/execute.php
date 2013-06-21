@@ -46,7 +46,8 @@ Yii::app()->getClientScript()->registerCssFile(Yii::app()->baseUrl . '/css/app/e
                 ?>
 
                 <div class="controls controls-row">
-
+                    <br />
+                    <br />
                     <div class="controls controls-row">
 
                         <?php
@@ -123,10 +124,22 @@ Yii::app()->getClientScript()->registerCssFile(Yii::app()->baseUrl . '/css/app/e
                 <div class="subtitle" id="log">
                     LOG:<br />
                     <div id="log-contents">
-
                     </div>
                 </div>
             </div>
+
+            <div class="well span6">
+                <div class="subtitle">
+                    FLAGS:<br />
+                    Z:<span class="flag" id="flagz">0</span>&nbsp;&nbsp;
+                    N:<span class="flag" id="flagn">0</span>&nbsp;&nbsp;
+                    E:<span class="flag" id="flage">0</span>&nbsp;&nbsp;
+                    L:<span class="flag" id="flagl">0</span>&nbsp;&nbsp;
+                    G:<span class="flag" id="flagg">0</span>&nbsp;&nbsp;
+                </div>
+
+            </div>
+
         </div>    
 
 
