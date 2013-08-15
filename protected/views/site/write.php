@@ -4,7 +4,7 @@ $this->breadcrumbs = [
 ];
 
 Yii::app()->getClientScript()->registerCssFile(Yii::app()->baseUrl . '/css/app/write.css');
-Yii::app()->getClientScript()->registerScriptFile(Yii::app()->baseUrl . '/js/site/app/write.js');
+Yii::app()->getClientScript()->registerScriptFile(Yii::app()->baseUrl . '/js/site/app/write/main.js');
 ?>
 
 <div class="container">
@@ -36,14 +36,12 @@ Yii::app()->getClientScript()->registerScriptFile(Yii::app()->baseUrl . '/js/sit
                         'focus' => [$model, 'mnemonic'],
                         'clientOptions' => [
                             'validateOnSubmit' => true
-                            ]]);
+                    ]]);
                     ?>
 
                     <div class="controls controls-row">
                         <?php echo $form->errorSummary($model, null, null, ['class' => 'alert alert-error']); ?>    
-
                     </div>
-
 
                     <div class="controls control-group">
                         <div class="row-fluid">
@@ -79,6 +77,8 @@ Yii::app()->getClientScript()->registerScriptFile(Yii::app()->baseUrl . '/js/sit
                                     'style' => "width:100%;"
                                 ]);
                                 ?>
+                                <?php echo $form->error($model, 'source_param'); ?>
+                                <?php echo $form->error($model, 'source_constant'); ?>
                             </div>
                             <div class="span3">
                                 <?php
@@ -87,7 +87,6 @@ Yii::app()->getClientScript()->registerScriptFile(Yii::app()->baseUrl . '/js/sit
                                     'class' => 'input-mini'
                                 ]);
                                 ?>
-
                             </div>
                         </div>
 
@@ -114,6 +113,8 @@ Yii::app()->getClientScript()->registerScriptFile(Yii::app()->baseUrl . '/js/sit
                                     'style' => "width:100%;"
                                 ]);
                                 ?>
+                                <?php echo $form->error($model, 'target_param'); ?>
+                                <?php echo $form->error($model, 'target_constant'); ?>
                             </div>
                             <div class="span3">
                                 <?php
@@ -164,7 +165,7 @@ Yii::app()->getClientScript()->registerScriptFile(Yii::app()->baseUrl . '/js/sit
                         [
                             'header' => 'Content',
                             'value' => '$data->humanReadableForm()'
-                    ]]]);
+                ]]]);
                 ?>
                 <br />
 
@@ -176,8 +177,8 @@ Yii::app()->getClientScript()->registerScriptFile(Yii::app()->baseUrl . '/js/sit
                         echo Chtml::htmlButton('erase contents', [
                             'class' => 'btn btn-danger span12',
                             'onclick' => 'window.location.href="' . Yii::app()->createUrl('site/erase_memory') . '";',
-                            'rel'=>'tooltip',
-                            'title'=>"Erase all memory contents and start anew."
+                            'rel' => 'tooltip',
+                            'title' => "Erase all memory contents and start anew."
                         ])
                         ?>
                     </div>

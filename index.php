@@ -1,6 +1,7 @@
 <?php
-//just something to force commit
-//poo
+
+
+mb_internal_encoding('UTF-8');
 
 // change the following paths if necessary
 $yii='/home/dev/yii/framework/yii.php';

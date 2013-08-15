@@ -17,7 +17,7 @@ class Decoder {
      * @return array A Microinstruction array, i.e. a microProgram
      */
     public function decode($instruction) {
-        $returnMicroprogram = array();
+        $returnMicroprogram = [];
 
         if (is_string($instruction))
             $returnMicroprogram = $this->getMicroprogramFromAlias($instruction);
@@ -32,7 +32,7 @@ class Decoder {
      * @param String $alias
      */
     private function getMicroprogramFromAlias($alias) {
-        $returnMicroprogram = array();
+        $returnMicroprogram = [];
 
         if ($alias === "fetch") {
             /*
@@ -208,7 +208,7 @@ class Decoder {
     }
 
     private function decodeMOVInstruction(Instruction $inst) {
-        $returnMicroprogram = array();
+        $returnMicroprogram = [];
 
         if ($inst->hasIndirection()) {
             if ($inst->hasConstant()) {

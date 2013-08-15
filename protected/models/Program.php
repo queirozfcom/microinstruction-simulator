@@ -3,7 +3,7 @@
 class Program {
 
     public static function getValidTargetableRegisters() {
-        $output = array();
+        $output = [];
         foreach (self::$targetableRegisters as $registerName) {
             $output[$registerName] = $registerName;
         }
@@ -49,7 +49,7 @@ class Program {
     private $currentMicroinstruction;
     private $nextInstruction;
     public $executionPhase = false;
-    private $log = array();
+    private $log = [];
     //private $fetchFirst = false;
 
     private $_currentMicroprogram = null;
@@ -164,7 +164,7 @@ class Program {
 
     public function reset() {
         $this->PC = new Register(new BinaryString(32, 0));
-        $this->log = array();
+        $this->log = [];
     }
 
     public function addToLog(Microinstruction $micro) {
@@ -204,7 +204,7 @@ class Program {
      */
     public function dumpInfo() {
 
-        $output = array();
+        $output = [];
         $output["R0"] = $this->R0;
         $output["R1"] = $this->R1;
         $output["R2"] = $this->R2;

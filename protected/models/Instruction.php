@@ -6,7 +6,7 @@ class Instruction extends BinaryString {
      * @var array
      * @static 
      */
-    protected static $validMnemonics = array(
+    protected static $validMnemonics = [
         'MOV',
         'ADD',
         'SUB',
@@ -25,7 +25,7 @@ class Instruction extends BinaryString {
         'BRE',
         'BRL',
         'BRG',
-        'RJMP');
+        'RJMP'];
     protected $length = 32;
     protected $string;
     //switch to private upon end of testing
@@ -37,7 +37,7 @@ class Instruction extends BinaryString {
     private $mnemonic;
 
     public static function getValidInstructions() {
-        $output = array();
+        $output = [];
         foreach (self::$validMnemonics as $mnemonic) {
             $output[$mnemonic] = $mnemonic;
         }

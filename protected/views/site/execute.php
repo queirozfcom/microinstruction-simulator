@@ -5,7 +5,7 @@ $this->breadcrumbs = [
 ];
 
 Yii::app()->clientScript->registerCoreScript('jquery.ui');
-Yii::app()->getClientScript()->registerScriptFile('js/site/app/execute.js');
+Yii::app()->getClientScript()->registerScriptFile('js/site/app/execute/main.js');
 Yii::app()->getClientScript()->registerCssFile(Yii::app()->baseUrl . '/css/app/execute.css');
 ?>
 <div class="container">

@@ -20,7 +20,7 @@ class MainMemory implements ArrayAccess, Countable {
     private $returnedValue;
 
     public function __construct() {
-        $this->memoryArea = array();
+        $this->memoryArea = [];
     }
 
     public function __get($a) {

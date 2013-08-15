@@ -10,6 +10,13 @@ if (!Array.prototype.indexOf) {
     };
 }
 
+function fnValidateActiveForm(param, parent) {
+                var form = $(parent), settings = form.data('settings');
+                $.each(settings.attributes, function (i, attribute) {
+                    $.fn.yiiactiveform.updateInput(attribute, param, form);
+                });
+};
+
 $(document).ready(function() {
 
     $('#add-instruction-button').click(function() {
@@ -23,6 +30,11 @@ $(document).ready(function() {
 
         } else {
             $("#NewInstructionForm_target_constant").fadeOut('fast');
+            //remove error class if it's there
+            $("#NewInstructionForm_target_constant").removeClass('error');
+            //these may lag behind because they're not in the same div
+            $("#NewInstructionForm_target_constant").val('');
+            $("#NewInstructionForm_target_constant_em_").hide();
         }
     });
     $("#NewInstructionForm_source_param").change(function() {
@@ -31,6 +43,11 @@ $(document).ready(function() {
             $("#NewInstructionForm_source_constant").fadeIn('fast').focus();
         } else {
             $("#NewInstructionForm_source_constant").fadeOut('fast');
+            //remove error class if it's there
+            $("#NewInstructionForm_source_constant").removeClass('error');
+            //these may lag behind because they're not in the same div
+            $("#NewInstructionForm_source_constant").val('');
+            $("#NewInstructionForm_source_constant_em_").hide();
         }
     });
 
@@ -83,4 +100,25 @@ $(document).ready(function() {
 
         }
     });
+    
+    
+    $("#NewInstructionForm_target_param_indirection").click(function(e){
+        if($(this).prop('checked')){
+            if($('#NewInstructionForm_target_param').parent().hasClass('error')){
+                
+                if($('#NewInstructionForm_target_param_em_').html()==='Direct Constants cannot be used as the target for an Instruction.'){
+                    $('#NewInstructionForm_target_param').parent().removeClass('error');
+                    $('#NewInstructionForm_target_param').parent().addClass('success');
+                    $('#NewInstructionForm_target_param_em_').html('').hide();
+                }
+                
+            }
+        }else{
+            //this makes it invalid.
+            $('#NewInstructionForm_target_param').parent().removeClass('success').addClass('error');
+            $('#NewInstructionForm_target_param_em_').show().html('Direct Constants cannot be used as the target for an Instruction.');
+        }
+        
+    });
+    
 });
