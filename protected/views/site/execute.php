@@ -119,8 +119,6 @@ Yii::app()->getClientScript()->registerCssFile(Yii::app()->baseUrl . '/css/app/e
 
             </div>
             <div class="well span6" style="min-height: 337px;">
-    <!--<div class="subtitle">Current Instruction: <br /><span id="current-instruction-span">&nbsp;</span></div>-->
-    <!--<div class="subtitle">Associated Microprogram: <span id="current-microinstruction-span"><br /><br /><br /><br /></span></div>-->
                 <div class="subtitle" id="log">
                     LOG:<br />
                     <div id="log-contents">
@@ -145,85 +143,87 @@ Yii::app()->getClientScript()->registerCssFile(Yii::app()->baseUrl . '/css/app/e
 
 
 
-        <div class="well app-half-div" id="bottom-div">
+        <div class="well app-half-div container-fluid" id="bottom-div">
             <div class="subtitle">Register Contents</div>
 
-            <div id="mux-b-regs-div">
-                <div class="display-div" id="r2-contents">
-                    R2:<br />
-                    <div class="reg-contents-input">
-                        <span rel="tooltip" title="0">00000000000000000000000000000000</span>
+            <div class="row-fluid">
+
+                <div id="mux-a-regs-div" class="span4">
+                    <div class="display-div" id="r0-contents">
+                        R0:<br />
+                        <div class="reg-contents-input well">
+                            <span rel="tooltip" title="0">00000000000000000000000000000000</span>
+                        </div>
+                    </div>
+                    <div class="display-div" id="r1-contents" >
+                        R1:<br />
+                        <div class="reg-contents-input well">
+                            <span rel="tooltip" title="0">00000000000000000000000000000000</span>
+                        </div>
+                    </div>
+                    <div class="display-div" id="pc-contents">
+                        PC:<br />
+                        <div class="reg-contents-input well">
+                            <span rel="tooltip" title="0">00000000000000000000000000000000</span>
+                        </div>
+                    </div>
+                    <div class="display-div" id="ar1-contents">
+                        AR1:
+                        <div class="reg-contents-input well">
+                            <span rel="tooltip" title="0">00000000000000000000000000000000</span>
+                        </div>
                     </div>
                 </div>
-                <div class="display-div" id="r3-contents" >
-                    R3:<br />
-                    <div class="reg-contents-input">
-                        <span rel="tooltip" title="0">00000000000000000000000000000000</span>
+                <div id="mux-b-regs-div" class="span4">
+                    <div class="display-div" id="r2-contents">
+                        R2:<br />
+                        <div class="reg-contents-input well">
+                            <span rel="tooltip" title="0">00000000000000000000000000000000</span>
+                        </div>
+                    </div>
+                    <div class="display-div" id="r3-contents">
+                        R3:<br />
+                        <div class="reg-contents-input well">
+                            <span rel="tooltip" title="0">00000000000000000000000000000000</span>
+                        </div>
+                    </div>
+                    <div class="display-div" id="r4-contents">
+                        R4:<br />
+                        <div class="reg-contents-input well">
+                            <span rel="tooltip" title="0">00000000000000000000000000000000</span>
+                        </div>
+                    </div>
+                    <div class="display-div" id="ar2-contents">
+                        AR2:
+                        <div class="reg-contents-input well">
+                            <span rel="tooltip" title="0">00000000000000000000000000000000</span>
+                        </div>
                     </div>
                 </div>
-                <div class="display-div" id="r4-contents">
-                    R4:<br />
-                    <div class="reg-contents-input">
-                        <span rel="tooltip" title="0">00000000000000000000000000000000</span>
+                <div id="memory-related-regs-div" class="span4">
+                    <div class="display-div" id="mdr-contents">
+                        MDR:<br />
+                        <div class="reg-contents-input well">
+                            <span rel="tooltip" title="0">00000000000000000000000000000000</span>
+                        </div>
                     </div>
-                </div>
-                <div class="display-div" id="ar2-contents">
-                    AR2:
-                    <div class="reg-contents-input">
-                        <span rel="tooltip" title="0">00000000000000000000000000000000</span>
+                    <div class="display-div" id="mar-contents" >
+                        MAR:<br />
+                        <div class="reg-contents-input well">
+                            <span rel="tooltip" title="0">00000000000000000000000000000000</span>
+                        </div>
                     </div>
-                </div>
-            </div>
-            <div id="mux-a-regs-div">
-                <div class="display-div" id="r0-contents">
-                    R0:<br />
-                    <div class="reg-contents-input">
-                        <span rel="tooltip" title="0">00000000000000000000000000000000</span>
+                    <div class="display-div" id="ir-contents">
+                        IR:<br />
+                        <div class="reg-contents-input well">
+                            <span rel="tooltip" title="0">00000000000000000000000000000000</span>
+                        </div>
                     </div>
-                </div>
-                <div class="display-div" id="r1-contents" >
-                    R1:<br />
-                    <div class="reg-contents-input">
-                        <span rel="tooltip" title="0">00000000000000000000000000000000</span>
-                    </div>
-                </div>
-                <div class="display-div" id="pc-contents">
-                    PC:<br />
-                    <div class="reg-contents-input">
-                        <span rel="tooltip" title="0">00000000000000000000000000000000</span>
-                    </div>
-                </div>
-                <div class="display-div" id="ar1-contents">
-                    AR1:
-                    <div class="reg-contents-input">
-                        <span rel="tooltip" title="0">00000000000000000000000000000000</span>
-                    </div>
-                </div>
-            </div>
-            <div id="memory-related-regs-div">
-                <div class="display-div" id="mdr-contents">
-                    MDR:<br />
-                    <div class="reg-contents-input">
-                        <span rel="tooltip" title="0">00000000000000000000000000000000</span>
-                    </div>
-                </div>
-                <div class="display-div" id="mar-contents" >
-                    MAR:<br />
-                    <div class="reg-contents-input">
-                        <span rel="tooltip" title="0">00000000000000000000000000000000</span>
-                    </div>
+
                 </div>
 
             </div>
-            <br style="clear:both;" />
-            <div id="ir-regs-div">
-                <div class="display-div" id="ir-contents">
-                    IR:<br />
-                    <div class="reg-contents-input">
-                        <span rel="tooltip" title="0">00000000000000000000000000000000</span>
-                    </div>
-                </div>
-            </div>    
+
             <br style="clear:both;" />
         </div>
     </div>

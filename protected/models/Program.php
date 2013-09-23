@@ -47,7 +47,6 @@ class Program {
     private $controlUnit;
     //other
     private $currentMicroinstruction;
-    private $nextInstruction;
     public $executionPhase = false;
     private $log = [];
     //private $fetchFirst = false;
@@ -92,6 +91,53 @@ class Program {
     public function getLog() {
         if (isset($this->log))
             return $this->log;
+    }
+
+    public function resetFlags() {
+        $this->flags['Z'] = false;
+        $this->flags['N'] = false;
+        $this->flags['E'] = false;
+        $this->flags['L'] = false;
+        $this->flags['G'] = false;
+        $this->flags['R'] = true;
+    }
+
+    public function resetLog() {
+        $this->log = [];
+    }
+
+    public function resetPC() {
+        $this->PC = new Register(new BinaryString(32, 0));
+    }
+
+    /**
+     * Resets all registers to zero. 
+     */
+    public function resetRegisters() {
+        $this->PC = new Register(new BinaryString(32, 0));
+        $this->R0 = new Register(new BinaryString(32, 0));
+        $this->R1 = new Register(new BinaryString(32, 0));
+        $this->R2 = new Register(new BinaryString(32, 0));
+        $this->R3 = new Register(new BinaryString(32, 0));
+        $this->R4 = new Register(new BinaryString(32, 0));
+        $this->AR1 = new Register(new BinaryString(32, 0));
+        $this->AR2 = new Register(new BinaryString(32, 0));
+        $this->MDR = new Register(new BinaryString(32, 0));
+        $this->MAR = new Register(new BinaryString(32, 0));
+        $this->IR = new Register(new BinaryString(32, 0));
+    }
+
+    public function resetAuxiliaryVariables() {
+
+        unset($this->currentMicroinstruction);
+        $this->_currentMicroprogram = null;
+        $this->_currentMicroprogramIndex = 0;
+
+        $this->_currentMicroProgramType = [
+            'fetch' => false,
+            'regular' => false,
+            'increment' => true
+        ];
     }
 
     public function run() {
@@ -188,36 +234,6 @@ class Program {
         $this->mainMemory->append($bs);
     }
 
-    public function resetFlags() {
-        $this->flags['Z'] = false;
-        $this->flags['N'] = false;
-        $this->flags['E'] = false;
-        $this->flags['L'] = false;
-        $this->flags['G'] = false;
-        $this->flags['R'] = true;
-    }
-
-    public function resetPC() {
-        $this->PC = new Register(new BinaryString(32, 0));
-    }
-
-    /**
-     * Resets all registers to zero. 
-     */
-    public function resetRegisters() {
-        $this->PC = new Register(new BinaryString(32, 0));
-        $this->R0 = new Register(new BinaryString(32, 0));
-        $this->R1 = new Register(new BinaryString(32, 0));
-        $this->R2 = new Register(new BinaryString(32, 0));
-        $this->R3 = new Register(new BinaryString(32, 0));
-        $this->R4 = new Register(new BinaryString(32, 0));
-        $this->AR1 = new Register(new BinaryString(32, 0));
-        $this->AR2 = new Register(new BinaryString(32, 0));
-        $this->MDR = new Register(new BinaryString(32, 0));
-        $this->MAR = new Register(new BinaryString(32, 0));
-        $this->IR = new Register(new BinaryString(32, 0));
-    }
-
     public function addToLog(Microinstruction $micro) {
         $this->log[] = $micro;
     }
@@ -257,6 +273,7 @@ class Program {
     }
 
     public function runNextInstruction() {
+
         $this->fetch();
 
         $nextInstruction = $this->IR->getContent();

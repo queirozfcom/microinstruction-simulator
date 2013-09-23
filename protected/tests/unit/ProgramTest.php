@@ -72,8 +72,6 @@ class ProgramTest extends CDbTestCase {
         
     }
 
-    
-    
     public function test_simplest_mov() {
         //mov(50,r0)
         $p = new Program;
@@ -379,33 +377,6 @@ class ProgramTest extends CDbTestCase {
         $this->assertEquals(50, $p->AR2->asInt());
     }
 
-//    public function testMovRegToMar() {
-//        //mov(50,r4)
-//        //mov(r4,mar)
-//
-//        $p = new Program;
-//
-//        $lines = Factory::returnInstructionAndPossibleConstants(new VOInstruction('mov', 'constant', false, 50, 'r4', false, null));
-//
-//        foreach ($lines as $line) {
-//            $p->appendToMemory($line);
-//        }
-//
-//        $lines = Factory::returnInstructionAndPossibleConstants(new VOInstruction('mov', 'r4', false, null, 'mar', false, null));
-//
-//        foreach ($lines as $line) {
-//            $p->appendToMemory($line);
-//        }
-//
-//        $p->runNextInstruction();
-//        $p->runNextInstruction();
-//
-//        $this->assertEquals(50, $p->R4->asInt());
-//
-//        $this->assertEquals(50, $p->MAR->asInt());
-//    }
-//
-//    
     public function testAddRegistersOnDifferentSide() {
         //mov(80,r0)
         //mov(180,r3)
@@ -1000,68 +971,6 @@ class ProgramTest extends CDbTestCase {
         $this->assertEquals(35, $p->mainMemory[756]->asInt());
     }
 
-//    public function testMulSimple() {
-//        //MOV(R1,15)    
-//        //MOV(R3,5)    
-//        //MUL(R1,R3)
-//        //R1 deve ter 75    
-//
-//        $p = new Program;
-//
-//        $lines = Factory::returnInstructionAndPossibleConstants(new VOInstruction('mov', 'r1', false, null, 'constant', false, 15));
-//
-//        foreach ($lines as $line) {
-//            $p->appendToMemory($line);
-//        }
-//        $lines = Factory::returnInstructionAndPossibleConstants(new VOInstruction('mov', 'r3', false, null, 'constant', false, 5));
-//
-//        foreach ($lines as $line) {
-//            $p->appendToMemory($line);
-//        }
-//        $lines = Factory::returnInstructionAndPossibleConstants(new VOInstruction('mul', 'r1', false, null, 'r3', false, null));
-//
-//        foreach ($lines as $line) {
-//            $p->appendToMemory($line);
-//        }
-//
-//        $p->runNextInstruction();
-//        $p->runNextInstruction();
-//        $p->runNextInstruction();
-//
-//        $this->assertEquals(75, $p->R1->asInt());
-//    }
-//
-//    public function testMulComplex() {
-//        //MOV([50],100)   
-//        //MOV([51],35)    
-//        //MUL([50],[51])
-//        //[50] deve ter 3500    
-//
-//        $p = new Program;
-//
-//        $lines = Factory::returnInstructionAndPossibleConstants(new VOInstruction('mov', 'constant', true, 50, 'constant', false, 100));
-//
-//        foreach ($lines as $line) {
-//            $p->appendToMemory($line);
-//        }
-//        $lines = Factory::returnInstructionAndPossibleConstants(new VOInstruction('mov', 'constant', true, 51, 'constant', false, 35));
-//
-//        foreach ($lines as $line) {
-//            $p->appendToMemory($line);
-//        }
-//        $lines = Factory::returnInstructionAndPossibleConstants(new VOInstruction('mul', 'constant', true, 50, 'constant', true, 51));
-//
-//        foreach ($lines as $line) {
-//            $p->appendToMemory($line);
-//        }
-//
-//        $p->runNextInstruction();
-//        $p->runNextInstruction();
-//        $p->runNextInstruction();
-//
-//        $this->assertEquals(3500, $p->mainMemory[50]->asInt());
-//    }
-//
 //    public function testAndSimple() {
 //        //mov(r3,3)
 //        //mov(r1,17)
@@ -1417,65 +1326,6 @@ class ProgramTest extends CDbTestCase {
         $this->assertEquals(0, $p->R4->asInt());
     }
 
-    //mov([10],#3)
-    //shr([10]) ->devemos ver 1 no [10]
-//        $p = new Program;
-//
-//        $lines = Factory::returnInstructionAndPossibleConstants(new VOInstruction('mov', 'constant', true, 10, 'constant', false, 3));
-//
-//        $this->assertEquals(3, count($lines));
-//
-//        foreach ($lines as $line) {
-//            $p->appendToMemory($line);
-//        }
-//        $lines = Factory::returnInstructionAndPossibleConstants(new VOInstruction('shr', 'constant', true, 10, null, false, null));
-//
-//        $this->assertEquals(2, count($lines));
-//
-//        foreach ($lines as $line) {
-//            $p->appendToMemory($line);
-//        }
-//
-//        $p->runNextInstruction();
-//
-//        $this->assertEquals(3, $p->mainMemory[10]->asInt());
-//
-//        $p->runNextInstruction();
-//
-//        $this->assertEquals(1, $p->mainMemory[10]->asInt());
-//
-//
-//        //mov(r3,90)
-//        //mov([r3],45)
-//        //shr([r3]) ->there should be 22 at [90]
-//        $p = new Program;
-//
-//        $lines = Factory::returnInstructionAndPossibleConstants(new VOInstruction('mov', 'r3', false, null, 'constant', false, 90));
-//
-//        foreach ($lines as $line) {
-//            $p->appendToMemory($line);
-//        }
-//
-//        $lines = Factory::returnInstructionAndPossibleConstants(new VOInstruction('mov', 'r3', true, null, 'constant', false, 45));
-//
-//        foreach ($lines as $line) {
-//            $p->appendToMemory($line);
-//        }
-//
-//        $lines = Factory::returnInstructionAndPossibleConstants(new VOInstruction('shr', 'r3', true, null, null, false, null));
-//
-//        foreach ($lines as $line) {
-//            $p->appendToMemory($line);
-//        }
-//
-//
-//        $p->runNextInstruction();
-//        $p->runNextInstruction();
-//        $p->runNextInstruction();
-//
-//        $this->assertEquals(22, $p->mainMemory[90]->asInt());
-//    }
-//
     public function testSHL() {
         //mov(90r3,)
         //mov(45[r3],)
@@ -1658,6 +1508,7 @@ class ProgramTest extends CDbTestCase {
         $this->assertEquals(0, $p->mainMemory[40]->asInt());
         $this->assertEquals(50, $p->R3->asInt());
     }
+    
 //
 //    public function testFlagNegativeGetsSet() {
 //        //mov(r3,2)
@@ -1741,6 +1592,57 @@ class ProgramTest extends CDbTestCase {
         $this->assertEquals(50, $p->R0->asInt());
         
     }
+    
+    public function testExampleOneFullRun(){
+    //    mov(0,R0)
+    //    mov(50,R1)
+    //    mov(0,R2)
+    //    add(R1,R2)
+    //    sub(1,R0) ;decrementa o contador
+    //    cmp(5,R0) ;R0 - 5
+    //    brz(1) 	;se a conta anterior deu zero, pula a próxima instrução
+    //    brn(-7) ;se a conta anterior deu negativo, volta 5 instruções 
+        $p = new Program;
+
+        foreach (Factory::returnInstructionAndPossibleConstants(new VOInstruction('mov', 'constant', false, 0, 'r0', false, null)) as $line) {
+            $p->appendToMemory($line);
+        }
+        foreach (Factory::returnInstructionAndPossibleConstants(new VOInstruction('mov', 'constant', false, 50, 'r1', false, null)) as $line) {
+            $p->appendToMemory($line);
+        }
+        foreach (Factory::returnInstructionAndPossibleConstants(new VOInstruction('mov', 'constant', false, 0, 'r2', false, null)) as $line) {
+            $p->appendToMemory($line);
+        }
+        foreach (Factory::returnInstructionAndPossibleConstants(new VOInstruction('add', 'r1', false, null, 'r2', false, null)) as $line) {
+            $p->appendToMemory($line);
+        }
+        foreach (Factory::returnInstructionAndPossibleConstants(new VOInstruction('add', 'constant', false, 1, 'r0', false, null)) as $line) {
+            $p->appendToMemory($line);
+        }
+        foreach (Factory::returnInstructionAndPossibleConstants(new VOInstruction('cmp', 'constant', false, 5, 'r0', false, null)) as $line) {
+            $p->appendToMemory($line);
+        }
+        foreach (Factory::returnInstructionAndPossibleConstants(new VOInstruction('brz', 'constant', false, 1, null, false, null)) as $line) {
+            $p->appendToMemory($line);
+        }
+        foreach (Factory::returnInstructionAndPossibleConstants(new VOInstruction('brn', 'constant', false, -7, null, false, null)) as $line) {
+            $p->appendToMemory($line);
+        }
+        
+        
+        $p->run();
+        
+        $this->assertEquals(250, $p->R2->asInt());
+        $this->assertEquals(5, $p->R0->asInt());
+        $this->assertEquals(50, $p->R1->asInt());
+        
+    }
+    
+    
+    
+
+    
+    
 }
 
 ?>

@@ -25,9 +25,6 @@ class SiteController extends Controller {
      * when an action is not explicitly requested by users.
      */
     public function actionIndex() {
-        // renders the view file 'protected/views/site/index.php'
-        // using the default layout 'protected/views/layouts/main.php'
-
         $prog = $this->getProgramInstance();
 
         $this->setProgramInstance($prog);
@@ -52,6 +49,7 @@ class SiteController extends Controller {
         if (is_null(Yii::app()->user->getState('program'))) {
             $this->redirect(['write']);
         }
+        
         $prog = $this->getProgramInstance();
 
         $dp = new CArrayDataProvider($prog->mainMemory->memoryArea, [
@@ -108,8 +106,12 @@ class SiteController extends Controller {
     public function actionReset() {
         if (Yii::app()->request->isPostRequest) {
             $prog = $this->getProgramInstance();
+            
             $prog->resetRegisters();
             $prog->resetFlags();
+            $prog->resetLog();
+            $prog->resetAuxiliaryVariables();
+            
             $this->setProgramInstance($prog);
             $this->dumpInfoAsJson($prog);
         }

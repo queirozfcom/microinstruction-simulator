@@ -134,10 +134,6 @@ class Instruction extends BinaryString {
             return false;
     }
 
-    private function requiresTwoArguments() {
-        return !$this->requiresOnlyOneArgument();
-    }
-
     public function hasIndirection() {
         return $this->indirection1 || $this->indirection2;
     }
@@ -182,6 +178,10 @@ class Instruction extends BinaryString {
             return true;
         else
             return false;
+    }
+    
+    private function requiresTwoArguments() {
+        return !$this->requiresOnlyOneArgument();
     }
 
     private function setBranchOffset($offset) {

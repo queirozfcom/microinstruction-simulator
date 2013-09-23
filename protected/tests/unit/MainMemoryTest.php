@@ -1,5 +1,6 @@
 <?php
-require_once '../../models/Program.php';
+
+require_once '/var/www/micro/protected/models/Program.php';
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
