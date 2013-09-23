@@ -14,7 +14,7 @@ class Decoder {
      * 
      * @param Array an optional array of flags. Some instructions need flags 
      * 
-     * @return array A Microinstruction array, i.e. a microProgram
+     * @return Microinstruction[] , i.e. a microProgram
      */
     public function decode($instruction) {
         $returnMicroprogram = [];

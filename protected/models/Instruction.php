@@ -25,7 +25,8 @@ class Instruction extends BinaryString {
         'BRE',
         'BRL',
         'BRG',
-        'RJMP'];
+        'RJMP'
+    ];
     protected $length = 32;
     protected $string;
     //switch to private upon end of testing
@@ -73,7 +74,7 @@ class Instruction extends BinaryString {
             //branch-type instructions
             //normal usage
             $this->setIntegerValue(0);
-            
+
             $this->setMnemonic(func_get_arg(0));
             $this->setParam1('constant');
             $this->setBranchOffset(func_get_arg(1));
@@ -142,7 +143,7 @@ class Instruction extends BinaryString {
     }
 
     public function isBranch() {
-        if ($this->mnemonic === 'BRZ' || $this->mnemonic === 'BRN' || $this->mnemonic === 'BRE' || $this->mnemonic === 'BRL' || $this->mnemonic === 'BRG' || $this->mnemonic ==='RJMP')
+        if ($this->mnemonic === 'BRZ' || $this->mnemonic === 'BRN' || $this->mnemonic === 'BRE' || $this->mnemonic === 'BRL' || $this->mnemonic === 'BRG' || $this->mnemonic === 'RJMP')
             return true;
         else
             return false;

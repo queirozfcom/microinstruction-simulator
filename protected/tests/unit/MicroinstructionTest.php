@@ -26,7 +26,6 @@ class MicroinstructionTest extends CDbTestCase {
         $mi = new Microinstruction;
         $mi->setMuxAndALUValueForMOVFromSourceRegister('MDR');
 
-
         $this->assertEquals(1, $mi[0]);
         $this->assertEquals(1, $mi[12]);
         $this->assertEquals(0, $mi[13]);

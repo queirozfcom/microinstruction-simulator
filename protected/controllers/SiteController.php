@@ -30,7 +30,6 @@ class SiteController extends Controller {
 
         $prog = $this->getProgramInstance();
 
-
         $this->setProgramInstance($prog);
 
         $this->render('index', []);
@@ -109,7 +108,8 @@ class SiteController extends Controller {
     public function actionReset() {
         if (Yii::app()->request->isPostRequest) {
             $prog = $this->getProgramInstance();
-            $prog->reset();
+            $prog->resetRegisters();
+            $prog->resetFlags();
             $this->setProgramInstance($prog);
             $this->dumpInfoAsJson($prog);
         }
@@ -179,7 +179,10 @@ class SiteController extends Controller {
             'model' => $model
         ]);
     }
-
+    /**
+     * 
+     * @return Program
+     */
     private function getProgramInstance() {
 
         if (is_null(Yii::app()->user->getState('program')))

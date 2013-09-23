@@ -68,6 +68,32 @@ class Program {
         'increment' => true
     ];
 
+    public function __get($a) {
+        return $this->$a;
+    }
+
+    public function __construct() {
+        $this->ALU = new ALU();
+        $this->mainMemory = new MainMemory();
+        $this->controlUnit = new ControlUnit();
+        $this->R0 = new Register(new BinaryString(32, 0));
+        $this->R1 = new Register(new BinaryString(32, 0));
+        $this->R2 = new Register(new BinaryString(32, 0));
+        $this->R3 = new Register(new BinaryString(32, 0));
+        $this->R4 = new Register(new BinaryString(32, 0));
+        $this->AR1 = new Register(new BinaryString(32, 0));
+        $this->AR2 = new Register(new BinaryString(32, 0));
+        $this->PC = new Register(new BinaryString(32, 0));
+        $this->IR = new Register(new BinaryString(32, 0));
+        $this->MDR = new Register(new BinaryString(32, 0));
+        $this->MAR = new Register(new BinaryString(32, 0));
+    }
+
+    public function getLog() {
+        if (isset($this->log))
+            return $this->log;
+    }
+
     public function run() {
         while (true) {
             try {
@@ -162,28 +188,24 @@ class Program {
         $this->mainMemory->append($bs);
     }
 
-    public function reset() {
+    public function resetFlags() {
+        $this->flags['Z'] = false;
+        $this->flags['N'] = false;
+        $this->flags['E'] = false;
+        $this->flags['L'] = false;
+        $this->flags['G'] = false;
+        $this->flags['R'] = true;
+    }
+
+    public function resetPC() {
         $this->PC = new Register(new BinaryString(32, 0));
-        $this->log = [];
     }
 
-    public function addToLog(Microinstruction $micro) {
-        $this->log[] = $micro;
-    }
-
-    public function __get($a) {
-        return $this->$a;
-    }
-
-    public function getLog() {
-        if (isset($this->log))
-            return $this->log;
-    }
-
-    public function __construct() {
-        $this->ALU = new ALU();
-        $this->mainMemory = new MainMemory();
-        $this->controlUnit = new ControlUnit();
+    /**
+     * Resets all registers to zero. 
+     */
+    public function resetRegisters() {
+        $this->PC = new Register(new BinaryString(32, 0));
         $this->R0 = new Register(new BinaryString(32, 0));
         $this->R1 = new Register(new BinaryString(32, 0));
         $this->R2 = new Register(new BinaryString(32, 0));
@@ -191,10 +213,13 @@ class Program {
         $this->R4 = new Register(new BinaryString(32, 0));
         $this->AR1 = new Register(new BinaryString(32, 0));
         $this->AR2 = new Register(new BinaryString(32, 0));
-        $this->PC = new Register(new BinaryString(32, 0));
-        $this->IR = new Register(new BinaryString(32, 0));
         $this->MDR = new Register(new BinaryString(32, 0));
         $this->MAR = new Register(new BinaryString(32, 0));
+        $this->IR = new Register(new BinaryString(32, 0));
+    }
+
+    public function addToLog(Microinstruction $micro) {
+        $this->log[] = $micro;
     }
 
     /**
@@ -217,16 +242,16 @@ class Program {
         $output["MDR"] = $this->MDR;
         $output["MAR"] = $this->MAR;
         $output["IR"] = $this->IR;
-        
-        $output["Z"] = ($this->flags['Z'])? '1' : '0';
-        $output["N"] = ($this->flags['N'])? '1' : '0';
-        $output["E"] = ($this->flags['E'])? '1' : '0';
-        $output["L"] = ($this->flags['L'])? '1' : '0';
-        $output["G"] = ($this->flags['G'])? '1' : '0';
-        
+
+        $output["Z"] = ($this->flags['Z']) ? '1' : '0';
+        $output["N"] = ($this->flags['N']) ? '1' : '0';
+        $output["E"] = ($this->flags['E']) ? '1' : '0';
+        $output["L"] = ($this->flags['L']) ? '1' : '0';
+        $output["G"] = ($this->flags['G']) ? '1' : '0';
+
         $output['log'] = array_map(function($e) {
-                    return ($e->__toString());
-                }, $this->log);
+            return ($e->__toString());
+        }, $this->log);
 
         return $output;
     }
@@ -521,15 +546,6 @@ class Program {
             $this->flags['G'] = true;
         else
             throw new ProgramException('Something is wrong: the number "' . $result->asInt() . '" looks like it\'s not an Integer. What is it, then?');
-    }
-
-    private function resetFlags() {
-        $this->flags['Z'] = false;
-        $this->flags['N'] = false;
-        $this->flags['E'] = false;
-        $this->flags['L'] = false;
-        $this->flags['G'] = false;
-        $this->flags['R'] = true;
     }
 
 }

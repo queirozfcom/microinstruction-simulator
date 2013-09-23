@@ -52,13 +52,13 @@ Yii::app()->getClientScript()->registerCssFile(Yii::app()->baseUrl . '/css/app/e
 
                         <?php
                         $this->widget('bootstrap.widgets.BootButton', array(
-                            'label' => 'reset PC',
+                            'label' => 'Reset PC and Other Registers',
                             'htmlOptions' => array(
                                 'id' => 'reset-button',
                                 'class' => 'span12',
                                 'targeturl' => $this->createUrl('site/reset'),
                                 'rel' => 'tooltip',
-                                'data-title' => 'Reset PC (Program Counter) but keep Memory and Register Contents intact.'
+                                'data-title' => 'Reset PC (Program Counter) and Other Registers but Keep Memory Contents Intact'
                             ),
                             'type' => 'danger', // '', 'primary', 'info', 'success', 'warning', 'danger' or 'inverse'
                             'size' => 'normal', // '', 'large', 'small' or 'mini'
@@ -69,13 +69,13 @@ Yii::app()->getClientScript()->registerCssFile(Yii::app()->baseUrl . '/css/app/e
                     <div class="controls controls-row">
                         <?php
                         $this->widget('bootstrap.widgets.BootButton', array(
-                            'label' => 'run next microinstruction',
+                            'label' => 'Run Next Microinstruction',
                             'htmlOptions' => array(
                                 'class' => 'span4',
                                 'id' => 'run-next-microinstruction-button',
                                 'targeturl' => $this->createUrl('site/run_next_microinstruction'),
                                 'rel' => 'tooltip',
-                                'data-title' => 'Run the next microinstruction.'
+                                'data-title' => 'Run the Next Microinstruction.'
                             ),
                             'type' => 'warning', // '', 'primary', 'info', 'success', 'warning', 'danger' or 'inverse'
                             'size' => 'normal', // '', 'large', 'small' or 'mini'
@@ -83,13 +83,13 @@ Yii::app()->getClientScript()->registerCssFile(Yii::app()->baseUrl . '/css/app/e
                         ?>
                         <?php
                         $this->widget('bootstrap.widgets.BootButton', array(
-                            'label' => 'run next instruction',
+                            'label' => 'Run Next Instruction',
                             'htmlOptions' => array(
                                 'class' => 'span4',
                                 'id' => 'run-next-instruction-button',
                                 'targeturl' => $this->createUrl('site/run_next_instruction'),
                                 'rel' => 'tooltip',
-                                'data-title' => 'Fetch the next Instruction from Memory and run it.'
+                                'data-title' => 'Fetch the Next Instruction from Memory and Run it.'
                             ),
                             'type' => 'inverse', // '', 'primary', 'info', 'success', 'warning', 'danger' or 'inverse'
                             'size' => 'normal', // '', 'large', 'small' or 'mini'
@@ -98,13 +98,13 @@ Yii::app()->getClientScript()->registerCssFile(Yii::app()->baseUrl . '/css/app/e
 
                         <?php
                         $this->widget('bootstrap.widgets.BootButton', array(
-                            'label' => 'run program',
+                            'label' => 'Run Program',
                             'htmlOptions' => array(
                                 'class' => 'span4',
                                 'id' => 'run-everything-button',
                                 'targeturl' => $this->createUrl('site/run_everything'),
                                 'rel' => 'tooltip',
-                                'data-title' => 'Run the whole thing. Program stops automatically when the PC reaches the last valid Memory line.'
+                                'data-title' => 'Run the Whole Program. Program stops Automatically When the PC Reaches the Last Valid Memory line.'
                             ),
                             'type' => 'success', // '', 'primary', 'info', 'success', 'warning', 'danger' or 'inverse'
                             'size' => 'medium', // '', 'large', 'small' or 'mini'

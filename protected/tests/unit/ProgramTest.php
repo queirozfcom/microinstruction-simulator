@@ -16,12 +16,12 @@ class ProgramTest extends CDbTestCase {
         $p = new Program;
     }
 
-    public function test_reset() {
+    public function test_reset_pc() {
         $p = new Program;
-        $p->reset();
+        $p->resetPC();
         $this->assertEquals(0, $p->PC->asInt());
     }
-
+    
     public function testMovRegToReg() {
         //mov(4,r0)
         //mov(r0,r3) //4 in r3
@@ -39,7 +39,41 @@ class ProgramTest extends CDbTestCase {
 
         $this->assertEquals(4, $p->R3->asInt());
     }
+    
+    public function testMovRegToRegAndReset() {
+        //mov(4,r0)
+        //mov(r0,r3) //4 in r3
 
+        $p = new Program;
+
+        foreach ($lines = Factory::returnInstructionAndPossibleConstants(new VOInstruction('mov', 'constant', false, 4, 'r0', false, null)) as $line) {
+            $p->appendToMemory($line);
+        }
+        foreach ($lines = Factory::returnInstructionAndPossibleConstants(new VOInstruction('mov', 'r0', false, null, 'r3', false, null)) as $line) {
+            $p->appendToMemory($line);
+        }
+
+        $p->run();
+
+        $this->assertEquals(4, $p->R3->asInt());
+        
+        $p->resetRegisters();
+        
+        $this->assertEquals(0, $p->PC->asInt());
+        $this->assertEquals(0, $p->R0->asInt());
+        $this->assertEquals(0, $p->R1->asInt());
+        $this->assertEquals(0, $p->R2->asInt());
+        $this->assertEquals(0, $p->R3->asInt());
+        $this->assertEquals(0, $p->R4->asInt());
+        $this->assertEquals(0, $p->AR1->asInt());
+        $this->assertEquals(0, $p->AR2->asInt());
+        $this->assertEquals(0, $p->MDR->asInt());
+        $this->assertEquals(0, $p->MAR->asInt());
+        
+    }
+
+    
+    
     public function test_simplest_mov() {
         //mov(50,r0)
         $p = new Program;
