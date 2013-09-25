@@ -1,5 +1,9 @@
-microinstruction-simulator
+Microinstruction Simulator
 ==========================
-microinstructor simulator, breaks down execution ofo assembler code in its basic microinstruction components.
+Microinstructor simulator; breaks down execution of assembler code in its basic microinstruction components.
 
-live working version at micro.queirozf.com
+Live working version at http://micro.queirozf.com
+
+====
+
+Created using Yii Framework.
