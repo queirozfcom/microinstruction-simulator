@@ -67,7 +67,7 @@ Yii::app()->getClientScript()->registerScriptFile(Yii::app()->baseUrl . '/js/sit
                                 echo $form->checkBox($model, 'source_param_indirection', [
                                     'class' => 'param-indirection',
                                     'rel' => 'tooltip',
-                                    'title' => 'check this box to use this register/constant indirectly']);
+                                    'title' => 'Check this Box to Use this Register/Constant Indirectly']);
                                 ?>
                             </div>
                             <div class="span8">
@@ -101,7 +101,7 @@ Yii::app()->getClientScript()->registerScriptFile(Yii::app()->baseUrl . '/js/sit
                                 echo $form->checkBox($model, 'target_param_indirection', [
                                     'class' => 'param-indirection',
                                     'rel' => 'tooltip',
-                                    'title' => 'check this box to use this register/constant indirectly']);
+                                    'title' => 'Check this Box to Use this Register/Constant Indirectly']);
                                 ?>
 
                             </div>
@@ -131,9 +131,11 @@ Yii::app()->getClientScript()->registerScriptFile(Yii::app()->baseUrl . '/js/sit
                     <br />
                     <div class="controls controls-row">
                         <?php
-                        echo CHtml::submitButton('add instruction', [
-                            'class' => 'btn btn-primary span6 offset3',
-                            'id' => 'add-instruction-button'
+                        echo CHtml::submitButton('Append Instruction to Memory', [
+                            'class' => 'btn btn-primary span8 offset3',
+                            'id' => 'add-instruction-button',
+                            'rel'=>"tooltip",
+                            'title'=>'Append this Assembler Instruction to Memory. Note that one Assembler Instruction may not Amount to Exactly one Line in Memory Because some Instructions have CONSTANT Operands, which take a Whole Memory Line by Themselves'
                         ]);
                         ?>
                     </div>
@@ -174,11 +176,11 @@ Yii::app()->getClientScript()->registerScriptFile(Yii::app()->baseUrl . '/js/sit
                     <div class="span4 offset1">
 
                         <?php
-                        echo Chtml::htmlButton('erase contents', [
+                        echo Chtml::htmlButton('Erase Contents', [
                             'class' => 'btn btn-danger span12',
                             'onclick' => 'window.location.href="' . Yii::app()->createUrl('site/erase_memory') . '";',
                             'rel' => 'tooltip',
-                            'title' => "Erase all memory contents and start anew."
+                            'title' => "Erase all Memory Contents. Use this if you Want to Write Another Program."
                         ])
                         ?>
                     </div>
@@ -186,9 +188,10 @@ Yii::app()->getClientScript()->registerScriptFile(Yii::app()->baseUrl . '/js/sit
                     <div class="span6">
 
                         <?php
-                        echo Chtml::htmlButton('run', [
+                        echo Chtml::link('Proceed on to Execution',Yii::app()->createUrl('site/execute'), [
                             'class' => 'btn btn-primary span12',
-                            'onclick' => 'window.location.href="' . Yii::app()->createUrl('site/execute') . '";'
+                            'rel'=>'tooltip',
+                            'title'=>'Display the Execution Screen, where you can Execute your Program',
                         ])
                         ?>
                     </div>

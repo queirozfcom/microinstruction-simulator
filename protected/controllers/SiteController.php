@@ -181,6 +181,12 @@ class SiteController extends Controller {
             'model' => $model
         ]);
     }
+    
+    public function actionDocPT(){
+            header('Content-type: application/pdf');
+            readfile(dirname(__FILE__).'/../files/apresentacao.pdf');
+    }
+    
     /**
      * 
      * @return Program
@@ -198,5 +204,5 @@ class SiteController extends Controller {
     private function setProgramInstance(Program $prog) {
         Yii::app()->user->setState('program', $prog);
     }
-
+    
 }

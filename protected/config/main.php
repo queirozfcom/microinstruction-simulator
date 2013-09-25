@@ -55,6 +55,7 @@ return array(
             'urlFormat' => 'path',
             'showScriptName' => false,
 			'rules'=>array(
+                                'docPT'=>'site/docPT',
                                 '/<controller>'=>'/site/<controller>',
 				'<controller:\w+>/<id:\d+>'=>'<controller>/view',
 				'<controller:\w+>/<action:\w+>/<id:\d+>'=>'<controller>/<action>',
